@@ -1,0 +1,24 @@
+- rule_0:
+    rule: 90
+    neighborhood_size: 3
+    colors: 2
+
+- rule_1:
+    rule: 93254582498332408388995153046981554390801802940703147376395510193
+    neighborhood_size: 3
+    colors: 6
+
+- rule_2:
+    rule: 48354922929907675060435940371516397543831748634202646437895862574
+    neighborhood_size: 3
+    colors: 6
+
+- rule_3:
+    rule: 18415121
+    neighborhood_size: 3
+    colors: 3
+
+- rule_4:
+    rule: 3666074716
+    neighborhood_size: 5
+    colors: 2

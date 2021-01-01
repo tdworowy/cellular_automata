@@ -1,0 +1,18 @@
+<html>
+  <head>
+    <script src="twoD.js"></script>
+  </head>
+<body>
+    <form onsubmit="generateInitGrid()", id='initGrid', method="GET">
+        <label for="width">Width:</label><br>
+        <input type="text" id="width" name="width"><br>
+        <label for="height">Height:</label><br>
+        <input type="text" id="height" name="height"><br>
+        <label for="one_prob">Probability of one(colored state):</label><br>
+        <input type="text" id="one_prob" name="one_prob"><br>
+        <input type="submit" value="Generate init grid">
+    </form>
+    <textarea id="debug" name="debug" rows="10" cols="50">
+    </textarea>
+</body>
+</html>
