@@ -4,10 +4,29 @@ const generateInitGrid = async () => {
     var url = new URL('http://localhost:5000/grid/2d/random')
     
     url.search = new URLSearchParams(params).toString()
-    //var response = await fetch(url)
-    //var grid = await response.json()
-    fetch(url) //fetch works (request is handler by api correctly)
-    .then((resp) =>console.log("DEBUG"))// that never happens
-    .then((resp) =>document.getElementById('debag').value = resp.json())
-    //document.getElementById('debag').value = grid;
+    console.log(`url: ${url}`)
+    try {
+      var response = await fetch(url,
+        {method: "GET",
+        //  headers:{
+        //    "Accept": "*/*",
+        //    "Accept-Encoding": "gzip, deflate, br",
+        //    "Connection": "keep-alive",
+        //    "Cache-Control":"no-cache",
+        //    "Host":"localhost:5000",
+        //    "Origin":"localhost:5000"
+        //  }
+      })
+      console.log(`response: ${response}`)
+      var grid = await response.json()
+      console.log(`grid: ${grid}`)
+      document.getElementById('debag').value = grid
+
+    }
+    catch (e) {
+      console.log(e.message)
   }
+    
+  }
+
+// works fine from swagger, postman and just as url in browser, but not from fucking javascript 

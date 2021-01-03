@@ -1,4 +1,6 @@
-from flask import Flask, request, make_response, send_from_directory, current_app, send_file
+import json
+
+from flask import Flask, request, make_response, send_from_directory, current_app, send_file, jsonify
 from flask_restx import Api, fields, Resource
 
 from _1D.cellular_automata import generate_random, generate_rule, cellular_automata_step_1d
@@ -13,9 +15,9 @@ api.init_app(app)
 @app.after_request
 def after_request(response):
     response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+   # response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Headers', '*')
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
-    print(response)
     return response
 
 
@@ -30,8 +32,8 @@ class Grid2dRandom(Resource):
         grid = generate_grid_random_cells(width=int(width),
                                           height=int(height),
                                           probability_of_one=float(probability_of_one))
-        response = {'grid': grid}
-        return response, 200
+        response = jsonify({'grid': grid})
+        return response
 
 
 @api.route('/grid/2d/center')
@@ -45,8 +47,8 @@ class Grid2dCenter(Resource):
         grid = generate_grid_central(width=int(width),
                                      height=int(height),
                                      cell_count=int(cell_count))
-        response = {'grid': grid}
-        return response, 200
+        response = jsonify({'grid': grid})
+        return response
 
 
 step_fields_2d = api.model('Cellular_Automata_2_D', {
@@ -67,8 +69,8 @@ class CellularAutomata2DStep(Resource):
         grid = RoundList([RoundList([value for value in row]) for row in grid])
         new_grid = update_grid_one_d(grid, rules[rule])
 
-        response = {'grid': new_grid}
-        return response, 200
+        response = jsonify({'grid': new_grid})
+        return response
 
 
 @api.route('/grid/1d/random')
@@ -81,8 +83,8 @@ class Grid1dRandom(Resource):
         grid = RoundList(generate_random(
             input_list=[i for i in range(int(colors_count))],
             length=int(width)))
-        response = {'grid': grid}
-        return response, 200
+        response = jsonify({'grid': grid})
+        return response
 
 
 step_fields_1d = api.model('Cellular_Automata_1_D', {
@@ -115,18 +117,18 @@ class CellularAutomata1DStep(Resource):
                               neighborhood_size=int(neighborhood_size),
                               colours=colours)
         new_grid = cellular_automata_step_1d(input_list=grid, rules=rules)
-        response = {'grid': new_grid}
-        return response, 200
+        response = jsonify({'grid': new_grid})
+        return response
 
 
 @api.route('/')
 class Default(Resource):
     @api.doc()
     def get(self):
-        response = {
+        response = jsonify({
             "Message": "API running"
-        }
-        return response, 200
+        })
+        return response
 
 
 if __name__ == '__main__':
