@@ -121,7 +121,7 @@ class CellularAutomata1DStep(Resource):
         return response
 
 
-@api.route('/')
+@api.route('/test')
 class Default(Resource):
     @api.doc()
     def get(self):

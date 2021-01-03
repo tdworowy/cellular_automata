@@ -1,9 +1,7 @@
-const generateInitGrid = async () => {
+const FetchTest = async () => {
  
-    var params = new FormData(document.querySelector('#initGrid'))
-    var url = new URL('http://localhost:5000/grid/2d/random')
-    url.search = new URLSearchParams(params).toString()
-
+    var url = new URL('http://localhost:5000/test')
+    
     console.log(`url: ${url}`)
     try {
       var response = await fetch(url,
@@ -17,11 +15,10 @@ const generateInitGrid = async () => {
         //    "Origin":"localhost:5000"
         //  }
       })
-      var response = await response.json()
-      var grid = JSON.stringify(response)
-      console.log(`grid: ${grid}`)
-      document.getElementById('debag').value = grid
-
+      console.log(`response: ${response}`)
+      var response_json = await response.json()
+      console.log(`response_json: ${JSON.stringify(response_json)}`)
+      
     }
     catch (e) {
       console.log(e)
@@ -30,4 +27,3 @@ const generateInitGrid = async () => {
     
   }
 
-// form is the root of problems
