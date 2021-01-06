@@ -1,7 +1,8 @@
 var formEl = document.getElementById('initGrid');
 var formE2 = document.getElementById('step');
 
-formEl.addEventListener('submit', function(event) {
+
+ function initGrid (event) {
   var headers = new Headers();
   headers.set('Accept', 'application/json');
 
@@ -26,7 +27,9 @@ formEl.addEventListener('submit', function(event) {
     });
 
   event.preventDefault();
-});
+}
+
+
 
 function step (event) {
   var headers = new Headers();
@@ -55,14 +58,16 @@ responsePromise
   generateGrid(jsonData.grid)
 });
 if(event) {
-event.preventDefault();
+  event.preventDefault();
 }
+return responsePromise
+
 }
 
-formE2.addEventListener('submit',step);
+const blue = "rgba("+0+","+0+","+255+","+255+")";
+const red = "rgba("+255+","+0+","+0+","+255+")";
 
 function generateGrid(grid){
-
 var canvas = document.getElementById("canvas");
 var context = canvas.getContext("2d");
 var prevGrid = JSON.parse(localStorage.getItem("prevGrid"));
@@ -70,15 +75,11 @@ if(prevGrid != grid) {
   for(var x=0; x<grid.length;x++) {
     for(var y=0; y<grid[x].length;y++) {
       if(grid[x][y] == 1) {
-        r = 255
-        g = 255
-        b = 255
+        var color = red
       } else {
-        r = 0
-        g = 0
-        b = 0
+        var color = blue
       }
-    context.fillStyle = "rgba("+r+","+g+","+b+","+255+")";
+    context.fillStyle = color
     context.fillRect( x, y, 1, 1 );
   }
   }
@@ -86,8 +87,16 @@ if(prevGrid != grid) {
 }    
 }
 
-function play(){
+async function play(){
+  var count = 1
   while(true) {
-    step()
+    await step()
+    console.log(`step ${count}`)
+    count ++
+    
   }
 }
+
+
+formEl.addEventListener('submit',initGrid);
+formE2.addEventListener('submit',step);

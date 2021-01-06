@@ -1,7 +1,7 @@
 import tkinter
 from doctest import master
 
-from _2D.general_2d_automata import update_grid_one_d, \
+from _2D.general_2d_automata import update_grid_two_d, \
     generate_snowflake_rule, generate_grid_central
 from _2D.general_visualization import CellularAutomata2DVisualization
 
@@ -41,7 +41,7 @@ class SnowflakeVisualization(CellularAutomata2DVisualization):
             y = 0
         self.prev_step = [[value for value in row] for row in self.grid]
         neighbours_number = [int(number) for number in self.neighbours_number.get().split(",")]
-        self.grid = update_grid_one_d(self.grid, rules=generate_snowflake_rule(neighbours_number))
+        self.grid = update_grid_two_d(self.grid, rules=generate_snowflake_rule(neighbours_number))
 
     def play_call_back(self):
         self.grid = generate_grid_central(self.width // self.cell_size,

@@ -1,10 +1,8 @@
-import json
-
-from flask import Flask, request, make_response, send_from_directory, current_app, send_file, jsonify
+from flask import Flask, request, jsonify
 from flask_restx import Api, fields, Resource
 
 from _1D.cellular_automata import generate_random, generate_rule, cellular_automata_step_1d
-from _2D.general_2d_automata import generate_grid_random_cells, generate_grid_central, update_grid_one_d, rules
+from _2D.general_2d_automata import generate_grid_random_cells, generate_grid_central, update_grid_two_d, rules
 from utils.utils import RoundList
 
 api = Api(title='Cellular automata', default="CellularAutomata")
@@ -67,7 +65,7 @@ class CellularAutomata2DStep(Resource):
         grid = values['grid']
         rule = values['rule']
         grid = RoundList([RoundList([value for value in row]) for row in grid])
-        new_grid = update_grid_one_d(grid, rules[rule])
+        new_grid = update_grid_two_d(grid, rules[rule])
 
         response = jsonify({'grid': new_grid})
         return response

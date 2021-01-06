@@ -138,7 +138,7 @@ def count_colored_neighbours(x: int, y: int, grid: RoundList):
     return colored_neighbours
 
 
-def update_grid_one_d(grid: RoundList, rules: defaultdict):
+def update_grid_two_d(grid: RoundList, rules: defaultdict):
     new_grid = RoundList([RoundList([value for value in row]) for row in grid])
     for i, row in enumerate(grid):
         for j, cell in enumerate(row):
@@ -152,4 +152,4 @@ if __name__ == "__main__":
     grid = generate_grid_random_cells(1000, 1000, 0.7)
     for i in range(100):
         print(i)
-        grid = update_grid_one_d(grid, game_of_live_rules)
+        grid = update_grid_two_d(grid, game_of_live_rules)
