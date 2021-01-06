@@ -1,7 +1,7 @@
 const FetchTest = async () => {
  
-    var url = new URL('http://localhost:5000/test')
-    
+    //var url = new URL('http://localhost:5000/test')
+    var url = "http://localhost:5000/grid/2d/random?width=10&height=10&one_prob=0.2"
     console.log(`url: ${url}`)
     try {
       var response = await fetch(url,

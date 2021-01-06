@@ -122,7 +122,7 @@ class CellularAutomata1DStep(Resource):
 
 
 @api.route('/test')
-class Default(Resource):
+class ApiTest(Resource):
     @api.doc()
     def get(self):
         response = jsonify({

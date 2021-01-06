@@ -1,18 +1,32 @@
 <html>
   <head>
-    <script src="twoD.js"></script>
   </head>
 <body>
-    <form onsubmit="generateInitGrid()" id='initGrid' method="GET">
-        <label for="width">Width:</label><br>
-        <input type="text" id="width" name="width"><br>
-        <label for="height">Height:</label><br>
-        <input type="text" id="height" name="height"><br>
-        <label for="one_prob">Probability of one(colored state):</label><br>
+    <form onsubmit="" id='initGrid'>
+        <label for="width">Width:</label>
+        <input type="text" id="width" name="width">
+        <label for="height">Height:</label>
+        <input type="text" id="height" name="height">
+        <label for="one_prob">Probability of one(colored state):</label>
         <input type="text" id="one_prob" name="one_prob"><br>
-        <input type="submit" value="Generate init grid">
+        <button type="submit">Generate init grid</button>
     </form>
-    <textarea id="debug" name="debug" rows="10" cols="50">
-    </textarea>
+    <form onsubmit="" id='step'>
+      <label for="rule">Rule:</label>
+      <select id="rule" name="rule">
+        <option value="game_of_life">game of life</option>
+        <option value="amoeba">amoeba</option>
+        <option value="twoXTwo">2X2</option>
+        <option value="threeFourLive">34 live</option>
+        <option value="coagulations">coagulations</option>
+        <option value="mazectric_rules">mazectric</option>
+        <option value="move">move</option>
+        <option value="walled_cities">walled cities</option>
+      </select>
+      <button type="submit">Next Step</button>
+  </form>
+  <button id=play onclick="play()" >Play</button> <br>
+  <canvas id="canvas" width="420px" height="420px" style="background: #fff; margin:10px"></canvas>
 </body>
+<script src="twoD.js"></script>
 </html>
