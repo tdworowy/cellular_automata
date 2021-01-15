@@ -1,3 +1,7 @@
 TODO:
  - flask api
  - web frontend
+ - unit tests
+ - improve performance (use numpy instead of lists )
+
+http://drsfenner.org/blog/2015/08/game-of-life-in-numpy-2/
