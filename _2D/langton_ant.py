@@ -1,19 +1,20 @@
 from utils.utils import RoundList
 from random import randint
+import numpy as np
 
 ant_symbols = [2]
 
 
-def if_zero(grid: list, x: int, y: int, turn: int) -> tuple:
-    grid = RoundList([RoundList([[value[0], value[1]] for value in row]) for row in grid])
-    grid[x][y] = [1, 0]
+def if_zero(grid: np.arange, x: int, y: int, turn: int) -> tuple:
+    grid = grid.copy()
+    grid[x][y] = {1: 0}
     turn = turn + 1
     return grid, turn
 
 
-def if_one(grid: list, x: int, y: int, turn: int) -> tuple:
-    grid = RoundList([RoundList([[value[0], value[1]] for value in row]) for row in grid])
-    grid[x][y] = [0, 0]
+def if_one(grid: np.arange, x: int, y: int, turn: int) -> tuple:
+    grid = grid.copy()
+    grid[x][y] = {0: 0}
     turn = turn - 1
     return grid, turn
 
@@ -25,32 +26,32 @@ rules = {
 
 
 def generate_grid(width: int, height: int, ant_count: int = 1, random_init_turn=False) -> tuple:
-    array = RoundList([RoundList([[0, 0] for _ in range(width)]) for _ in range(height)])
+    array = np.full((height, width), {0: 0})
     if ant_count == 1:
-        array[width // 2][height // 2] = [0, ant_symbols[0]]
+        array[width // 2][height // 2] = {0: ant_symbols[0]}
     else:
         for i in range(2, ant_count + 2):
-            x = randint(0, width)
-            y = randint(0, height)
+            x = randint(0, width - 1)
+            y = randint(0, height - 1)
             ant_symbols.append(i)
-            array[x][y] = [0, i]
+            array[x][y] = {0: i}
 
     turns = {ant_symbol: randint(1, 4) if random_init_turn else 1 for ant_symbol in ant_symbols}
     return array, turns
 
 
 def update_grid(grid: list, turns: dict, rules: dict = rules) -> tuple:
-    grid = RoundList([RoundList([[value[0], value[1]] for value in row]) for row in grid])
+    grid = grid.copy()
     positions = []
 
     for i, row in enumerate(grid):
         for j, value in enumerate(row):
-            if value[1] in ant_symbols:
-                positions.append((i, j, value[1]))
+            if list(value.values())[0] in ant_symbols:
+                positions.append((i, j, list(value.values())[0]))
 
     for position in positions:
         x, y, ant_symbol = position
-        grid, turn = rules[grid[x][y][0]](grid, x, y, turns[ant_symbol])
+        grid, turn = rules[list(grid[x][y].keys())[0]](grid, x, y, turns[ant_symbol])
 
         if turn == 5:
             turn = 1
@@ -58,15 +59,16 @@ def update_grid(grid: list, turns: dict, rules: dict = rules) -> tuple:
             turn = 4
 
         turns[ant_symbol] = turn
-
+        width = grid.shape[0]
+        height = grid.shape[1]
         if turn == 1:
-            grid[x + 1][y][1] = ant_symbol
+            grid[(x + 1) % width][y] = {list(grid[(x + 1) % width][y].keys())[0]: ant_symbol}
         if turn == 2:
-            grid[x][y - 1][1] = ant_symbol
+            grid[x][(y - 1) % height] = {list(grid[x][(y - 1) % height].keys())[0]: ant_symbol}
         if turn == 3:
-            grid[x - 1][y][1] = ant_symbol
+            grid[(x - 1) % width][y] = {list(grid[(x - 1) % width][y].keys())[0]: ant_symbol}
         if turn == 4:
-            grid[x][y + 1][1] = ant_symbol
+            grid[x][(y + 1) % height] = {list(grid[x][(y + 1) % height].keys())[0]: ant_symbol}
 
     return grid, turns
 

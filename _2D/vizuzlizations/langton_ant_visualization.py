@@ -2,12 +2,13 @@ import tkinter
 from collections import defaultdict
 from doctest import master
 
+import numpy as np
+
 from _2D.langton_ant import generate_grid, update_grid
-from utils.utils import RoundList
 
 
 class GUI:
-    def __init__(self, width: int = 1085, height: int = 1085, cell_size: int = 20):
+    def __init__(self, width: int = 1085, height: int = 1085, cell_size: int = 5):
         self.top = tkinter.Tk()
         self.top_frame = tkinter.Frame()
         self.button_frame = tkinter.Frame()
@@ -29,8 +30,7 @@ class GUI:
 
         self.cell_size = cell_size
 
-        self.prev_step = RoundList([RoundList([[-1, -1] for _ in range(self.width // self.cell_size)]) for _ in
-                                    range(self.height // self.cell_size)])
+        self.prev_step = np.full((height // cell_size, width // cell_size), -1)
 
         self.cells = defaultdict(lambda: (-1, -1), {})
         self.step = 1
@@ -55,7 +55,7 @@ class GUI:
                     if self.cells[(x, y)] != (-1, -1):
                         self.canvas.delete(self.cells[(x, y)])
 
-                    colour = colours_rules[tuple(value)]
+                    colour = colours_rules[(list(value.keys())[0], list(value.values())[0])]
                     rectangle = self.canvas.create_rectangle(coordinate['x'],
                                                              coordinate['y'],
                                                              coordinate['x1'],
@@ -66,7 +66,7 @@ class GUI:
                 y = coordinate['y1']
             x = coordinate['x1']
             y = 0
-        self.prev_step = RoundList([RoundList([[value[0], value[1]] for value in row]) for row in self.grid])
+        self.prev_step = self.grid.copy()
         self.grid, self.turn = update_grid(self.grid, self.turn)
 
     def play_call_back(self):

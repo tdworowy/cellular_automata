@@ -1,6 +1,6 @@
-from random import choices
+import numpy as np
 from collections import defaultdict
-from utils.utils import RoundList, default_dict
+from utils.utils import  default_dict
 import time
 
 game_of_live_rules = {
@@ -107,22 +107,20 @@ def generate_snowflake_rule(neighbours_numbers: list):
     return snowflake_rules
 
 
-def generate_grid_random_cells(width: int, height: int, probability_of_one: float) -> RoundList:
+def generate_grid_random_cells(width: int, height: int, probability_of_one: float) -> np.ndarray:
     probability_of_zero = 1 - probability_of_one
-    return RoundList(
-        [RoundList([choices([0, 1], [probability_of_zero, probability_of_one])[0] for _ in range(width)])
-         for _ in range(height)])
+    return np.random.choice(a=(0, 1), size=(width, height), p=(probability_of_zero, probability_of_one))
 
 
-def generate_grid_one_cell(width: int, height: int) -> RoundList:
-    grid = RoundList([RoundList([0 for _ in range(width)]) for _ in range(height)])
+def generate_grid_one_cell(width: int, height: int) -> np.ndarray:
+    grid = np.full((height, width), 0)
     grid[width // 2][height // 2] = 1
     return grid
 
 
-def generate_grid_central(width: int, height: int, cell_count: int = 1) -> RoundList:
+def generate_grid_central(width: int, height: int, cell_count: int = 1) -> np.ndarray:
     if cell_count == 1: return generate_grid_one_cell(width, height)
-    grid = RoundList([RoundList([0 for _ in range(width)]) for _ in range(height)])
+    grid = np.full((height, width), 0)
     x = width // 2
     y = height // 2
     for i in range(cell_count // 2):
@@ -131,16 +129,16 @@ def generate_grid_central(width: int, height: int, cell_count: int = 1) -> Round
     return grid
 
 
-def count_colored_neighbours(x: int, y: int, grid: RoundList):
+def count_colored_neighbours(x: int, y: int, grid: np.ndarray):
     colored_neighbours = 0
-    for i in range(x - 1, x + 2):
-        for j in range(y - 1, y + 2):
+    for i in range((x - 1) % grid.shape[0], (x + 2) % grid.shape[0]):
+        for j in range((y - 1) % grid.shape[1], (y + 2) % grid.shape[1]):
             if grid[i][j] == 1 and (i, j) != (x, y): colored_neighbours += 1
     return colored_neighbours
 
 
-def update_grid_two_d(grid: RoundList, rules: defaultdict):
-    new_grid = RoundList([RoundList([value for value in row]) for row in grid])
+def update_grid_two_d(grid: np.ndarray, rules: defaultdict):
+    new_grid = grid.copy()
     for i, row in enumerate(grid):
         for j, cell in enumerate(row):
             state = cell
@@ -150,10 +148,11 @@ def update_grid_two_d(grid: RoundList, rules: defaultdict):
 
 
 if __name__ == "__main__":
-    grid = generate_grid_random_cells(1000, 1000, 0.7)
-    for i in range(100):
-        print(i)
-        start = time.time()
-        grid = update_grid_two_d(grid, game_of_live_rules)
-        end = time.time()
-        print(f"Step time: {end - start}")
+    print(generate_grid_central(10,10,4))
+    #grid = generate_grid_random_cells(500, 500, 0.7)
+    #print(list(grid.tolist()))
+    # for i in range(10):
+    #      start = time.time()
+    #      grid = update_grid_two_d(grid, game_of_live_rules)
+    #      end = time.time()
+    #      print(f"Step time: {end - start}")

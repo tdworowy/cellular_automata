@@ -30,16 +30,16 @@ class SnowflakeVisualization(CellularAutomata2DVisualization):
                 coordinate = self.rectangle_coordinates(x, y)
                 if value != value_prev:
                     colour = colours_rules[value]
-                    self.canvas.create_rectangle(coordinate['x'],
-                                                 coordinate['y'],
-                                                 coordinate['x1'],
+                    self.canvas.create_rectangle(coordinate['x1'],
                                                  coordinate['y1'],
+                                                 coordinate['x2'],
+                                                 coordinate['y2'],
                                                  fill=colour)
 
-                y = coordinate['y1']
-            x = coordinate['x1']
+                y = coordinate['y2']
+            x = coordinate['x2']
             y = 0
-        self.prev_step = [[value for value in row] for row in self.grid]
+        self.prev_step = self.grid.copy()
         neighbours_number = [int(number) for number in self.neighbours_number.get().split(",")]
         self.grid = update_grid_two_d(self.grid, rules=generate_snowflake_rule(neighbours_number))
 

@@ -1,7 +1,7 @@
 import tkinter
 from collections import defaultdict
 from doctest import master
-
+import numpy as np
 from _2D.general_2d_automata import generate_grid_random_cells, update_grid_two_d
 
 
@@ -21,8 +21,7 @@ class CellularAutomata2DVisualization:
 
         self.cell_size = cell_size
 
-        self.prev_step = [[-1 for _ in range(self.width // self.cell_size)] for _ in
-                          range(self.height // self.cell_size)]
+        self.prev_step = np.full((height//cell_size, width//cell_size), -1)
 
         self.probability_of_one = probability_of_one
 

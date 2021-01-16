@@ -3,6 +3,8 @@ from flask_restx import Api, fields, Resource
 
 from _1D.cellular_automata import generate_random, generate_rule, cellular_automata_step_1d
 from _2D.general_2d_automata import generate_grid_random_cells, generate_grid_central, update_grid_two_d, rules
+import numpy as np
+
 from utils.utils import RoundList
 
 api = Api(title='Cellular automata', default="CellularAutomata")
@@ -13,7 +15,7 @@ api.init_app(app)
 @app.after_request
 def after_request(response):
     response.headers.add('Access-Control-Allow-Origin', '*')
-   # response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    # response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
     response.headers.add('Access-Control-Allow-Headers', '*')
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
     return response
@@ -30,7 +32,7 @@ class Grid2dRandom(Resource):
         grid = generate_grid_random_cells(width=int(width),
                                           height=int(height),
                                           probability_of_one=float(probability_of_one))
-        response = jsonify({'grid': grid})
+        response = jsonify({'grid': grid.tolist()})
         return response
 
 
@@ -45,7 +47,7 @@ class Grid2dCenter(Resource):
         grid = generate_grid_central(width=int(width),
                                      height=int(height),
                                      cell_count=int(cell_count))
-        response = jsonify({'grid': grid})
+        response = jsonify({'grid': grid.tolist()})
         return response
 
 
@@ -64,10 +66,10 @@ class CellularAutomata2DStep(Resource):
         values = request.get_json()
         grid = values['grid']
         rule = values['rule']
-        grid = RoundList([RoundList([value for value in row]) for row in grid])
+        grid = np.array(grid)
         new_grid = update_grid_two_d(grid, rules[rule])
 
-        response = jsonify({'grid': new_grid})
+        response = jsonify({'grid': new_grid.tolist()})
         return response
 
 
