@@ -7,7 +7,7 @@ import numpy as np
 from _2D.langton_ant import generate_grid, update_grid
 
 
-class GUI:
+class LangtonAnt:
     def __init__(self, width: int = 1085, height: int = 1085, cell_size: int = 5):
         self.top = tkinter.Tk()
         self.top_frame = tkinter.Frame()
@@ -96,10 +96,10 @@ class GUI:
         self.top.mainloop()
 
 
-def main():
-    ui = GUI()
+def langton_ant():
+    ui = LangtonAnt()
     ui.main_loop()
 
 
 if __name__ == "__main__":
-    main()
+    langton_ant()

@@ -68,9 +68,9 @@ class SnowflakeVisualization(CellularAutomata2DVisualization):
         self.top.mainloop()
 
 
-def main():
+def snowflake():
     SnowflakeVisualization().main_loop()
 
 
 if __name__ == "__main__":
-    main()
+    snowflake()
