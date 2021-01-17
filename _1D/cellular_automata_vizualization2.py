@@ -2,7 +2,7 @@ import yaml
 import pygame
 from _1D.cellular_automata import cellular_automata_step_1d, generate_rule
 from _1D.cellular_automata_vizualization1 import generate_random
-from utils.utils import RoundList
+import numpy as np
 
 
 class GUI:
@@ -22,16 +22,15 @@ class GUI:
         self.input_list = self.random_init_list()
 
     def random_init_list(self):
-        return RoundList(generate_random(
-            input_list=[i for i in range(self.color_count)],
+        return generate_random(
+            input_list=tuple(i for i in range(int(self.color_count))),
             length=self.width // self.cell_size)
-        )
 
     def rectangle_coordinates(self, x: int, y: int) -> dict:
         dic = {'x1': x, 'y1': y, 'x2': self.cell_size + x, 'y2': self.cell_size + y}
         return dic
 
-    def draw_cell(self, cells: list):
+    def draw_cell(self, cells: np.ndarray):
         colours = {
             0: (0, 0, 255),
             1: (255, 0, 0),
@@ -43,10 +42,10 @@ class GUI:
         self.x = 0
         for cell in cells:
             coordinate = self.rectangle_coordinates(self.x, self.y)
-            pygame.draw.rect(self.screen, colours[cell], (coordinate["x1"],
-                                                          coordinate["y1"],
-                                                          coordinate["x2"],
-                                                          coordinate["y2"]))
+            pygame.draw.rect(self.screen, colours[int(cell)], (coordinate["x1"],
+                                                               coordinate["y1"],
+                                                               coordinate["x2"],
+                                                               coordinate["y2"]))
             self.x += self.cell_size
         self.y += self.cell_size
         pygame.display.flip()

@@ -2,12 +2,13 @@ import os
 import tkinter
 from doctest import master
 from os import path, mkdir
-from random import choices, randrange
+from random import randrange
+import numpy as np
 from typing import Iterable
 
 from PIL import Image
 
-from _1D.cellular_automata import RoundList, generate_rule, \
+from _1D.cellular_automata import generate_rule, \
     cellular_automata_step_1d, generate_random
 
 
@@ -88,13 +89,12 @@ class GUI:
             f"Possible Rules: {str(count_rules(int(self.neighborhood_size.get()), int(self.color_count.get())))}")
 
     def random_init_list(self):
-        return RoundList(generate_random(
-            input_list=[i for i in range(int(self.color_count.get()))],
+        return generate_random(
+            input_list=tuple(i for i in range(int(self.color_count.get()))),
             length=self.width // self.cell_size)
-        )
 
     def one_cell_start(self):
-        input_list = RoundList([0 for i in range(self.width // self.cell_size)])
+        input_list = np.full((1, self.width // self.cell_size), 0)
         input_list[len(input_list) // 2] = 1
         return input_list
 
@@ -120,7 +120,7 @@ class GUI:
         }
         for i in self.input_list:
             coordinate = self.rectangle_coordinates(self.x, self.y)
-            colour = colours[i]
+            colour = colours[int(i)]
             rectangle = self.canvas.create_rectangle(coordinate['x1'],
                                                      coordinate['y1'],
                                                      coordinate['x2'],
