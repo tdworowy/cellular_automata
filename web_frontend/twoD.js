@@ -73,19 +73,17 @@ const red = "rgba("+255+","+0+","+0+","+255+")";
 function generateGrid(grid){
   const canvas = document.getElementById("canvas");
   const context = canvas.getContext("2d");
-  const prevGrid = JSON.parse(localStorage.getItem("prevGrid"));
+ 
   let color;
   let x_cor=0;
   let y_cor=0;
-  
-  if(prevGrid != grid) {
-    for(var x=0; x < grid.length; x++) {
-      for(var y=0; y < grid[x].length; y++) {
-        if(grid[x][y] == 1) {
-          color = red
-        } else {
-          color = blue
-        }
+  for(var x=0; x < grid.length; x++) {
+     for(var y=0; y < grid[x].length; y++) {
+       if(grid[x][y] == 1) {
+         color = red
+       } else {
+         color = blue
+       }
         
         context.fillStyle = color
         context.fillRect( x_cor, y_cor, call_width, call_hight );
@@ -94,7 +92,6 @@ function generateGrid(grid){
       }
     }
     localStorage.setItem("prevGrid", JSON.stringify(grid));
-  }    
 }
 
 async function play(){
