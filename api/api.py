@@ -80,24 +80,24 @@ class Grid1dRandom(Resource):
         print(request.args)
         width = request.args.get('width')
         colors_count = request.args.get('colors_count')
-        grid = RoundList(generate_random(
-            input_list=[i for i in range(int(colors_count))],
-            length=int(width)))
-        response = jsonify({'grid': grid})
+        grid = generate_random(
+            input_list=tuple(i for i in range(int(colors_count))),
+            length=int(width))
+        response = jsonify({'grid': grid.tolist()})
         return response
 
 
 step_fields_1d = api.model('Cellular_Automata_1_D', {
-    'wolfram_number': fields.Integer(required=True,
-                                     description=f'number of rule',
-                                     default=90),
-    'neighborhood_size': fields.Integer(required=True,
-                                        description='how many neighbor are checked',
-                                        default=3),
-    'colours': fields.List(fields.Integer(), required=True,
-                           description=f'cells colors (states)',
-                           default=[0, 1]),
-    'grid': fields.List(fields.Integer(), required=True, description='grid to transform'),
+    'wolfram_number': fields.String(required=True,
+                                    description=f'number of rule',
+                                    default='90'),
+    'neighborhood_size': fields.String(required=True,
+                                       description='how many neighbor are checked',
+                                       default='3'),
+    'colours': fields.String(required=True,
+                             description=f'cells colors (states)',
+                             default='0,1'),
+    'grid': fields.List(fields.List(fields.Integer()), required=True, description='grid to transform'),
 })
 
 
@@ -112,12 +112,12 @@ class CellularAutomata1DStep(Resource):
         neighborhood_size = values['neighborhood_size']
         colours = values['colours']
 
-        grid = RoundList(grid)
+        grid =  np.array(grid)
         rules = generate_rule(wolfram_number=int(wolfram_number),
                               neighborhood_size=int(neighborhood_size),
-                              colours=colours)
+                              colours=[int(color) for color in colours.split(',')])
         new_grid = cellular_automata_step_1d(input_list=grid, rules=rules)
-        response = jsonify({'grid': new_grid})
+        response = jsonify({'grid': new_grid.tolist()})
         return response
 
 

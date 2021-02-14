@@ -57,7 +57,7 @@ def generate_random(input_list: tuple, length: int):
 
 
 if __name__ == "__main__":
-    input_list = np.random.choice(a=(0, 1), size=(100, 1), p=(0.7, 0.3))
+    input_list = generate_random((0, 1, 2), 100)
     rule = generate_rule(110, 3)
     for seg in rule:
         print(f"{seg.neighborhood} {seg.type} ")
