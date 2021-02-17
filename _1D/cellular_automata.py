@@ -57,11 +57,14 @@ def generate_random(input_list: tuple, length: int):
 
 
 if __name__ == "__main__":
-    input_list = generate_random((0, 1, 2), 100)
-    rule = generate_rule(110, 3)
-    for seg in rule:
-        print(f"{seg.neighborhood} {seg.type} ")
-
-    for i in range(20):
-        input_list = cellular_automata_step_1d(input_list, rule)
-        print("".join(["*" if i == 1 else " " for i in input_list]))
+    # input_list = generate_random((0, 1, 2), 100)
+    # rule = generate_rule(110, 3)
+    # for seg in rule:
+    #     print(f"{seg.neighborhood} {seg.type} ")
+    #
+    # for i in range(20):
+    #     input_list = cellular_automata_step_1d(input_list, rule)
+    #     print("".join(["*" if i == 1 else " " for i in input_list]))
+    input_list1 = np.full((20, 1), 0)
+    input_list1[len(input_list1) // 2] = 1
+    print(input_list1)

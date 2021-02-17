@@ -94,7 +94,7 @@ class GUI:
             length=self.width // self.cell_size)
 
     def one_cell_start(self):
-        input_list = np.full((1, self.width // self.cell_size), 0)
+        input_list = np.full((self.width // self.cell_size,1), 0)
         input_list[len(input_list) // 2] = 1
         return input_list
 

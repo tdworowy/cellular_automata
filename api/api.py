@@ -4,8 +4,7 @@ from flask_restx import Api, fields, Resource
 from _1D.cellular_automata import generate_random, generate_rule, cellular_automata_step_1d
 from _2D.general_2d_automata import generate_grid_random_cells, generate_grid_central, update_grid_two_d, rules
 import numpy as np
-
-from utils.utils import RoundList
+import random
 
 api = Api(title='Cellular automata', default="CellularAutomata")
 app = Flask(__name__)
@@ -87,6 +86,20 @@ class Grid1dRandom(Resource):
         return response
 
 
+@api.route('/grid/1d/center')
+class Grid1dCenter(Resource):
+    @api.doc(params={'width': 'width', 'colors_count': 'colors count (states)'})
+    def get(self):
+        print(request.args)
+        width = request.args.get('width')
+        colors_count = request.args.get('colors_count')
+        grid = np.full((int(width), 1), 0)
+        grid[len(grid) // 2] = random.randrange(1, int(colors_count))
+
+        response = jsonify({'grid': grid.tolist()})
+        return response
+
+
 step_fields_1d = api.model('Cellular_Automata_1_D', {
     'wolfram_number': fields.String(required=True,
                                     description=f'number of rule',
@@ -112,7 +125,7 @@ class CellularAutomata1DStep(Resource):
         neighborhood_size = values['neighborhood_size']
         colours = values['colours']
 
-        grid =  np.array(grid)
+        grid = np.array(grid)
         rules = generate_rule(wolfram_number=int(wolfram_number),
                               neighborhood_size=int(neighborhood_size),
                               colours=[int(color) for color in colours.split(',')])

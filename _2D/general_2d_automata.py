@@ -1,6 +1,6 @@
 import numpy as np
 from collections import defaultdict
-from utils.utils import  default_dict
+from utils.utils import default_dict
 import time
 
 game_of_live_rules = {
@@ -84,6 +84,17 @@ walled_cities_rules = {
 }
 walled_cities_rules = defaultdict(lambda: 0, walled_cities_rules)
 
+
+def generate_snowflake_rule(neighbours_numbers: list = [1]):
+    snowflake_rules = default_dict(lambda self, key: key[0])
+
+    for neighbours_number in neighbours_numbers:
+        snowflake_rules[(0, neighbours_number)] = 1
+        snowflake_rules[(1, neighbours_number)] = 1
+
+    return snowflake_rules
+
+
 rules = {
     'game_of_life': game_of_live_rules,
     'amoeba': amoeba_rules,
@@ -92,19 +103,13 @@ rules = {
     'coagulations': coagulations_rules,
     'mazectric_rules': mazectric_rules,
     'move': move_rules,
-    'walled_cities': walled_cities_rules
+    'walled_cities': walled_cities_rules,
+    'snowflake_1': generate_snowflake_rule(neighbours_numbers=[1]),
+    'snowflake_1_5': generate_snowflake_rule(neighbours_numbers=[1, 5]),
+    'snowflake_1_3_5': generate_snowflake_rule(neighbours_numbers=[1, 3, 5]),
+    'snowflake_1_3': generate_snowflake_rule(neighbours_numbers=[1, 3]),
 
 }
-
-
-def generate_snowflake_rule(neighbours_numbers: list):
-    snowflake_rules = default_dict(lambda self, key: key[0])
-
-    for neighbours_number in neighbours_numbers:
-        snowflake_rules[(0, neighbours_number)] = 1
-        snowflake_rules[(1, neighbours_number)] = 1
-
-    return snowflake_rules
 
 
 def generate_grid_random_cells(width: int, height: int, probability_of_one: float) -> np.ndarray:
@@ -148,9 +153,9 @@ def update_grid_two_d(grid: np.ndarray, rules: defaultdict):
 
 
 if __name__ == "__main__":
-    print(generate_grid_central(10,10,4))
-    #grid = generate_grid_random_cells(500, 500, 0.7)
-    #print(list(grid.tolist()))
+    print(generate_grid_central(10, 10, 4))
+    # grid = generate_grid_random_cells(500, 500, 0.7)
+    # print(list(grid.tolist()))
     # for i in range(10):
     #      start = time.time()
     #      grid = update_grid_two_d(grid, game_of_live_rules)
