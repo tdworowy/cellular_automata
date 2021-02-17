@@ -5,15 +5,25 @@ const call_width = 10
 const call_hight = 10
 
  function initGrid (event) {
+  const params = new FormData(document.querySelector('#initGrid')) 
+  if(params.get('grid_type')== 'random'){
+    getGrid('http://localhost:5000/grid/2d/random',params)
+  }
+  if(params.get('grid_type')== 'center'){
+    params.set('cell_count', '1') 
+    getGrid('http://localhost:5000/grid/2d/center', params)
+  }
+  event.preventDefault();
+}
+
+function getGrid(url_str, params) {
   const headers = new Headers();
   headers.set('Accept', 'application/json');
-
-  const params = new FormData(document.querySelector('#initGrid'))
 
   document.getElementById("canvas").width = params.get('width') * call_width
   document.getElementById("canvas").height = params.get('height') * call_hight
  
-  const url = new URL('http://localhost:5000/grid/2d/random')
+  const url = new URL(url_str)
   url.search = new URLSearchParams(params).toString()
  
   var responsePromise = fetch(url,  {method: "GET",
@@ -27,11 +37,7 @@ const call_hight = 10
     .then(function(jsonData) {
       generateGrid(jsonData.grid)
     });
-
-  event.preventDefault();
 }
-
-
 
 function step (event) {
   const headers = new Headers();
