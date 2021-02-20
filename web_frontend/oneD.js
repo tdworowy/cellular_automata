@@ -5,6 +5,8 @@ const call_width = config.call_width
 const call_hight =  config.call_hight
 let y = 0
 
+let hight = 10000 //TODO make canvas with dynamic height
+
 function initGrid (event) {
   const params = new FormData(document.querySelector('#initGrid')) 
   if(params.get('grid_type')== 'random'){
@@ -21,7 +23,7 @@ function getGrid(url_str, params) {
   headers.set('Accept', 'application/json');
 
   document.getElementById("canvas").width = params.get('width') * call_width
-  document.getElementById("canvas").height = params.get('height') * call_hight
+  document.getElementById("canvas").height = hight
  
   const url = new URL(url_str)
   url.search = new URLSearchParams(params).toString()
