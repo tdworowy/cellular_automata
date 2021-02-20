@@ -118,7 +118,7 @@ def generate_grid_random_cells(width: int, height: int, probability_of_one: floa
 
 
 def generate_grid_one_cell(width: int, height: int) -> np.ndarray:
-    grid = np.full((height, width), 0)
+    grid = np.full((width,height ), 0)
     grid[width // 2][height // 2] = 1
     return grid
 
@@ -153,7 +153,8 @@ def update_grid_two_d(grid: np.ndarray, rules: defaultdict):
 
 
 if __name__ == "__main__":
-    print(generate_grid_central(10, 10, 4))
+    pass
+   # print(generate_grid_central(10, 10, 4))
     # grid = generate_grid_random_cells(500, 500, 0.7)
     # print(list(grid.tolist()))
     # for i in range(10):
