@@ -1,17 +1,17 @@
 const formEl = document.getElementById('initGrid');
 const formE2 = document.getElementById('step');
 
-const call_width = 10
-const call_hight = 10
+const call_width = config.call_width
+const call_hight =  config.call_hight
 
- function initGrid (event) {
+function initGrid (event) {
   const params = new FormData(document.querySelector('#initGrid')) 
   if(params.get('grid_type')== 'random'){
-    getGrid('http://localhost:5000/grid/2d/random',params)
+    getGrid(config.twoDRandom,params)
   }
   if(params.get('grid_type')== 'center'){
     params.set('cell_count', '1') 
-    getGrid('http://localhost:5000/grid/2d/center', params)
+    getGrid(config.twoDCenter, params)
   }
   event.preventDefault();
 }
@@ -51,7 +51,7 @@ function step (event) {
     'grid':grid
   } 
   body = JSON.stringify({...body})
-  const url = new URL('http://localhost:5000/CellularAutomata/2d/step')
+  const url = new URL(config.twoDStep)
  
   var responsePromise = fetch(url,  {
     method: "POST",
