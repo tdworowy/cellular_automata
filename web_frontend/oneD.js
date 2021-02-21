@@ -85,7 +85,7 @@ const blue = "rgba("+0+","+0+","+255+","+255+")";
 const red = "rgba("+255+","+0+","+0+","+255+")";
 const green = "rgba("+0+","+255+","+0+","+255+")";
 const black = "rgba("+0+","+0+","+0+","+255+")";
-const white = "rgba("+255+","+255+","+255+","+255+")";
+const aquamarine = "rgba("+102+","+205+","+212+","+255+")";
 const gold = "rgba("+255+","+215+","+0+","+255+")";
 const purple = "rgba("+255+","+0+","+255+","+255+")";
 
@@ -108,7 +108,7 @@ function generateGrid(grid,y){
          break;
          case 3:color = black
          break;
-         case 4:color = white
+         case 4:color = aquamarine
          break;
          case 5:color = gold
          break;

@@ -1,5 +1,5 @@
 const host = 'http://localhost:5000'
-config={
+const config = {
     "call_width" : 5,
     "call_hight" : 5,
     "oneDRandom":`${host}/grid/1d/random`,
@@ -8,4 +8,4 @@ config={
     "twoDRandom": `${host}/grid/2d/random`,
     "twoDCenter":  `${host}/grid/2d/center`,
     "twoDStep": `${host}/CellularAutomata/2d/step`
-}
+    }
