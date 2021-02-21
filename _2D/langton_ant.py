@@ -1,8 +1,7 @@
-from utils.utils import RoundList
 from random import randint
 import numpy as np
 
-ant_symbols = [2]
+ant_symbols = ['2']
 
 
 def if_zero(grid: np.arange, x: int, y: int, turn: int) -> tuple:
@@ -25,7 +24,7 @@ rules = {
 }
 
 
-def generate_grid(width: int, height: int, ant_count: int = 1, random_init_turn=False) -> tuple:
+def generate_grid_ant(width: int, height: int, ant_count: int = 1, random_init_turn=False) -> tuple:
     array = np.full((height, width), {0: 0})
     if ant_count == 1:
         array[width // 2][height // 2] = {0: ant_symbols[0]}
@@ -33,15 +32,14 @@ def generate_grid(width: int, height: int, ant_count: int = 1, random_init_turn=
         for i in range(2, ant_count + 2):
             x = randint(0, width - 1)
             y = randint(0, height - 1)
-            ant_symbols.append(i)
-            array[x][y] = {0: i}
+            ant_symbols.append(str(i))
+            array[x][y] = {0: str(i)}
 
     turns = {ant_symbol: randint(1, 4) if random_init_turn else 1 for ant_symbol in ant_symbols}
     return array, turns
 
 
-def update_grid(grid: list, turns: dict, rules: dict = rules) -> tuple:
-    grid = grid.copy()
+def update_grid_ant(grid: np.ndarray, turns: dict, rules: dict = rules) -> tuple:
     positions = []
 
     for i, row in enumerate(grid):
@@ -51,7 +49,9 @@ def update_grid(grid: list, turns: dict, rules: dict = rules) -> tuple:
 
     for position in positions:
         x, y, ant_symbol = position
-        grid, turn = rules[list(grid[x][y].keys())[0]](grid, x, y, turns[ant_symbol])
+        turn = turns[ant_symbol]
+        rule_key = int(list(grid[x][y].keys())[0])
+        grid, turn = rules[rule_key](grid, x, y, turn)
 
         if turn == 5:
             turn = 1
@@ -74,11 +74,11 @@ def update_grid(grid: list, turns: dict, rules: dict = rules) -> tuple:
 
 
 if __name__ == "__main__":
-    grid, turns = generate_grid(5, 5, 3)
+    grid, turns = generate_grid_ant(5, 5, 3)
     for line in grid:
         print(line)
     for i in range(10):
-        grid, turns = update_grid(grid, turns)
+        grid, turns = update_grid_ant(grid, turns)
         print("*" * 10)
         for line in grid:
             print(line)

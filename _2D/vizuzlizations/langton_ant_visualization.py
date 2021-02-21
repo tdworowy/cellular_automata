@@ -4,7 +4,7 @@ from doctest import master
 
 import numpy as np
 
-from _2D.langton_ant import generate_grid, update_grid
+from _2D.langton_ant import generate_grid_ant, update_grid_ant
 
 
 class LangtonAnt:
@@ -67,13 +67,13 @@ class LangtonAnt:
             x = coordinate['x1']
             y = 0
         self.prev_step = self.grid.copy()
-        self.grid, self.turn = update_grid(self.grid, self.turn)
+        self.grid, self.turn = update_grid_ant(self.grid, self.turn)
 
     def play_call_back(self):
-        self.grid, self.turn = generate_grid(self.width // self.cell_size,
-                                             self.height // self.cell_size,
-                                             int(self.ants_count.get()),
-                                             bool(int(self.random_init_turn.get())))
+        self.grid, self.turn = generate_grid_ant(self.width // self.cell_size,
+                                                 self.height // self.cell_size,
+                                                 int(self.ants_count.get()),
+                                                 bool(int(self.random_init_turn.get())))
 
         while 1:
             self.step_call_back()

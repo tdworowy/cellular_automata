@@ -6,6 +6,8 @@ from _2D.general_2d_automata import generate_grid_random_cells, generate_grid_ce
 import numpy as np
 import random
 
+from _2D.langton_ant import generate_grid_ant, update_grid_ant
+
 api = Api(title='Cellular automata', default="CellularAutomata")
 app = Flask(__name__)
 api.init_app(app)
@@ -50,6 +52,25 @@ class Grid2dCenter(Resource):
         return response
 
 
+@api.route('/grid/2d/ant')
+class Grid2dRandom(Resource):
+    @api.doc(params={'width': 'width', 'height': 'height', 'ant_count': 'number of ants', 'random_init_turn': 'random '
+                                                                                                              'initial turn of ant'})
+    def get(self):
+        print(request.args)
+        width = request.args.get('width')
+        height = request.args.get('height')
+        ant_count = request.args.get('ant_count')
+        random_init_turn = request.args.get('random_init_turn')
+        grid, turns = generate_grid_ant(width=int(width),
+                                        height=int(height),
+                                        ant_count=int(ant_count),
+                                        random_init_turn=int(random_init_turn)
+                                        )
+        response = jsonify({'grid': grid.tolist(), 'turns': turns})
+        return response
+
+
 step_fields_2d = api.model('Cellular_Automata_2_D', {
     'rule': fields.String(required=True, default='game_of_life',
                           description=f'Cellular Automata rule, available:{rules.keys()}'),
@@ -69,6 +90,27 @@ class CellularAutomata2DStep(Resource):
         new_grid = update_grid_two_d(grid, rules[rule])
 
         response = jsonify({'grid': new_grid.tolist()})
+        return response
+
+
+step_fields_ant = api.model('Langton ant', {
+    'grid': fields.List(fields.List(fields.Raw), required=True, description='grid to transform'),
+    'turns': fields.Raw(required=True, description='Ant turns')
+})
+
+
+@api.route('/CellularAutomata/2d/ant')
+class CellularAutomata2DAntStep(Resource):
+    @api.doc(body=step_fields_ant)
+    @api.expect(step_fields_ant, validate=True)
+    def post(self):
+        values = request.get_json()
+        grid = values['grid']
+        turns = values['turns']
+        grid = np.array(grid)
+        new_grid, turns = update_grid_ant(grid, turns)
+
+        response = jsonify({'grid': new_grid.tolist(), 'turns': turns})
         return response
 
 
