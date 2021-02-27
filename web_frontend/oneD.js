@@ -81,41 +81,14 @@ return responsePromise
 
 }
 
-const blue = "rgba("+0+","+0+","+255+","+255+")";
-const red = "rgba("+255+","+0+","+0+","+255+")";
-const green = "rgba("+0+","+255+","+0+","+255+")";
-const black = "rgba("+0+","+0+","+0+","+255+")";
-const aquamarine = "rgba("+102+","+205+","+212+","+255+")";
-const gold = "rgba("+255+","+215+","+0+","+255+")";
-const purple = "rgba("+255+","+0+","+255+","+255+")";
-
-
 function generateGrid(grid,y){
   const canvas = document.getElementById("canvas");
   const context = canvas.getContext("2d");
  
-  let color;
   let x_cor=0;
   let y_cor=0;
   for(var x=0; x < grid.length; x++) {
-       switch(grid[x][0]) 
-       {
-         case 0: color = blue
-         break;
-         case 1:color = red
-         break;
-         case 2:color = green
-         break;
-         case 3:color = black
-         break;
-         case 4:color = aquamarine
-         break;
-         case 5:color = gold
-         break;
-         case 6:color = purple
-         break;
-       }
-        context.fillStyle = color
+        context.fillStyle = colors[grid[x][0]]
         y_cor = y * call_width
         context.fillRect( x_cor, y_cor, call_width, call_hight );
         x_cor = x * call_width
