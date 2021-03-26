@@ -47,7 +47,7 @@ def cellular_automata_step_1d(input_list: np.ndarray, rules: list) -> np.ndarray
             current_neighborhood = tuple(input_list[j] for j in range((i - temp) % width, (i + temp + 1) % width))
 
             if current_neighborhood == rule.neighborhood:
-                output_list[i] = (rule.type)
+                output_list[i] = rule.type
 
     return output_list
 
