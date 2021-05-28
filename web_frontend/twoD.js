@@ -6,10 +6,10 @@ const call_hight =  config.call_hight
 
 function initGrid (event) {
   const params = new FormData(document.querySelector('#initGrid')) 
-  if(params.get('grid_type')== 'random'){
+  if(params.get('grid_type') === 'random'){
     getGrid(config.twoDRandom,params)
   }
-  if(params.get('grid_type')== 'center'){
+  if(params.get('grid_type') === 'center'){
     params.set('cell_count', '1') 
     getGrid(config.twoDCenter, params)
   }
@@ -79,6 +79,7 @@ function generateGrid(grid){
  
   let x_cor=0;
   let y_cor=0;
+  
   for(var x=0; x < grid.length; x++) {
      for(var y=0; y < grid[x].length; y++) {
         context.fillStyle = colors[grid[x][y]]

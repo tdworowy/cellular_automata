@@ -153,12 +153,16 @@ def update_grid_two_d(grid: np.ndarray, rules: defaultdict):
 
 
 if __name__ == "__main__":
-    pass
-# print(generate_grid_central(10, 10, 4))
-grid = generate_grid_random_cells(1000, 1000, 0.7)
-# print(list(grid.tolist()))
-for i in range(10):
-    start = time.time()
-    grid = update_grid_two_d(grid, game_of_live_rules)
-    end = time.time()
-    print(f"Step time: {end - start}")
+    # print(generate_grid_central(10, 10, 4))
+    # grid = generate_grid_random_cells(1000, 1000, 0.7)
+    # # print(list(grid.tolist()))
+    # for i in range(10):
+    #     start = time.time()
+    #     grid = update_grid_two_d(grid, game_of_live_rules)
+    #     end = time.time()
+    #     print(f"Step time: {end - start}")
+    rule = generate_snowflake_rule([1,3,5])
+    print(rule)
+    print(rule[(0, 6)])
+    print(rule[(1, 3)])
+    print(rule[(1, 7)])
