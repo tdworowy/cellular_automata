@@ -25,7 +25,7 @@ def wolfram_number_to_bin(wolfram_number: int, possible_states: int, colours_cou
     return list(wolfram_number)[::-1]
 
 
-def generate_rule(wolfram_number: int, neighborhood_size: int = 3, colours: list = None):
+def generate_rule(wolfram_number: int, neighborhood_size: int = 3, colours: list = None) -> list:
     if not colours: colours = [0, 1]
     colours_count = len(colours)
     possible_states = colours_count ** neighborhood_size
@@ -52,7 +52,7 @@ def cellular_automata_step_1d(input_list: np.ndarray, rules: list) -> np.ndarray
     return output_list
 
 
-def generate_random(input_list: tuple, length: int):
+def generate_random(input_list: tuple, length: int) -> np.ndarray:
     return np.random.choice(a=input_list, size=(length, 1))
 
 
