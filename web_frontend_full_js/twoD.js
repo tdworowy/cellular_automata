@@ -70,6 +70,7 @@ walled_cities_rules = {
 };
 
 function generateSnowflakeRule(neighbours_numbers = [1]) {
+  // don't work
   let snowflake_rules = {};
 
   for (neighbours_number of neighbours_numbers) {
@@ -90,7 +91,7 @@ rules = {
   twoXTwo: _2x2_rules,
   threeFourLive: _34_live_rules,
   coagulations: coagulations_rules,
-  mazectric_rules: mazectric_rules,
+  mazectric: mazectric_rules,
   move: move_rules,
   walled_cities: walled_cities_rules,
   snowflake_1: generateSnowflakeRule((neighbours_numbers = [1])),

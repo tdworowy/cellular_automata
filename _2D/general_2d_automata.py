@@ -108,9 +108,7 @@ rules = {
     'snowflake_1_5': generate_snowflake_rule(neighbours_numbers=[1, 5]),
     'snowflake_1_3_5': generate_snowflake_rule(neighbours_numbers=[1, 3, 5]),
     'snowflake_1_3': generate_snowflake_rule(neighbours_numbers=[1, 3]),
-
 }
-
 
 def generate_grid_random_cells(width: int, height: int, probability_of_one: float) -> np.ndarray:
     probability_of_zero = 1 - probability_of_one
