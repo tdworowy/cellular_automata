@@ -7,6 +7,15 @@ let y = 0;
 
 let hight = 10000; //TODO make canvas with dynamic height
 
+class RuleSegment {
+  neighborhood;
+  type;
+  constructor(neighborhood, type) {
+    this.neighborhood = neighborhood;
+    this.type = type;
+  }
+}
+
 function product(iterable, repeat = 1) {
   let pools;
   let result;
@@ -125,7 +134,7 @@ function generate_rule(
   );
   let i = 0;
   for (let comb of product(colours, neighborhood_size)) {
-    rule.append(self.RuleSegment.new(comb, int(wolfram_number_a[i])));
+    rule.append(new RuleSegment(comb, int(wolfram_number_a[i])));
     i += 1;
   }
   return rule;
