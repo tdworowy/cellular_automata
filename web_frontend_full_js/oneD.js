@@ -19,30 +19,12 @@ function initGrid(event) {
 }
 
 function getGrid(url_str, params) {
-  const headers = new Headers();
-  headers.set("Accept", "application/json");
-
   document.getElementById("canvas").width = params.get("width") * call_width;
   document.getElementById("canvas").height = hight;
-
-  const url = new URL(url_str);
-  url.search = new URLSearchParams(params).toString();
-
-  var responsePromise = fetch(url, { method: "GET", headers: headers });
-
-  responsePromise
-    .then(function (response) {
-      return response.json();
-    })
-    .then(function (jsonData) {
-      generateGrid(jsonData.grid, y);
-    });
+  // TODO
 }
 
 function step(event) {
-  const headers = new Headers();
-  headers.set("Content-Type", "application/json");
-
   const params = new FormData(document.querySelector("#step"));
   const init_params = new FormData(document.querySelector("#initGrid"));
   const grid = JSON.parse(localStorage.getItem("prevGrid"));
@@ -56,26 +38,7 @@ function step(event) {
     colours: colours.toString(),
     grid: grid,
   };
-  body = JSON.stringify({ ...body });
-  const url = new URL(config.oneDStep);
-
-  var responsePromise = fetch(url, {
-    method: "POST",
-    headers: headers,
-    body: body,
-  });
-  responsePromise
-    .then(function (response) {
-      return response.json();
-    })
-    .then(function (jsonData) {
-      y++;
-      generateGrid(jsonData.grid, y);
-    });
-  if (event) {
-    event.preventDefault();
-  }
-  return responsePromise;
+  //TODO
 }
 
 function generateGrid(grid, y) {
