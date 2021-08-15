@@ -70,7 +70,7 @@ walled_cities_rules = {
 };
 
 function generateSnowflakeRule(neighbours_numbers = [1]) {
-  // don't work
+  // don't work, but interested moving tringels efect
   let snowflake_rules = {};
 
   for (neighbours_number of neighbours_numbers) {
@@ -94,10 +94,10 @@ rules = {
   mazectric: mazectric_rules,
   move: move_rules,
   walled_cities: walled_cities_rules,
-  snowflake_1: generateSnowflakeRule((neighbours_numbers = [1])),
-  snowflake_1_5: generateSnowflakeRule((neighbours_numbers = [1, 5])),
-  snowflake_1_3_5: generateSnowflakeRule((neighbours_numbers = [1, 3, 5])),
-  snowflake_1_3: generateSnowflakeRule((neighbours_numbers = [1, 3])),
+  snowflake_1: generateSnowflakeRule([1]),
+  snowflake_1_5: generateSnowflakeRule([1, 5]),
+  snowflake_1_3_5: generateSnowflakeRule([1, 3, 5]),
+  snowflake_1_3: generateSnowflakeRule([1, 3]),
 };
 
 function generateGridRandom(hight, width, prob_of_one) {
@@ -105,7 +105,7 @@ function generateGridRandom(hight, width, prob_of_one) {
   for (let i = 0; i < hight; i++) {
     let row = [];
     for (let j = 0; j < width; j++) {
-      let rand_int = Math.random() * 10 + 1;
+      let rand_int = Math.floor(Math.random() * 10 + 1);
       if (rand_int <= prob_of_one * 10) row.push(1);
       else row.push(0);
     }

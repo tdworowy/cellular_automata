@@ -4,6 +4,7 @@ const formE2 = document.getElementById("step");
 const call_width = config.call_width;
 const call_hight = config.call_hight;
 let y = 0;
+let grid = [];
 
 let hight = 10000; //TODO make canvas with dynamic height
 
@@ -16,34 +17,41 @@ class RuleSegment {
   }
 }
 
-function product(iterable, repeat = 1) {
-  let pools;
-  let result;
-  for (let i = 0; i < repeat; i++) {
-    pools.push(iterable);
-  }
-  for (let pool of pools) {
-    for (let x of result) {
-      for (let y of pool) {
-        if (![x + [y]] in result && (x + [y]).length <= repeat) {
-          result.push(x + [y]);
-        }
-      }
-    }
-  }
-  let final_result = [];
-  for (let res of result) {
-    if (res.length == repeat) {
-      final_result.push(res);
-    }
-  }
-  return final_result;
+function generate_array_from_number(number) {
+  return Array.from(Array(Number(number)).keys());
 }
 
+function product(iterables, repeat) {
+  var argv = Array.prototype.slice.call(arguments),
+    argc = argv.length;
+  if (argc === 2 && !isNaN(argv[argc - 1])) {
+    var copies = [];
+    for (var i = 0; i < argv[argc - 1]; i++) {
+      copies.push(argv[0].slice());
+    }
+    argv = copies;
+  }
+  return argv.reduce(
+    function tl(accumulator, value) {
+      var tmp = [];
+      accumulator.forEach(function (a0) {
+        value.forEach(function (a1) {
+          tmp.push(a0.concat(a1));
+        });
+      });
+      return tmp;
+    },
+    [[]]
+  );
+}
+const divmod = (x, y) => [Math.floor(x / y), x % y];
 function n_nary(number, n) {
   if (number == 0) return "0";
   let nums = [];
-  while (number) nums.push((number % n).toString());
+  while (number) {
+    [number, r] = divmod(number, n);
+    nums.push((number % n).toString());
+  }
   return nums.reverse().join("");
 }
 
@@ -54,23 +62,22 @@ function wolfram_number_to_bin(wolfram_number, possible_states, colours_count) {
   return wolfram_number_s.split("", true).reverse();
 }
 
-function cellular_automata_step_1d(input_list, rules) {
+function cellular_automata_step_1d(input_list, rules) { //TODO fix it
   let output_list = [];
-  let width = input_list[0].length;
+  const width = input_list.length;
 
-  for (let i = 0; i < input_list.length; i++) {
+  for (let i = 0; i < width; i++) {
     for (let rule of rules) {
-      let neighborhood_size = rule.neighborhood.length;
-      let temp = (neighborhood_size - 1) / 2;
-      let current_neighborhood = [];
-
+      const neighborhood_size = rule.neighborhood.length;
+      const temp = (neighborhood_size - 1) / 2;
+      const current_neighborhood = [];
       for (
         let j = (((i - temp) % width) + width) % width;
         j < (i + temp + 1) % width;
         j++
       ) {
         current_neighborhood.push(input_list[j]);
-
+        
         if (current_neighborhood == rule.neighborhood)
           output_list.push(rule.type);
         else output_list.push(0);
@@ -81,41 +88,22 @@ function cellular_automata_step_1d(input_list, rules) {
   return output_list;
 }
 
-function generate_grid_random(hight, width, states = [0, 1]) {
-  let grid = [];
-  let first_row = [];
+function generate_grid_random(width, states = [0, 1]) {
+  let row = [];
   for (let i = 0; i < width; i++) {
-    var rand_int = Math.random() * states.length + 1;
-    first_row.push(rand_int);
+    let rand_int = Math.floor(Math.random() * states.length);
+    row.push(rand_int);
   }
-  grid.push(first_row);
-
-  for (let j = 0; i < hight - 1; i++) {
-    let row = [];
-    for (let i = 0; i < width; i++) {
-      row.push(0);
-    }
-    grid.push(row);
-  }
+  return row;
 }
 
-function generate_grid_center(hight, width, states = [0, 1]) {
-  let grid = [];
-  let first_row = [];
+function generate_grid_center(width, states = [0, 1]) {
+  let row = [];
   for (let i = 0; i < width; i++) {
-    first_row.push(0);
+    row.push(0);
   }
-  first_row[width / 2] = states[1];
-  grid.push(first_row);
-
-  for (let j = 0; j < hight - 1; j++) {
-    let row = [];
-    for (let i = 0; i < width; i++) {
-      row.push(0);
-    }
-    grid.push(row);
-  }
-  return grid;
+  row[width / 2] = states[1];
+  return row;
 }
 
 function generate_rule(
@@ -133,45 +121,49 @@ function generate_rule(
     colours_count
   );
   let i = 0;
-  for (let comb of product(colours, neighborhood_size)) {
-    rule.append(new RuleSegment(comb, int(wolfram_number_a[i])));
-    i += 1;
+  let combinations = product(colours, neighborhood_size);
+  for (let comb of combinations) {
+    rule.push(new RuleSegment(comb, parseInt(wolfram_number_a[i])));
+    i++;
   }
   return rule;
 }
 
 function initGrid(event) {
   const params = new FormData(document.querySelector("#initGrid"));
-  if (params.get("grid_type") == "random") {
-    getGrid(config.oneDRandom, params);
-  }
-  if (params.get("grid_type") == "center") {
-    getGrid(config.oneDCenter, params);
-  }
-  event.preventDefault();
-}
-
-function getGrid(url_str, params) {
   document.getElementById("canvas").width = params.get("width") * call_width;
   document.getElementById("canvas").height = hight;
-  // TODO
+  let states = generate_array_from_number(params.get("colors_count"));
+
+  if (params.get("grid_type") == "random") {
+    grid = generate_grid_random(params.get("width"), states);
+  }
+  if (params.get("grid_type") == "center") {
+    grid = generate_grid_center(params.get("width"), states);
+  }
+  generateGrid(grid, y);
+
+  event.preventDefault();
 }
 
 function step(event) {
   const params = new FormData(document.querySelector("#step"));
   const init_params = new FormData(document.querySelector("#initGrid"));
-  const grid = JSON.parse(localStorage.getItem("prevGrid"));
-  let colours = Array.from(
-    Array(Number(init_params.get("colors_count"))).keys()
-  );
+  const colours = generate_array_from_number(init_params.get("colors_count"));
 
-  let body = {
-    wolfram_number: params.get("wolfram_number"),
-    neighborhood_size: params.get("neighborhood_size"),
-    colours: colours.toString(),
-    grid: grid,
-  };
-  //TODO
+  // TODO fix, cashe rule mayby ?
+  const rule = generate_rule(
+    parseInt(params.get("wolfram_number")),
+    parseInt(params.get("neighborhood_size")),
+    colours
+  );
+  grid = cellular_automata_step_1d(grid, rule);
+  y++;
+
+  generateGrid(grid, y);
+  if (event) {
+    event.preventDefault();
+  }
 }
 
 function generateGrid(grid, y) {
@@ -181,13 +173,11 @@ function generateGrid(grid, y) {
   let x_cor = 0;
   let y_cor = 0;
   for (var x = 0; x < grid.length; x++) {
-    context.fillStyle = colors[grid[x][0]];
+    context.fillStyle = colors[grid[x]];
     y_cor = y * call_width;
     context.fillRect(x_cor, y_cor, call_width, call_hight);
     x_cor = x * call_width;
   }
-
-  localStorage.setItem("prevGrid", JSON.stringify(grid));
 }
 
 async function play() {
