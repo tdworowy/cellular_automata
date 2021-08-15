@@ -8,15 +8,6 @@ let grid = [];
 
 let hight = 10000; //TODO make canvas with dynamic height
 
-class RuleSegment {
-  neighborhood;
-  type;
-  constructor(neighborhood, type) {
-    this.neighborhood = neighborhood;
-    this.type = type;
-  }
-}
-
 function generate_array_from_number(number) {
   return Array.from(Array(Number(number)).keys());
 }
@@ -45,12 +36,13 @@ function product(iterables, repeat) {
   );
 }
 const divmod = (x, y) => [Math.floor(x / y), x % y];
+
 function n_nary(number, n) {
   if (number == 0) return "0";
   let nums = [];
   while (number) {
     [number, r] = divmod(number, n);
-    nums.push((number % n).toString());
+    nums.push(r.toString());
   }
   return nums.reverse().join("");
 }
@@ -58,11 +50,20 @@ function n_nary(number, n) {
 function wolfram_number_to_bin(wolfram_number, possible_states, colours_count) {
   let wolfram_number_s = n_nary(wolfram_number, colours_count);
   let temp = possible_states - wolfram_number_s.length;
-  wolfram_number_s = "0" * temp + wolfram_number_s;
-  return wolfram_number_s.split("", true).reverse();
+  wolfram_number_s_final = "";
+  for (let i = 0; i < temp; i++) {
+    wolfram_number_s_final += "0";
+  }
+  wolfram_number_s_final += wolfram_number_s;
+  return wolfram_number_s_final.split("").reverse();
 }
 
-function cellular_automata_step_1d(input_list, rules) { //TODO fix it
+arrays_equal = (a, b) => {
+  return !!a && !!b && !(a < b || b < a);
+};
+
+function cellular_automata_step_1d(input_list, rules) {
+  //TODO fix it
   let output_list = [];
   const width = input_list.length;
 
@@ -77,14 +78,12 @@ function cellular_automata_step_1d(input_list, rules) { //TODO fix it
         j++
       ) {
         current_neighborhood.push(input_list[j]);
-        
-        if (current_neighborhood == rule.neighborhood)
-          output_list.push(rule.type);
-        else output_list.push(0);
       }
+      if (arrays_equal(current_neighborhood, rule.neighborhood)) {
+        output_list.push(rule.type);
+      } else output_list.push(0);
     }
   }
-
   return output_list;
 }
 
@@ -123,7 +122,7 @@ function generate_rule(
   let i = 0;
   let combinations = product(colours, neighborhood_size);
   for (let comb of combinations) {
-    rule.push(new RuleSegment(comb, parseInt(wolfram_number_a[i])));
+    rule.push({ neighborhood: comb, type: parseInt(wolfram_number_a[i]) });
     i++;
   }
   return rule;

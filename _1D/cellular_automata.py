@@ -65,6 +65,8 @@ if __name__ == "__main__":
     # for i in range(20):
     #     input_list = cellular_automata_step_1d(input_list, rule)
     #     print("".join(["*" if i == 1 else " " for i in input_list]))
-    input_list1 = np.full((20, 1), 0)
-    input_list1[len(input_list1) // 2] = 1
-    print(input_list1)
+    # input_list1 = np.full((20, 1), 0)
+    # input_list1[len(input_list1) // 2] = 1
+    # print(input_list1)
+    print(wolfram_number_to_bin(110, 2 ** 3, 2))
+   # print(n_nary(110,2))
