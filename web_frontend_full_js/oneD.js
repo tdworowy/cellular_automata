@@ -141,21 +141,24 @@ function initGrid(event) {
     grid = generate_grid_center(params.get("width"), states);
   }
   generateGrid(grid, y);
-
   event.preventDefault();
 }
+
+let rule = undefined
 
 function step(event) {
   const params = new FormData(document.querySelector("#step"));
   const init_params = new FormData(document.querySelector("#initGrid"));
   const colours = generate_array_from_number(init_params.get("colors_count"));
 
-  // TODO fix, cashe rule mayby ?
-  const rule = generate_rule(
-    parseInt(params.get("wolfram_number")),
-    parseInt(params.get("neighborhood_size")),
-    colours
-  );
+  // TODO still need to fix ?
+  if(!rule){
+    rule = generate_rule(
+      parseInt(params.get("wolfram_number")),
+      parseInt(params.get("neighborhood_size")),
+      colours
+    );
+  }
   grid = cellular_automata_step_1d(grid, rule);
   y++;
 

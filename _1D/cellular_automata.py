@@ -69,4 +69,4 @@ if __name__ == "__main__":
     # input_list1[len(input_list1) // 2] = 1
     # print(input_list1)
     print(wolfram_number_to_bin(110, 2 ** 3, 2))
-   # print(n_nary(110,2))
+    # print(n_nary(110,2))
