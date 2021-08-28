@@ -3,6 +3,8 @@ const formE2 = document.getElementById("step");
 
 const call_width = config.call_width;
 const call_hight = config.call_hight;
+let grid;
+let prev_grid;
 
 game_of_live_rules = {
   "0_3": 1,
@@ -118,7 +120,7 @@ function generateGridCenter(hight, width) {
   for (let i = 0; i < hight; i++) {
     let row = [];
     for (let j = 0; j < width; j++) {
-      if (i == hight / 2 && j == width / 2) row.push(1);
+      if (i === hight / 2 && j === width / 2) row.push(1);
       else row.push(0);
     }
     grid.push(row);
@@ -138,15 +140,14 @@ function countColoredNeighbours(x, y, grid_x_axis, grid_y_axis, grid) {
       j < (y + 2) % grid_y_axis;
       j++
     ) {
-      if (grid[i][j] == 1 && i != x && j != y) colored_neighbours += 1;
+      if (grid[i][j] === 1 && i != x && j != y) colored_neighbours += 1;
     }
   }
   return colored_neighbours;
 }
 
 function updateGrid(grid, grid_x_axis, grid_y_asix, rules) {
-  // TODO don't work for snowflake
-  let new_grid = grid.slice();
+  let new_grid = JSON.parse(JSON.stringify(grid));
   for (let i = 0; i < grid.length; i++) {
     for (let j = 0; j < grid[i].length; j++) {
       let state = grid[i][j];
@@ -170,7 +171,6 @@ function updateGrid(grid, grid_x_axis, grid_y_asix, rules) {
 
 function initGrid(event) {
   const params = new FormData(document.querySelector("#initGrid"));
-  let grid;
   if (params.get("grid_type") === "random") {
     grid = generateGridRandom(
       params.get("width"),
@@ -194,7 +194,7 @@ function step(event) {
   }
 
   const params = new FormData(document.querySelector("#step"));
-  const grid = JSON.parse(localStorage.getItem("prevGrid"));
+  grid = JSON.parse(JSON.stringify(prev_grid));
   new_grid = updateGrid(
     grid,
     grid.length,
@@ -219,16 +219,12 @@ function generateGrid(grid) {
       y_cor = y * call_width;
     }
   }
-  localStorage.setItem("prevGrid", JSON.stringify(grid));
+  prev_grid = JSON.parse(JSON.stringify(grid));
 }
 
-// don't work
 function play() {
-  let count = 1;
-  while (true) {
+  for (let i = 0; i < 50; i++) {
     step();
-    console.log(`step ${count}`);
-    count++;
   }
 }
 
