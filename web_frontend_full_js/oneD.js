@@ -65,7 +65,7 @@ arrays_equal = (a, b) => {
 function cellular_automata_step_1d(input_list, rules) {
   let output_list = [];
   const width = input_list.length;
-  let rule_found = false
+  let rule_found = false;
 
   for (let i = 0; i < width; i++) {
     for (let rule of rules) {
@@ -81,13 +81,13 @@ function cellular_automata_step_1d(input_list, rules) {
       }
       if (arrays_equal(current_neighborhood, rule.neighborhood)) {
         output_list.push(rule.type);
-        rule_found = true
-      };
+        rule_found = true;
+      }
     }
-    if(!rule_found){
-      output_list.push(0)
+    if (!rule_found) {
+      output_list.push(0);
     }
-    rule_found = false
+    rule_found = false;
   }
   return output_list;
 }
@@ -115,22 +115,22 @@ function generate_rule(
   neighborhood_size = 3,
   colours = [0, 1]
 ) {
-    let colours_count = colours.length;
-    let possible_states = colours_count ** neighborhood_size;
-    let rule = [];
+  let colours_count = colours.length;
+  let possible_states = colours_count ** neighborhood_size;
+  let rule = [];
 
-    let wolfram_number_a = wolfram_number_to_bin(
-      wolfram_number,
-      possible_states,
-      colours_count
-    );
-    let i = 0;
-    let combinations = product(colours, neighborhood_size);
-    for (let comb of combinations) {
-      rule.push({ neighborhood: comb, type: parseInt(wolfram_number_a[i]) });
-      i++;
-    }
-    return rule;
+  let wolfram_number_a = wolfram_number_to_bin(
+    wolfram_number,
+    possible_states,
+    colours_count
+  );
+  let i = 0;
+  let combinations = product(colours, neighborhood_size);
+  for (let comb of combinations) {
+    rule.push({ neighborhood: comb, type: parseInt(wolfram_number_a[i]) });
+    i++;
+  }
+  return rule;
 }
 
 function initGrid(event) {
@@ -150,14 +150,14 @@ function initGrid(event) {
   event.preventDefault();
 }
 
-let rule = undefined
+let rule = undefined;
 
 function step(event) {
   const params = new FormData(document.querySelector("#step"));
   const init_params = new FormData(document.querySelector("#initGrid"));
   const colours = generate_array_from_number(init_params.get("colors_count"));
 
-  if(!rule){
+  if (!rule) {
     rule = generate_rule(
       parseInt(params.get("wolfram_number")),
       parseInt(params.get("neighborhood_size")),
@@ -188,10 +188,10 @@ function generateGrid(grid, y) {
 }
 
 function generate() {
-  for(let i = 0; i< 100;i++){
+  for (let i = 0; i < 100; i++) {
     step();
     console.log(`step ${i}`);
- }
+  }
 }
 
 formEl.addEventListener("submit", initGrid);

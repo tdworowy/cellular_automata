@@ -110,6 +110,7 @@ rules = {
     'snowflake_1_3': generate_snowflake_rule(neighbours_numbers=[1, 3]),
 }
 
+
 def generate_grid_random_cells(width: int, height: int, probability_of_one: float) -> np.ndarray:
     probability_of_zero = 1 - probability_of_one
     return np.random.choice(a=(0, 1), size=(width, height), p=(probability_of_zero, probability_of_one))
@@ -159,8 +160,7 @@ if __name__ == "__main__":
     #     grid = update_grid_two_d(grid, game_of_live_rules)
     #     end = time.time()
     #     print(f"Step time: {end - start}")
-    rule = generate_snowflake_rule([1,3,5])
-    print(rule)
-    print(rule[(0, 6)])
-    print(rule[(1, 3)])
-    print(rule[(1, 7)])
+    print(generate_snowflake_rule([1]))
+    print(generate_snowflake_rule([1, 5]))
+    print(generate_snowflake_rule([1, 3, 5]))
+    print(generate_snowflake_rule([1, 4]))

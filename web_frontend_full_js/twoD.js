@@ -70,14 +70,13 @@ walled_cities_rules = {
 };
 
 function generateSnowflakeRule(neighbours_numbers = [1]) {
-  // don't work, but interested moving tringels efect
   let snowflake_rules = {};
 
   for (neighbours_number of neighbours_numbers) {
     snowflake_rules["0" + "_" + neighbours_number.toString()] = 1;
     snowflake_rules["1" + "_" + neighbours_number.toString()] = 1;
   }
-  for (let i = 0; i++; i < 9)
+  for (let i = 0; i < 9; i++)
     if (!neighbours_numbers.includes(i)) {
       snowflake_rules["0" + "_" + i.toString()] = 0;
       snowflake_rules["1" + "_" + i.toString()] = 1;
@@ -146,6 +145,7 @@ function countColoredNeighbours(x, y, grid_x_axis, grid_y_axis, grid) {
 }
 
 function updateGrid(grid, grid_x_axis, grid_y_asix, rules) {
+  // TODO don't work for snowflake
   let new_grid = grid.slice();
   for (let i = 0; i < grid.length; i++) {
     for (let j = 0; j < grid[i].length; j++) {
@@ -158,12 +158,13 @@ function updateGrid(grid, grid_x_axis, grid_y_asix, rules) {
         grid
       );
       let rule = rules[state.toString() + "_" + live_neighbours.toString()];
-      if (rule) new_grid[i][j] = rule;
-      else new_grid[i][j] = 0;
+      if (rule) {
+        new_grid[i][j] = rule;
+      } else {
+        new_grid[i][j] = 0;
+      }
     }
   }
-  console.log(new_grid[0].length)
-  console.log(new_grid[1].length)
   return new_grid;
 }
 
@@ -194,15 +195,13 @@ function step(event) {
 
   const params = new FormData(document.querySelector("#step"));
   const grid = JSON.parse(localStorage.getItem("prevGrid"));
-  new_grid = await updateGrid(
+  new_grid = updateGrid(
     grid,
     grid.length,
     grid[0].length,
     rules[params.get("rule")]
   );
-  return new Promise((res, rej) => {
-    generateGrid(new_grid);
-  });
+  generateGrid(new_grid);
 }
 
 function generateGrid(grid) {
@@ -224,7 +223,7 @@ function generateGrid(grid) {
 }
 
 // don't work
-async function play() {
+function play() {
   let count = 1;
   while (true) {
     step();
