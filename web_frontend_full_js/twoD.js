@@ -162,6 +162,8 @@ function updateGrid(grid, grid_x_axis, grid_y_asix, rules) {
       else new_grid[i][j] = 0;
     }
   }
+  console.log(new_grid[0].length)
+  console.log(new_grid[1].length)
   return new_grid;
 }
 
@@ -185,7 +187,7 @@ function initGrid(event) {
   generateGrid(grid);
 }
 
-async function step(event) {
+function step(event) {
   if (event) {
     event.preventDefault();
   }
@@ -225,7 +227,7 @@ function generateGrid(grid) {
 async function play() {
   let count = 1;
   while (true) {
-    await step();
+    step();
     console.log(`step ${count}`);
     count++;
   }

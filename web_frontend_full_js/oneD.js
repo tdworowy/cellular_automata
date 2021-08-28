@@ -63,9 +63,9 @@ arrays_equal = (a, b) => {
 };
 
 function cellular_automata_step_1d(input_list, rules) {
-  //TODO fix it
   let output_list = [];
   const width = input_list.length;
+  let rule_found = false
 
   for (let i = 0; i < width; i++) {
     for (let rule of rules) {
@@ -81,8 +81,13 @@ function cellular_automata_step_1d(input_list, rules) {
       }
       if (arrays_equal(current_neighborhood, rule.neighborhood)) {
         output_list.push(rule.type);
-      } else output_list.push(0);
+        rule_found = true
+      };
     }
+    if(!rule_found){
+      output_list.push(0)
+    }
+    rule_found = false
   }
   return output_list;
 }
@@ -110,25 +115,26 @@ function generate_rule(
   neighborhood_size = 3,
   colours = [0, 1]
 ) {
-  let colours_count = colours.length;
-  let possible_states = colours_count ** neighborhood_size;
-  let rule = [];
+    let colours_count = colours.length;
+    let possible_states = colours_count ** neighborhood_size;
+    let rule = [];
 
-  let wolfram_number_a = wolfram_number_to_bin(
-    wolfram_number,
-    possible_states,
-    colours_count
-  );
-  let i = 0;
-  let combinations = product(colours, neighborhood_size);
-  for (let comb of combinations) {
-    rule.push({ neighborhood: comb, type: parseInt(wolfram_number_a[i]) });
-    i++;
-  }
-  return rule;
+    let wolfram_number_a = wolfram_number_to_bin(
+      wolfram_number,
+      possible_states,
+      colours_count
+    );
+    let i = 0;
+    let combinations = product(colours, neighborhood_size);
+    for (let comb of combinations) {
+      rule.push({ neighborhood: comb, type: parseInt(wolfram_number_a[i]) });
+      i++;
+    }
+    return rule;
 }
 
 function initGrid(event) {
+  y = 0;
   const params = new FormData(document.querySelector("#initGrid"));
   document.getElementById("canvas").width = params.get("width") * call_width;
   document.getElementById("canvas").height = hight;
@@ -151,7 +157,6 @@ function step(event) {
   const init_params = new FormData(document.querySelector("#initGrid"));
   const colours = generate_array_from_number(init_params.get("colors_count"));
 
-  // TODO still need to fix ?
   if(!rule){
     rule = generate_rule(
       parseInt(params.get("wolfram_number")),
@@ -168,10 +173,10 @@ function step(event) {
   }
 }
 
-function generateGrid(grid, y) {
-  const canvas = document.getElementById("canvas");
-  const context = canvas.getContext("2d");
+const canvas = document.getElementById("canvas");
+const context = canvas.getContext("2d");
 
+function generateGrid(grid, y) {
   let x_cor = 0;
   let y_cor = 0;
   for (var x = 0; x < grid.length; x++) {
@@ -182,13 +187,11 @@ function generateGrid(grid, y) {
   }
 }
 
-async function play() {
-  let count = 1;
-  while (true) {
-    await step();
-    console.log(`step ${count}`);
-    count++;
-  }
+function generate() {
+  for(let i = 0; i< 100;i++){
+    step();
+    console.log(`step ${i}`);
+ }
 }
 
 formEl.addEventListener("submit", initGrid);
