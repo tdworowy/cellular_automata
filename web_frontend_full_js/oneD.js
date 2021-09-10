@@ -156,13 +156,14 @@ function initGrid(event) {
 }
 
 let rule = undefined;
+const cash_rule = false
 
 function step(event) {
   const params = new FormData(document.querySelector("#step"));
   const init_params = new FormData(document.querySelector("#initGrid"));
   const colours = generate_array_from_number(init_params.get("colors_count"));
 
-  if (!rule) {
+  if (!rule || !cash_rule) {
     rule = generate_rule(
       parseInt(params.get("wolfram_number")),
       parseInt(params.get("neighborhood_size")),
