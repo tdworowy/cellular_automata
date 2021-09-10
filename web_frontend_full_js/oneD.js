@@ -1,5 +1,6 @@
 const formEl = document.getElementById("initGrid");
 const formE2 = document.getElementById("step");
+const neighborhood_size_input = document.getElementById("neighborhood_size");
 
 const call_width = config.call_width;
 const call_hight = config.call_hight;
@@ -10,6 +11,10 @@ let hight = 10000; //TODO make canvas with dynamic height
 
 function generate_array_from_number(number) {
   return Array.from(Array(Number(number)).keys());
+}
+
+function get_random_wolfram_number(neighborhood_size, color_count) {
+  return Math.floor(Math.random() * 2 ** (color_count ** neighborhood_size));
 }
 
 function product(iterables, repeat) {
@@ -173,6 +178,17 @@ function step(event) {
   }
 }
 
+function on_neighborhood_size_change() {
+  const params = new FormData(document.querySelector("#step"));
+  const init_params = new FormData(document.querySelector("#initGrid"));
+
+  const wolfram_number = get_random_wolfram_number(
+    parseInt(params.get("neighborhood_size")),
+    parseInt(init_params.get("colors_count"))
+  );
+  document.getElementById("wolfram_number").value = wolfram_number;
+}
+
 const canvas = document.getElementById("canvas");
 const context = canvas.getContext("2d");
 
@@ -193,6 +209,6 @@ function generate() {
     console.log(`step ${i}`);
   }
 }
-
+neighborhood_size_input.addEventListener("change", on_neighborhood_size_change);
 formEl.addEventListener("submit", initGrid);
 formE2.addEventListener("submit", step);
