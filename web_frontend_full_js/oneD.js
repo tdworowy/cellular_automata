@@ -7,7 +7,7 @@ const call_hight = config.call_hight;
 let y = 0;
 let grid = [];
 
-let hight = 10000; //TODO make canvas with dynamic height
+let hight = 1000; 
 
 function generate_array_from_number(number) {
   return Array.from(Array(Number(number)).keys());
@@ -205,7 +205,7 @@ function generateGrid(grid, y) {
 }
 
 function generate() {
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < config.iterations; i++) {
     step();
     console.log(`step ${i}`);
   }

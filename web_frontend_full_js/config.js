@@ -1,6 +1,7 @@
 const config = {
   call_width: 2,
   call_hight: 2,
+  iterations: 50
 };
 
 const blue = "rgba(" + 0 + "," + 0 + "," + 255 + "," + 255 + ")";

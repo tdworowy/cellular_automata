@@ -223,7 +223,7 @@ function generateGrid(grid) {
 }
 
 function play() {
-  for (let i = 0; i < 50; i++) {
+  for (let i = 0; i < config.iterations; i++) {
     step();
   }
 }
