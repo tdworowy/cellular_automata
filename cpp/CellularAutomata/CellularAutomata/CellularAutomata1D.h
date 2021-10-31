@@ -17,4 +17,5 @@ struct RuleSegment {
 std::string nNary(int number, int n);
 std::string WolframNumberToBin(int worframNumber, int PossibleStates, int ColoursCount);
 std::list<RuleSegment> generateRule(int worframNumber, int neighborhoodSize, std::string colours);
-std::list<std::tuple<int, int>> product(std::string iterables, int repear);
+char** product(std::string iterable, int repear);
+void deleteArray(int resultSize, int** arr);
