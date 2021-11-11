@@ -188,11 +188,7 @@ function initGrid(event) {
   generateGrid(grid);
 }
 
-function step(event) {
-  if (event) {
-    event.preventDefault();
-  }
-
+function step() {
   const params = new FormData(document.querySelector("#step"));
   grid = JSON.parse(JSON.stringify(prev_grid));
   new_grid = updateGrid(
@@ -202,6 +198,17 @@ function step(event) {
     rules[params.get("rule")]
   );
   generateGrid(new_grid);
+}
+function step_event(event) {
+  if (event && event.hasOwnProperty("preventDefault")) {
+    event.preventDefault();
+  }
+  step();
+}
+
+function step_play() {
+  step();
+  window.requestAnimationFrame(step_play);
 }
 
 function generateGrid(grid) {
@@ -223,10 +230,8 @@ function generateGrid(grid) {
 }
 
 function play() {
-  for (let i = 0; i < config.iterations; i++) {
-    step();
-  }
+  window.requestAnimationFrame(step_play);
 }
 
 formEl.addEventListener("submit", initGrid);
-formE2.addEventListener("submit", step);
+formE2.addEventListener("submit", step_event);

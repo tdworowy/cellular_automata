@@ -12,14 +12,21 @@
       </select>
       <button type="submit">Generate init grid</button>
     </form>
+    <div id="max_wolfram_number">Max wolfram number:</div>
+    <br />
     <form onsubmit="" id="step">
-      <label for="wolfram_number">Wolfram number:</label>
-      <input type="text" id="wolfram_number" name="wolfram_number" />
       <label for="neighborhood_size">Neighborhood size:</label>
       <input type="text" id="neighborhood_size" name="neighborhood_size" />
+      <label for="wolfram_number">Wolfram number:</label>
+      <input
+        type="text"
+        id="wolfram_number"
+        name="wolfram_number"
+        disabled="true"
+      /><br />
       <button type="submit">Next Step</button>
     </form>
-    <button id="generate" onclick="generate()">generate</button> <br />
+    <button id="generate" onclick="generate()">Generate</button> <br />
     <canvas
       id="canvas"
       width="420px"

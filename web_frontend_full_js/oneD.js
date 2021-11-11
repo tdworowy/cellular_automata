@@ -1,20 +1,30 @@
 const formEl = document.getElementById("initGrid");
 const formE2 = document.getElementById("step");
 const neighborhood_size_input = document.getElementById("neighborhood_size");
+const colors_count_input = document.getElementById("colors_count");
+const max_wolfram_number_div = document.getElementById("max_wolfram_number");
 
 const call_width = config.call_width;
 const call_hight = config.call_hight;
 let y = 0;
 let grid = [];
 
-let hight = 1000; 
+let hight = 1000;
 
 function generate_array_from_number(number) {
   return Array.from(Array(Number(number)).keys());
 }
 
 function get_random_wolfram_number(neighborhood_size, color_count) {
-  return Math.floor(Math.random() * 2 ** (color_count ** neighborhood_size));
+  const max_wolfram_number = get_max_wolfram_number(
+    neighborhood_size,
+    color_count
+  );
+  return [Math.floor(Math.random() * max_wolfram_number), max_wolfram_number];
+}
+
+function get_max_wolfram_number(neighborhood_size, color_count) {
+  return 2 ** (color_count ** neighborhood_size);
 }
 
 function product(iterables, repeat) {
@@ -156,14 +166,14 @@ function initGrid(event) {
 }
 
 let rule = undefined;
-const cash_rule = false
+const cache_rule = false;
 
-function step(event) {
+function step() {
   const params = new FormData(document.querySelector("#step"));
   const init_params = new FormData(document.querySelector("#initGrid"));
   const colours = generate_array_from_number(init_params.get("colors_count"));
 
-  if (!rule || !cash_rule) {
+  if (!rule || !cache_rule) {
     rule = generate_rule(
       parseInt(params.get("wolfram_number")),
       parseInt(params.get("neighborhood_size")),
@@ -174,20 +184,38 @@ function step(event) {
   y++;
 
   generateGrid(grid, y);
+}
+function step_event(event) {
   if (event) {
     event.preventDefault();
   }
+  step();
 }
 
-function on_neighborhood_size_change() {
+function step_play() {
+  step();
+  window.requestAnimationFrame(step_play);
+}
+
+function set_wolfram_number() {
   const params = new FormData(document.querySelector("#step"));
   const init_params = new FormData(document.querySelector("#initGrid"));
 
-  const wolfram_number = get_random_wolfram_number(
-    parseInt(params.get("neighborhood_size")),
-    parseInt(init_params.get("colors_count"))
-  );
-  document.getElementById("wolfram_number").value = wolfram_number;
+  const neighborhood_size = parseInt(params.get("neighborhood_size"));
+  const colors_count = parseInt(init_params.get("colors_count"));
+
+  if (neighborhood_size && colors_count) {
+    const [wolfram_number, max_wolfram_number] = get_random_wolfram_number(
+      parseInt(params.get("neighborhood_size")),
+      parseInt(init_params.get("colors_count"))
+    );
+    document.getElementById("wolfram_number").value = wolfram_number;
+    document.getElementById("wolfram_number").disabled = false;
+
+    max_wolfram_number_div.appendChild(
+      document.createTextNode(max_wolfram_number)
+    );
+  }
 }
 
 const canvas = document.getElementById("canvas");
@@ -205,11 +233,11 @@ function generateGrid(grid, y) {
 }
 
 function generate() {
-  for (let i = 0; i < config.iterations; i++) {
-    step();
-    console.log(`step ${i}`);
-  }
+  window.requestAnimationFrame(step_play);
 }
-neighborhood_size_input.addEventListener("change", on_neighborhood_size_change);
+
+neighborhood_size_input.addEventListener("change", set_wolfram_number);
+neighborhood_size_input.addEventListener("change", set_wolfram_number);
+
 formEl.addEventListener("submit", initGrid);
 formE2.addEventListener("submit", step);

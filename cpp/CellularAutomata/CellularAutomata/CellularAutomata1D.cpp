@@ -12,7 +12,7 @@ char** product(std::string iterable, int repeat)
 	int resultSize = pow(iterable.length(), repeat);
 	std::list<std::string> pools;
 	
-	char** result = new char*[resultSize];
+	char** result = new char*[resultSize]; // mayby use list of strings
 	for (int i = 0; i < repeat; i++) {
 		result[i] = new char[repeat];
 	}// memory alocation
@@ -22,11 +22,11 @@ char** product(std::string iterable, int repeat)
 			result[i][j] = '0';
 		}
 	}// initialze with zeros
-
+	
 	for(int i = 0; i < repeat; i++) {
 		pools.push_back(iterable);
 	}
-	for (std::list<std::string>::iterator pool = pools.begin(); pool != pools.end(); ++pool) {
+	for (std::list<std::string>::iterator pool = pools.begin(); pool != pools.end(); ++pool) { // mayby resirsuv solution will be better
 		for (int i = 0; i < resultSize; i++) {
 			for (int j = 0; j < pool->length(); j++) {
 				const int tempArrSize = 1;
