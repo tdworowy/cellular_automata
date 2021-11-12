@@ -7,35 +7,33 @@
 #include <tuple>
 
 
-char** product(std::string iterable, int repeat)
+std::string* product(std::string iterable, int repeat)
 {	//TODO try to port https://github.com/tdworowy/cellular_automata_the_game/blob/master/scripts/utils.gd
 	int resultSize = pow(iterable.length(), repeat);
 	std::list<std::string> pools;
 	
-	char** result = new char*[resultSize]; // mayby use list of strings
+	std::string* result = new std::string[resultSize]; 
 	for (int i = 0; i < repeat; i++) {
-		result[i] = new char[repeat];
+		result[i] = "0";
 	}// memory alocation
 
-	for(int i = 0; i < resultSize; i++) {
-		for(int j = 0; j < repeat; j++) {
-			result[i][j] = '0';
-		}
-	}// initialze with zeros
-	
+		
 	for(int i = 0; i < repeat; i++) {
 		pools.push_back(iterable);
 	}
-	for (std::list<std::string>::iterator pool = pools.begin(); pool != pools.end(); ++pool) { // mayby resirsuv solution will be better
+	for (std::list<std::string>::iterator pool = pools.begin(); pool != pools.end(); ++pool) { // mayby recursive solution will be better
 		for (int i = 0; i < resultSize; i++) {
 			for (int j = 0; j < pool->length(); j++) {
 				const int tempArrSize = 1;
 				char* tempArr[tempArrSize] = { &pool->at(j) };
 				std::vector<char> temp;
 				
-				temp.reserve(sizeof(result[i])/ sizeof(*result[i]) + tempArrSize);
+				temp.reserve(sizeof(result[i])/ sizeof(result[i]) + tempArrSize);
 				temp.insert(temp.end(), std::begin(result[i]), std::end(result[i]));
 				temp.insert(temp.end(), std::begin(tempArr), std::end(tempArr));
+
+				std::string s(temp.begin(), temp.end());
+				std::cout << s;
 				// TODO make it works https://stackoverflow.com/questions/12791266/c-concatenate-two-int-arrays-into-one-larger-array/12791344
 				// https://stackoverflow.com/questions/62135867/c-const-char-with-begin-and-end
 
@@ -82,7 +80,7 @@ std::string WolframNumberToBin(int worframNumber, int PossibleStates, int Colour
 	std::reverse(std::begin(wolframNumber), std::end(wolframNumber));
 	return wolframNumber;
 }
-std::list<RuleSegment> generateRule(int initWorframNumber, int neighborhoodSize, std::string colours)
+/*std::list<RuleSegment> generateRule(int initWorframNumber, int neighborhoodSize, std::string colours)
 {
 	int colcoloursCount = colours.length();
 	long int possibleStates = pow(colcoloursCount,neighborhoodSize);
@@ -98,11 +96,11 @@ std::list<RuleSegment> generateRule(int initWorframNumber, int neighborhoodSize,
 	}
 	return rule;
 
-}
+}  */
 
 int main()
 {
-	std::cout << WolframNumberToBin(110, 8, 2);
+	product("123",3);
 	return 0;
 }
 

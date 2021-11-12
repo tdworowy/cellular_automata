@@ -68,5 +68,6 @@ if __name__ == "__main__":
     # input_list1 = np.full((20, 1), 0)
     # input_list1[len(input_list1) // 2] = 1
     # print(input_list1)
-    print(wolfram_number_to_bin(110, 8, 2))
-    #print(n_nary(110,2))
+    # print(wolfram_number_to_bin(110, 8, 2))
+    # print(n_nary(110,2))
+    print(list(product([1, 2, 3], repeat=3)))
