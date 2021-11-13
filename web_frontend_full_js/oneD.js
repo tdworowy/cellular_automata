@@ -9,7 +9,7 @@ const call_hight = config.call_hight;
 let y = 0;
 let grid = [];
 
-let hight = 1000;
+let hight = 10000;
 
 function generate_array_from_number(number) {
   return Array.from(Array(Number(number)).keys());
