@@ -1,32 +1,69 @@
 <html>
-  <head> </head>
+  <head>
+    <link rel="stylesheet" href="style-form.css" />
+  </head>
   <body>
     <form onsubmit="" id="initGrid">
-      <label for="width">Width:</label>
-      <input type="text" id="width" name="width" />
-      <label for="colors_count">Number of colors:</label>
-      <input type="text" id="colors_count" name="colors_count" />
-      <select id="grid_type" name="grid_type">
+      <div class=".form-group">
+        <input
+          class="input"
+          placeholder="Width"
+          type="text"
+          id="width"
+          name="width"
+          required
+        />
+        <label class="label" for="width">width</label>
+      </div>
+      <div class=".form-group">
+        <input
+          placeholder="Number of colors"
+          class="input"
+          type="text"
+          id="colors_count"
+          name="colors_count"
+          required
+        />
+        <label class="label" for="colors_count">Number of colors</label>
+      </div>
+      <select id="grid_type" name="grid_type" class="btn">
         <option value="random">random</option>
         <option value="center">center</option>
       </select>
-      <button type="submit">Generate init grid</button>
+      <button type="submit" class="btn">Generate init grid</button>
     </form>
     <div id="max_wolfram_number">Max wolfram number:</div>
     <br />
     <form onsubmit="" id="step">
-      <label for="neighborhood_size">Neighborhood size:</label>
-      <input type="text" id="neighborhood_size" name="neighborhood_size" />
-      <label for="wolfram_number">Wolfram number:</label>
-      <input
-        type="text"
-        id="wolfram_number"
-        name="wolfram_number"
-        disabled="true"
-      /><br />
-      <button type="submit">Next Step</button>
+      <div class=".form-group">
+        <input
+          placeholder="Neighborhood size"
+          class="input"
+          type="text"
+          id="neighborhood_size"
+          name="neighborhood_size"
+          required
+        />
+        <label class="label" for="neighborhood_size">Neighborhood size</label>
+      </div>
+      <div class=".form-group">
+        <input
+          placeholder="Wolfram number"
+          class="input"
+          type="text"
+          id="wolfram_number"
+          name="wolfram_number"
+          disabled="true"
+          required
+        />
+        <label class="label" for="wolfram_number">Wolfram number</label>
+      </div>
+
+      <button type="submit" class="btn">Next Step</button>
     </form>
-    <button id="generate" onclick="generate()">Generate</button> <br />
+    <button id="generate" class="btn" onclick="generate()">Generate</button>
+
+    <br />
     <canvas
       id="canvas"
       width="420px"
