@@ -47,7 +47,7 @@ $gray: #9b9b9b;
   position: relative;
   padding: 15px 0 0;
   margin-top: 10px;
-  width: 50%;
+  width: 100%;
 }
 
 .input {
@@ -62,7 +62,7 @@ $gray: #9b9b9b;
   background: transparent;
   transition: border-color 0.2s;
   &::placeholder {
-    color: $gray;
+    color: transparent;
   }
 
   &:placeholder-shown ~ .label {
@@ -77,7 +77,7 @@ $gray: #9b9b9b;
   display: block;
   transition: 0.2s;
   font-size: 1rem;
-  color: transparent;
+  color: $gray;
 }
 .input:focus {
   ~ .label {
@@ -112,4 +112,10 @@ body {
   min-height: 100vh;
   font-size: 1.5rem;
   background-color: #222222;
+}
+
+.max_wolfram_number {
+  position: relative;
+  left: 300px;
+  color: $white;
 }

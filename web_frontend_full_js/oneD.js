@@ -4,6 +4,9 @@ const neighborhood_size_input = document.getElementById("neighborhood_size");
 const colors_count_input = document.getElementById("colors_count");
 const max_wolfram_number_div = document.getElementById("max_wolfram_number");
 
+const next_step_button = document.getElementById("next_step");
+const generate_button = document.getElementById("generate");
+
 const call_width = config.call_width;
 const call_hight = config.call_hight;
 let y = 0;
@@ -185,12 +188,12 @@ function step() {
 
   generateGrid(grid, y);
 }
-function step_event(event) {
-  if (event) {
-    event.preventDefault();
-  }
-  step();
-}
+// function step_event(event) {
+//   if (event) {
+//     event.preventDefault();
+//   }
+//   step();
+// }
 
 function step_play() {
   step();
@@ -240,4 +243,5 @@ neighborhood_size_input.addEventListener("change", set_wolfram_number);
 neighborhood_size_input.addEventListener("change", set_wolfram_number);
 
 formEl.addEventListener("submit", initGrid);
-formE2.addEventListener("submit", step);
+next_step_button.addEventListener("click", step);
+generate_button.addEventListener("click", generate);
