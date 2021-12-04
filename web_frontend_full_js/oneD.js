@@ -5,7 +5,7 @@ const colors_count_input = document.getElementById("colors_count");
 const max_wolfram_number_div = document.getElementById("max_wolfram_number");
 
 const next_step_button = document.getElementById("next_step");
-const generate_button = document.getElementById("generate");
+const play_button = document.getElementById("play");
 
 const call_width = config.call_width;
 const call_hight = config.call_hight;
@@ -229,7 +229,7 @@ function generateGrid(grid, y) {
   }
 }
 
-function generate() {
+function play() {
   window.requestAnimationFrame(step_play);
 }
 
@@ -238,4 +238,4 @@ neighborhood_size_input.addEventListener("change", set_wolfram_number);
 
 formEl.addEventListener("submit", initGrid);
 next_step_button.addEventListener("click", step);
-generate_button.addEventListener("click", generate);
+play_button.addEventListener("click", play);
