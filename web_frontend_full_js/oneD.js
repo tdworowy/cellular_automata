@@ -188,12 +188,6 @@ function step() {
 
   generateGrid(grid, y);
 }
-// function step_event(event) {
-//   if (event) {
-//     event.preventDefault();
-//   }
-//   step();
-// }
 
 function step_play() {
   step();
