@@ -1,5 +1,6 @@
 const formEl = document.getElementById("initGrid");
 const formE2 = document.getElementById("step");
+const play_button = document.getElementById("play");
 
 const call_width = config.call_width;
 const call_hight = config.call_hight;
@@ -70,6 +71,8 @@ walled_cities_rules = {
   "1_4": 1,
   "1_5": 1,
 };
+
+let requestId = undefined;
 
 function generateSnowflakeRule(neighbours_numbers = [1]) {
   let snowflake_rules = {};
@@ -208,7 +211,7 @@ function step_event(event) {
 
 function step_play() {
   step();
-  window.requestAnimationFrame(step_play);
+  requestId = window.requestAnimationFrame(step_play);
 }
 
 function generateGrid(grid) {
@@ -230,8 +233,20 @@ function generateGrid(grid) {
 }
 
 function play() {
-  window.requestAnimationFrame(step_play);
+  if (!requestId) {
+    play_button.textContent = "Stop";
+    window.requestAnimationFrame(step_play);
+  }
+}
+function stop() {
+  if (requestId) {
+    play_button.textContent = "Play";
+    window.cancelAnimationFrame(requestId);
+    requestId = undefined;
+  }
 }
 
 formEl.addEventListener("submit", initGrid);
 formE2.addEventListener("submit", step_event);
+play_button.addEventListener("click", play);
+play_button.addEventListener("click", stop);

@@ -14,6 +14,8 @@ let grid = [];
 
 let hight = 10000;
 
+let requestId = undefined;
+
 function generate_array_from_number(number) {
   return Array.from(Array(Number(number)).keys());
 }
@@ -191,7 +193,7 @@ function step() {
 
 function step_play() {
   step();
-  window.requestAnimationFrame(step_play);
+  requestId = window.requestAnimationFrame(step_play);
 }
 
 function set_wolfram_number() {
@@ -230,12 +232,23 @@ function generateGrid(grid, y) {
 }
 
 function play() {
-  window.requestAnimationFrame(step_play);
+  if (!requestId) {
+    play_button.textContent = "Stop";
+    window.requestAnimationFrame(step_play);
+  }
 }
 
+function stop() {
+  if (requestId) {
+    play_button.textContent = "Play";
+    window.cancelAnimationFrame(requestId);
+    requestId = undefined;
+  }
+}
 neighborhood_size_input.addEventListener("change", set_wolfram_number);
 neighborhood_size_input.addEventListener("change", set_wolfram_number);
 
 formEl.addEventListener("submit", initGrid);
 next_step_button.addEventListener("click", step);
 play_button.addEventListener("click", play);
+play_button.addEventListener("click", stop);
