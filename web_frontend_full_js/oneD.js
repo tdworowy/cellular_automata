@@ -245,9 +245,8 @@ function stop() {
     requestId = undefined;
   }
 }
-neighborhood_size_input.addEventListener("change", set_wolfram_number);
-neighborhood_size_input.addEventListener("change", set_wolfram_number);
 
+neighborhood_size_input.addEventListener("change", set_wolfram_number);
 formEl.addEventListener("submit", initGrid);
 next_step_button.addEventListener("click", step);
 play_button.addEventListener("click", play);
