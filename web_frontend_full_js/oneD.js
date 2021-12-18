@@ -5,6 +5,7 @@ const colors_count_input = document.getElementById("colors_count");
 const max_wolfram_number_div = document.getElementById("max_wolfram_number");
 
 const next_step_button = document.getElementById("next_step");
+const random_number_button = document.getElementById("random_number");
 const play_button = document.getElementById("play");
 
 const call_width = config.call_width;
@@ -211,9 +212,7 @@ function set_wolfram_number() {
     document.getElementById("wolfram_number").value = wolfram_number;
     document.getElementById("wolfram_number").disabled = false;
 
-    max_wolfram_number_div.appendChild(
-      document.createTextNode(max_wolfram_number)
-    );
+    max_wolfram_number_div.innerText = `Max wolfram number: ${max_wolfram_number}`;
   }
 }
 
@@ -247,6 +246,7 @@ function stop() {
 }
 
 neighborhood_size_input.addEventListener("change", set_wolfram_number);
+random_number_button.addEventListener("click", set_wolfram_number);
 formEl.addEventListener("submit", initGrid);
 next_step_button.addEventListener("click", step);
 play_button.addEventListener("click", play);
