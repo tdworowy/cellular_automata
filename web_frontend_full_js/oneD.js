@@ -209,10 +209,10 @@ function set_wolfram_number() {
       parseInt(params.get("neighborhood_size")),
       parseInt(init_params.get("colors_count"))
     );
-    document.getElementById("wolfram_number").value = wolfram_number;
+    document.getElementById("wolfram_number").value = BigInt(wolfram_number);
     document.getElementById("wolfram_number").disabled = false;
 
-    max_wolfram_number_div.innerText = `Max wolfram number: ${max_wolfram_number}`;
+    max_wolfram_number_div.innerText = `Max wolfram number: ${BigInt(max_wolfram_number)}`;
   }
 }
 
