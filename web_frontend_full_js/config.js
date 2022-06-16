@@ -16,8 +16,8 @@ const colors = {
   0: blue,
   1: red,
   2: green,
-  3: black,
+  3: purple,
   4: aquamarine,
   5: gold,
-  6: purple,
+  6: black,
 };

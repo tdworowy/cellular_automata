@@ -4,7 +4,7 @@ const neighborhood_size_input = document.getElementById("neighborhood_size");
 const colors_count_input = document.getElementById("colors_count");
 const max_wolfram_number_div = document.getElementById("max_wolfram_number");
 
-const next_step_button = document.getElementById("next_step");
+//const next_step_button = document.getElementById("next_step");
 const random_number_button = document.getElementById("random_number");
 const play_button = document.getElementById("play");
 
@@ -13,9 +13,12 @@ const call_hight = config.call_hight;
 let y = 0;
 let grid = [];
 
-let hight = 10000;
+let hight = 1080;
 
 let requestId = undefined;
+
+const canvas = document.getElementById("canvas");
+const context = canvas.getContext("2d");
 
 function generate_array_from_number(number) {
   return Array.from(Array(Number(number)).keys());
@@ -172,28 +175,45 @@ function initGrid(event) {
 }
 
 let rule = undefined;
-const cache_rule = false;
+let wolfram_number_cashed = -1;
 
-function step() {
-  const params = new FormData(document.querySelector("#step"));
-  const init_params = new FormData(document.querySelector("#initGrid"));
-  const colours = generate_array_from_number(init_params.get("colors_count"));
-
-  if (!rule || !cache_rule) {
-    rule = generate_rule(
-      parseInt(params.get("wolfram_number")),
-      parseInt(params.get("neighborhood_size")),
-      colours
-    );
+function step(colours, wolfram_number, neighborhood_size) {
+  if (wolfram_number !== wolfram_number_cashed) {
+    rule = generate_rule(wolfram_number, neighborhood_size, colours);
+    wolfram_number_cashed = wolfram_number;
   }
+
   grid = cellular_automata_step_1d(grid, rule);
   y++;
-
   generateGrid(grid, y);
 }
 
+function take_canvas_screeanshot(name) {
+  // TODO work with name, and autosave
+  window.open(canvas.toDataURL("image/png"));
+}
+
 function step_play() {
-  step();
+  const params = new FormData(document.querySelector("#step"));
+  const init_params = new FormData(document.querySelector("#initGrid"));
+  const colours = generate_array_from_number(init_params.get("colors_count"));
+  const keep_playing = params.get("keep_playing");
+  const take_screeanshot = params.get("take_screeanshot");
+
+  const wolfram_number = parseInt(params.get("wolfram_number"));
+  const neighborhood_size = parseInt(params.get("neighborhood_size"));
+
+  if (y * call_hight <= hight) {
+    step(colours, wolfram_number, neighborhood_size);
+  } else {
+    if (take_screeanshot) {
+      take_canvas_screeanshot(`${wolfram_number}`);
+    }
+    if (keep_playing) {
+      y = 0;
+      set_wolfram_number();
+    }
+  }
   requestId = window.requestAnimationFrame(step_play);
 }
 
@@ -212,19 +232,18 @@ function set_wolfram_number() {
     document.getElementById("wolfram_number").value = BigInt(wolfram_number);
     document.getElementById("wolfram_number").disabled = false;
 
-    max_wolfram_number_div.innerText = `Max wolfram number: ${BigInt(max_wolfram_number)}`;
+    max_wolfram_number_div.innerText = `Max wolfram number: ${BigInt(
+      max_wolfram_number
+    )}`;
   }
 }
-
-const canvas = document.getElementById("canvas");
-const context = canvas.getContext("2d");
 
 function generateGrid(grid, y) {
   let x_cor = 0;
   let y_cor = 0;
   for (var x = 0; x < grid.length; x++) {
     context.fillStyle = colors[grid[x]];
-    y_cor = y * call_width;
+    y_cor = y * call_hight;
     context.fillRect(x_cor, y_cor, call_width, call_hight);
     x_cor = x * call_width;
   }
@@ -248,6 +267,6 @@ function stop() {
 neighborhood_size_input.addEventListener("change", set_wolfram_number);
 random_number_button.addEventListener("click", set_wolfram_number);
 formEl.addEventListener("submit", initGrid);
-next_step_button.addEventListener("click", step);
+//next_step_button.addEventListener("click", step);
 play_button.addEventListener("click", play);
 play_button.addEventListener("click", stop);
