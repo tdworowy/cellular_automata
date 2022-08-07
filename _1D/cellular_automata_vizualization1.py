@@ -94,7 +94,7 @@ class GUI:
             length=self.width // self.cell_size)
 
     def one_cell_start(self):
-        input_list = np.full((self.width // self.cell_size,1), 0)
+        input_list = np.full((self.width // self.cell_size, 1), 0)
         input_list[len(input_list) // 2] = 1
         return input_list
 
@@ -159,7 +159,7 @@ class GUI:
         self.play_all(generator())
 
     def play_all(self, rules_iter: Iterable):
-        self.silent = True
+        self.silent = False
 
         folder = f"1d_neighborhood_size_{self.neighborhood_size.get()}_colours_{self.color_count.get()}"
         if not path.isdir(folder):
@@ -170,7 +170,7 @@ class GUI:
             rule_file = f"rule_{rule}_{self.init_way}"
 
             if not self.replay and rule_file + ".png" in files_list:
-                break
+                continue
 
             self.rule = generate_rule(rule,
                                       int(self.neighborhood_size.get()),
@@ -214,7 +214,7 @@ class GUI:
 
 
 def main():
-    ui = GUI()
+    ui = GUI(width=1920, height=1080, cell_size=3)
     ui.main_loop()
 
 
