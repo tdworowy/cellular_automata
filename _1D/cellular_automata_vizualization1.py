@@ -93,7 +93,7 @@ class GUI:
             input_list=tuple(i for i in range(int(self.color_count.get()))),
             length=self.width // self.cell_size)
 
-    def one_cell_start(self):
+    def one_cell_start(self) -> np.ndarray:
         input_list = np.full((self.width // self.cell_size, 1), 0)
         input_list[len(input_list) // 2] = 1
         return input_list

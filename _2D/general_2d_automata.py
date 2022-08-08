@@ -1,7 +1,6 @@
 import numpy as np
 from collections import defaultdict
 from utils.utils import default_dict
-import time
 
 game_of_live_rules = {
     (0, 3): 1,
@@ -85,7 +84,7 @@ walled_cities_rules = {
 walled_cities_rules = defaultdict(lambda: 0, walled_cities_rules)
 
 
-def generate_snowflake_rule(neighbours_numbers: list = [1]):
+def generate_snowflake_rule(neighbours_numbers: list = [1]) -> dict:
     snowflake_rules = default_dict(lambda self, key: key[0])
 
     for neighbours_number in neighbours_numbers:
@@ -133,7 +132,7 @@ def generate_grid_central(width: int, height: int, cell_count: int = 1) -> np.nd
     return grid
 
 
-def count_colored_neighbours(x: int, y: int, grid: np.ndarray):
+def count_colored_neighbours(x: int, y: int, grid: np.ndarray) -> int:
     colored_neighbours = 0
     for i in range((x - 1) % grid.shape[0], (x + 2) % grid.shape[0]):
         for j in range((y - 1) % grid.shape[1], (y + 2) % grid.shape[1]):
@@ -141,7 +140,7 @@ def count_colored_neighbours(x: int, y: int, grid: np.ndarray):
     return colored_neighbours
 
 
-def update_grid_two_d(grid: np.ndarray, rules: defaultdict):
+def update_grid_two_d(grid: np.ndarray, rules: defaultdict) -> np.ndarray:
     new_grid = grid.copy()
     for i, row in enumerate(grid):
         for j, cell in enumerate(row):
