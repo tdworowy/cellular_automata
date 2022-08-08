@@ -118,7 +118,8 @@ class GUI:
             4: "white",
             5: "gold",
             6: "purple"
-        }
+            }
+
         for i in self.input_list:
             coordinate = self.rectangle_coordinates(self.x, self.y)
             colour = colours[int(i)]
