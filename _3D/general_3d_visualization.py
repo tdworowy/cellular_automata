@@ -8,7 +8,7 @@ from _3D.general_3d_automata import generate_grid_center_cell_start, update_grid
 
 
 class CellularAutomataCDVisualization:
-    def __init__(self, side=40, thk=0.1):
+    def __init__(self, side: int = 40, thk: float = 0.1):
         self.side = side
         self.thk = thk
         self.s2 = 2 * self.side - self.thk
@@ -36,7 +36,7 @@ class CellularAutomataCDVisualization:
 if __name__ == "__main__":
 
     grid = generate_grid_center_cell_start()
-    rules = _3d_rules.rule_3#_3d_rules.rule_1  # random_rule()
+    rules = _3d_rules.rule_3  # _3d_rules.rule_1  # random_rule()
     print(rules)
     visualization_3d = CellularAutomataCDVisualization()
     visualization_3d.generate_stage()

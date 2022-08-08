@@ -2,15 +2,11 @@ from collections import defaultdict
 from random import choice
 
 
-def random_rule(min_to_born=1):
+def random_rule(min_to_born: int = 1) -> dict:
     rule_a = {(0, i): choice([0, 1]) for i in range(27)}
     rule_b = {(1, i): choice([0, 1]) for i in range(27)}
 
-    rule = {**rule_a, **rule_b}
-
-    rule[(0, min_to_born)] = 1
-
-    return rule
+    return {**rule_a, **rule_b, (0, min_to_born): 1}
 
 
 rule_1 = {
@@ -31,7 +27,7 @@ rule_3 = {
     (0, 5): 1,
     (1, 5): 1
 }
-rule_3 = defaultdict(lambda: 0, rule_2)
+rule_3 = defaultdict(lambda: 0, rule_3)
 
 standard_game_of_live_rules = {
     (0, 3): 1,
