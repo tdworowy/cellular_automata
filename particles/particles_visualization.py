@@ -1,6 +1,11 @@
+import dataclasses
 import itertools
-from random import randint
+import math
+from random import randint, uniform
+from uuid import uuid4
+
 from kivy.app import App
+from kivy.clock import Clock
 from kivy.uix.widget import Widget
 from kivy.graphics import Color, Ellipse
 from kivy.config import Config
@@ -17,6 +22,25 @@ WIDTH = 1280
 HEIGHT = 720
 
 
+@dataclasses.dataclass
+class ParticleInfo:
+    id: str
+    color: str
+    x: int
+    y: int
+    vx: int
+    vy: int
+
+
+def random_rules():
+    rules = {}
+    colours_pairs = itertools.product(colours.keys(), colours.keys())
+    for pair in colours_pairs:
+        rules[pair] = uniform(-1, 1)
+
+    return rules
+
+
 class CanvasWidget(Widget):
 
     def __init__(self, **kwargs):
@@ -26,16 +50,84 @@ class CanvasWidget(Widget):
         Y = range(HEIGHT)
         self.coordinates = list(itertools.product(X, Y))
 
-    def generate_particle(self, x: int = 100, y: int = 100, color: tuple = (255, 255, 255, 8)):
-        with self.canvas:
-            Color(*color, mode='rgba')
-            self.particle = Ellipse(pos=(x - self.r, y - self.r), size=(2 * self.r, 2 * self.r))
-            print(self.particle)
+        self.particles = []
 
-    def generate_particles(self, count: int, color: tuple):
+        self.time_scale = 1
+        self.cutOff = 6400  # interaction distance
+        self.viscosity = 0.7
+        self.pulse_duration = 10
+
+        self.cutOff = 6400  #
+
+        self.rules = random_rules()
+
+    def generate_particle(self, id: str, color: str, x: int, y: int, vx: int, vy: int):
+        with self.canvas:
+            Color(*colours[color], mode='rgba')
+            x = x - self.r
+            y = y - self.r
+            particle = Ellipse(pos=(x, y), size=(2 * self.r, 2 * self.r))
+            self.particles.append(ParticleInfo(id, color, x, y, vx, vy))
+            print(particle)
+
+    def generate_init_particles(self, count: int, color: str):
         for i in range(count):
             x, y = self.coordinates.pop(randint(0, len(self.coordinates) - 1))
-            self.generate_particle(x, y, color)
+            self.generate_particle(str(uuid4()), color, x, y, 0, 0)
+
+    def update_particles(self):
+        self.canvas.clear()
+        particles = self.particles.copy()
+        self.particles = []
+
+        for particle in particles:
+            self.generate_particle(particle.id, particle.color, particle.x, particle.y, particle.vx, particle.vy)
+
+    def apply_rules(self, rules):
+        pulse = 0
+        pulse_x = 0
+        pulse_y = 0
+        total_v = 0
+        for particle_1 in self.particles:
+            fx = 0
+            fy = 0
+            for particle_2 in self.particles:
+                if particle_1.id != particle_2.id:
+                    g = rules[(particle_1.color, particle_2.color)]
+
+                    dx = particle_1.x - particle_2.x
+                    dy = particle_1.y - particle_2.y
+                    if dx != 0 or dy != 0:
+                        distance = dx * dx + dy * dy
+                        if distance < self.cutOff:
+                            F = g / math.sqrt(distance)
+                            fx += F * dx
+                            fy += F * dy
+            if pulse != 0:
+                dx = particle_1.x - pulse_x
+                dy = particle_1.y - pulse_y
+                distance = dx * dx + dy * dy
+                if distance < self.cutOff:
+                    F = 100. * pulse / distance / self.time_scale
+                    fx += F * dx
+                    fy += F * dy
+
+                vmix = (1 - self.viscosity)
+                particle_1.vx = particle_1.vx * vmix + fx * self.time_scale
+                particle_1.vy = particle_1.vy * vmix + fy * self.time_scale
+                particle_1.x += particle_1.vx
+                particle_1.y += particle_1.vy
+                total_v += math.fabs(particle_1.vx)
+                total_v += math.fabs(particle_1.vy)
+
+                if particle_1.x < 0 or particle_1.x >= WIDTH:
+                    particle_1.vx *= -1
+                    particle_1.x = 0 if particle_1.x < 0 else WIDTH - 1
+
+                if particle_1.y < 0 or particle_1.y >= HEIGHT:
+                    particle_1.vy *= -1
+                    particle_1.y = 0 if particle_1.y < 0 else HEIGHT - 1
+            total_v /= len(self.particles)
 
 
 class CanvasApp(App):
@@ -46,11 +138,18 @@ class CanvasApp(App):
         self.canvasWidget = CanvasWidget()
         return self.canvasWidget
 
+    def update(self, args):
+        self.canvasWidget.apply_rules(self.canvasWidget.rules)
+        self.canvasWidget.update_particles()
+
     def on_start(self, **kwargs):
-        self.canvasWidget.generate_particles(1000, colours["red"])
-        self.canvasWidget.generate_particles(1000, colours["blue"])
-        self.canvasWidget.generate_particles(1000, colours["green"])
+        self.canvasWidget.generate_init_particles(300, "red")
+        self.canvasWidget.generate_init_particles(300, "blue")
+        self.canvasWidget.generate_init_particles(300, "green")
+
+        Clock.schedule_interval(callback=self.update, timeout=0.01)
 
 
 if __name__ == "__main__":
     CanvasApp().run()
+
