@@ -3,7 +3,7 @@ const formE2 = document.getElementById("step");
 const play_button = document.getElementById("play");
 
 const call_width = config.call_width;
-const call_hight = config.call_hight;
+const call_height = config.call_height;
 let grid;
 let prev_grid;
 
@@ -104,9 +104,9 @@ rules = {
   snowflake_1_3: generateSnowflakeRule([1, 3]),
 };
 
-function generateGridRandom(hight, width, prob_of_one) {
+function generateGridRandom(height, width, prob_of_one) {
   let grid = [];
-  for (let i = 0; i < hight; i++) {
+  for (let i = 0; i < height; i++) {
     let row = [];
     for (let j = 0; j < width; j++) {
       let rand_int = Math.floor(Math.random() * 10 + 1);
@@ -118,12 +118,12 @@ function generateGridRandom(hight, width, prob_of_one) {
   return grid;
 }
 
-function generateGridCenter(hight, width) {
+function generateGridCenter(height, width) {
   let grid = [];
-  for (let i = 0; i < hight; i++) {
+  for (let i = 0; i < height; i++) {
     let row = [];
     for (let j = 0; j < width; j++) {
-      if (i === hight / 2 && j === width / 2) row.push(1);
+      if (i === height / 2 && j === width / 2) row.push(1);
       else row.push(0);
     }
     grid.push(row);
@@ -187,7 +187,7 @@ function initGrid(event) {
   }
   event.preventDefault();
   document.getElementById("canvas").width = params.get("width") * call_width;
-  document.getElementById("canvas").height = params.get("height") * call_hight;
+  document.getElementById("canvas").height = params.get("height") * call_height;
   generateGrid(grid);
 }
 
@@ -224,7 +224,7 @@ function generateGrid(grid) {
   for (var x = 0; x < grid.length; x++) {
     for (var y = 0; y < grid[x].length; y++) {
       context.fillStyle = colors[grid[x][y]];
-      context.fillRect(x_cor, y_cor, call_width, call_hight);
+      context.fillRect(x_cor, y_cor, call_width, call_height);
       x_cor = x * call_width;
       y_cor = y * call_width;
     }

@@ -9,11 +9,11 @@ const random_number_button = document.getElementById("random_number");
 const play_button = document.getElementById("play");
 
 const call_width = config.call_width;
-const call_hight = config.call_hight;
+const call_height = config.call_height;
 let y = 0;
 let grid = [];
 
-let hight = 1080;
+let height = 1080;
 
 let requestId = undefined;
 
@@ -161,7 +161,7 @@ function initGrid(event) {
   y = 0;
   const params = new FormData(document.querySelector("#initGrid"));
   document.getElementById("canvas").width = params.get("width") * call_width;
-  document.getElementById("canvas").height = hight;
+  document.getElementById("canvas").height = height;
   let states = generate_array_from_number(params.get("colors_count"));
 
   if (params.get("grid_type") == "random") {
@@ -203,7 +203,7 @@ function step_play() {
   const wolfram_number = parseInt(params.get("wolfram_number"));
   const neighborhood_size = parseInt(params.get("neighborhood_size"));
 
-  if (y * call_hight <= hight) {
+  if (y * call_height <= height) {
     step(colours, wolfram_number, neighborhood_size);
   } else {
     if (take_screeanshot) {
@@ -243,8 +243,8 @@ function generateGrid(grid, y) {
   let y_cor = 0;
   for (var x = 0; x < grid.length; x++) {
     context.fillStyle = colors[grid[x]];
-    y_cor = y * call_hight;
-    context.fillRect(x_cor, y_cor, call_width, call_hight);
+    y_cor = y * call_height;
+    context.fillRect(x_cor, y_cor, call_width, call_height);
     x_cor = x * call_width;
   }
 }

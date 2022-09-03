@@ -1,6 +1,6 @@
 const config = {
   call_width: 2,
-  call_hight: 2,
+  call_height: 2,
   iterations: 50,
 };
 
