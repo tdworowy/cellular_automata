@@ -22,11 +22,13 @@ WIDTH = 800
 HEIGHT = 600
 
 
-def ParticleInfo(color: str, x: int, y: int, vx: int, vy: int):
+# TODO genrate steps first, then render it
+
+def particle_info(color: str, x: int, y: int, vx: int, vy: int) -> dict:
     return {"color": color, "x": x, "y": y, "vx": vx, "vy": vy}
 
 
-def random_rules():
+def random_rules() -> dict:
     rules = {}
     colours_pairs = itertools.product(colours.keys(), colours.keys())
     for pair in colours_pairs:
@@ -58,7 +60,7 @@ class CanvasWidget(Widget):
         with self.canvas:
             Color(*colours[color], mode='rgba')
             particle = Ellipse(pos=(x, y), size=(2 * self.r, 2 * self.r))
-            self.particles.append(ParticleInfo(color, x, y, vx, vy))
+            self.particles.append(particle_info(color, x, y, vx, vy))
             print(particle)
 
     def generate_init_particles(self, count: int, color: str):
