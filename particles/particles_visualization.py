@@ -31,7 +31,7 @@ def random_rules():
     rules = {}
     colours_pairs = itertools.product(colours.keys(), colours.keys())
     for pair in colours_pairs:
-        rules[pair] = uniform(-1, 1)
+        rules[pair] = uniform(-2, 2)  # -1, 1
 
     return rules
 
@@ -48,19 +48,16 @@ class CanvasWidget(Widget):
         self.particles = []
 
         self.time_scale = 1
-        self.cutOff = 6400  # interaction distance
         self.viscosity = 0.7
         self.pulse_duration = 10
 
-        self.cutOff = 640  # 6400
+        self.cutOff = 1000  # 6400 # interaction distance
 
         self.rules = random_rules()
 
     def generate_particle(self, color: str, x: int, y: int, vx: int, vy: int):
         with self.canvas:
             Color(*colours[color], mode='rgba')
-            x = x - self.r
-            y = y - self.r
             particle = Ellipse(pos=(x, y), size=(2 * self.r, 2 * self.r))
             self.particles.append(ParticleInfo(color, x, y, vx, vy))
             print(particle)
@@ -94,21 +91,21 @@ class CanvasWidget(Widget):
                             fx += F * dx
                             fy += F * dy
 
-            vmix = (1 - self.viscosity)
+            vmix = (1. - self.viscosity)
             particle_1["vx"] = particle_1["vx"] * vmix + fx * self.time_scale
             particle_1["vy"] = particle_1["vy"] * vmix + fy * self.time_scale
 
+        for particle in self.particles:
+            particle["x"] += particle["vx"]
+            particle["y"] += particle["vy"]
 
-            particle_1["x"] += particle_1["vx"]
-            particle_1["y"] += particle_1["vy"]
+            if particle["x"] < 0 or particle["x"] >= WIDTH:
+                particle["vx"] *= -1
+                particle["x"] = 0 if particle["x"] < 0 else WIDTH - 1
 
-            if particle_1["x"] < 0 or particle_1["x"] >= WIDTH:
-                particle_1["vx"] *= -1
-                particle_1["x"] = 0 if particle_1["x"] < 0 else WIDTH - 1
-
-            if particle_1["y"] < 0 or particle_1["y"] >= HEIGHT:
-                particle_1["vy"] *= -1
-                particle_1["y"] = 0 if particle_1["y"] < 0 else HEIGHT - 1
+            if particle["y"] < 0 or particle["y"] >= HEIGHT:
+                particle["vy"] *= -1
+                particle["y"] = 0 if particle["y"] < 0 else HEIGHT - 1
 
 
 class CanvasApp(App):
@@ -124,9 +121,9 @@ class CanvasApp(App):
         self.canvasWidget.update_particles()
 
     def on_start(self, **kwargs):
-        self.canvasWidget.generate_init_particles(100, "red")
-        self.canvasWidget.generate_init_particles(100, "blue")
-        self.canvasWidget.generate_init_particles(100, "green")
+        self.canvasWidget.generate_init_particles(130, "red")
+        self.canvasWidget.generate_init_particles(130, "blue")
+        self.canvasWidget.generate_init_particles(130, "green")
 
         Clock.schedule_interval(callback=self.update, timeout=0.0)
         with open("rules.txt", "a") as rule_file:
