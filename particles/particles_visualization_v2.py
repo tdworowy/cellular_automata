@@ -24,6 +24,7 @@ HEIGHT = 600
 particles_queue = Queue()
 
 
+# TODO mayby use PyOpenGL to render graphics
 def particle_info(color: str, x: int, y: int, vx: int, vy: int) -> dict:
     return {"color": color, "x": x, "y": y, "vx": vx, "vy": vy}
 
