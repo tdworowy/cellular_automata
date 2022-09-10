@@ -1,15 +1,12 @@
 import itertools
 import math
 from random import randint, uniform
-# from threading import Thread
 from multiprocessing import Process, Queue
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.uix.widget import Widget
 from kivy.graphics import Color, Ellipse
 from kivy.config import Config
-
-# from queue import Queue
 
 colours = {"blue": (0, 0, 255, 255),
            "red": (255, 0, 0, 255),
@@ -48,9 +45,8 @@ class ParticlesGenerator:
 
         self.time_scale = 1
         self.viscosity = 0.7
-        self.pulse_duration = 10
 
-        self.cutOff = 1000  # 6400 # interaction distance
+        self.cutOff = 1500  # 6400 # interaction distance
 
         self.rules = random_rules()
 
