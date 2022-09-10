@@ -57,9 +57,9 @@ class CanvasWidget(Widget):
     def generate_particle(self, color: str, x: int, y: int, vx: int, vy: int):
         with self.canvas:
             Color(*colours[color], mode='rgba')
-            particle = Ellipse(pos=(x, y), size=(2 * self.r, 2 * self.r))
+            Ellipse(pos=(x, y), size=(2 * self.r, 2 * self.r))
             self.particles.append(particle_info(color, x, y, vx, vy))
-            print(particle)
+
 
     def generate_init_particles(self, count: int, color: str):
         for i in range(count):
