@@ -22,8 +22,6 @@ WIDTH = 800
 HEIGHT = 600
 
 
-# TODO genrate steps first, then render it
-
 def particle_info(color: str, x: int, y: int, vx: int, vy: int) -> dict:
     return {"color": color, "x": x, "y": y, "vx": vx, "vy": vy}
 
@@ -122,12 +120,12 @@ class CanvasApp(App):
         self.canvasWidget.update_particles()
 
     def on_start(self, **kwargs):
-        self.canvasWidget.generate_init_particles(130, "red")
-        self.canvasWidget.generate_init_particles(130, "blue")
-        self.canvasWidget.generate_init_particles(130, "green")
+        self.canvasWidget.generate_init_particles(100, "red")
+        self.canvasWidget.generate_init_particles(100, "blue")
+        self.canvasWidget.generate_init_particles(100, "green")
 
         Clock.schedule_interval(callback=self.update, timeout=0.0)
-        with open("rules.txt", "a") as rule_file:
+        with open("interesting_rules.txt", "a") as rule_file:
             rule_file.write(f"{str(self.canvasWidget.rules)}\n")
 
 
