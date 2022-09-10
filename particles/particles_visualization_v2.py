@@ -65,8 +65,7 @@ class CanvasApp(App):
         init_particles += particles_generator.generate_init_particles(150, "purple")
 
         self.canvasWidget.generate_particle(init_particles)
-        #rules = random_rules(colours)
-        rules = {('blue', 'blue'): -1.619456250134184, ('blue', 'red'): -0.3459078130538211, ('blue', 'green'): 1.9235154087769644, ('blue', 'purple'): 0.7328078105108142, ('red', 'blue'): -1.9393750396825413, ('red', 'red'): -0.6213147956593676, ('red', 'green'): 1.4581702264244472, ('red', 'purple'): 1.0189031499122243, ('green', 'blue'): -0.7719620051953995, ('green', 'red'): -0.07758659422276581, ('green', 'green'): 0.7873139469760457, ('green', 'purple'): -0.44476962397851905, ('purple', 'blue'): -0.5279724795400558, ('purple', 'red'): 1.7644963352292482, ('purple', 'green'): 1.8229069818418595, ('purple', 'purple'): 1.8826645344706283}
+        rules = random_rules(colours)
 
         process = Process(target=particles_generator.update_particles,
                           args=(rules, init_particles, particles_queue))
