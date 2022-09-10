@@ -60,7 +60,6 @@ class CanvasWidget(Widget):
             Ellipse(pos=(x, y), size=(2 * self.r, 2 * self.r))
             self.particles.append(particle_info(color, x, y, vx, vy))
 
-
     def generate_init_particles(self, count: int, color: str):
         for i in range(count):
             x, y = self.coordinates.pop(randint(0, len(self.coordinates) - 1))
@@ -125,7 +124,7 @@ class CanvasApp(App):
         self.canvasWidget.generate_init_particles(100, "green")
 
         Clock.schedule_interval(callback=self.update, timeout=0.0)
-        with open("interesting_rules.txt", "a") as rule_file:
+        with open("rules.txt", "a") as rule_file:
             rule_file.write(f"{str(self.canvasWidget.rules)}\n")
 
 
