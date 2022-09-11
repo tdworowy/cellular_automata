@@ -16,4 +16,4 @@ if __name__ == '__main__':
     if visualizations[number] == 'langton_ant':
         LangtonAnt(width=1085, height=1085, cell_size=5).main_loop()
     else:
-        CellularAutomata2DVisualization(rules=rules[visualizations[number]], width=1085, height=1085, cell_size=10).main_loop()
+        CellularAutomata2DVisualization(rules=rules[visualizations[number]], width=1085, height=1085, cell_size=5).main_loop()

@@ -51,7 +51,7 @@ class SnowflakeVisualization(CellularAutomata2DVisualization):
         while 1:
             self.step_call_back()
             self.top.update()
-            print(f"step:{self.step}")
+            # print(f"step:{self.step}")
             self.step += 1
 
     def main_loop(self):

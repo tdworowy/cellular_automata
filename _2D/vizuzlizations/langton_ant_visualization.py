@@ -77,7 +77,7 @@ class LangtonAnt:
 
         while 1:
             self.step_call_back()
-            print(f"step: {self.step}")
+            #  print(f"step: {self.step}")
             self.top.update()
             self.step += 1
 

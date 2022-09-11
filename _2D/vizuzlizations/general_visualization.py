@@ -21,7 +21,7 @@ class CellularAutomata2DVisualization:
 
         self.cell_size = cell_size
 
-        self.prev_step = np.full((height//cell_size, width//cell_size), -1)
+        self.prev_step = np.full((height // cell_size, width // cell_size), -1)
 
         self.probability_of_one = probability_of_one
 
@@ -70,7 +70,7 @@ class CellularAutomata2DVisualization:
         while 1:
             self.step_call_back()
             self.top.update()
-            print(f"step: {self.step}")
+            # print(f"step: {self.step}")
             self.step += 1
 
     def main_loop(self):
