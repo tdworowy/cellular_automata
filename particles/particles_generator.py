@@ -4,6 +4,7 @@ from multiprocessing import Queue
 from random import uniform, randint
 
 
+# TODO rewrite using numpy ?
 def particle_info(color: str, x: int, y: int, vx: int, vy: int) -> dict:
     return {"color": color, "x": x, "y": y, "vx": vx, "vy": vy}
 
@@ -38,6 +39,7 @@ class ParticlesGenerator:
             particles.append(particle_info(color, x, y, 0, 0))
         return particles
 
+    # TODO make it multithread ?
     def apply_rules(self, rules: dict, particles: list) -> list:
         for particle_1 in particles:
             fx = 0
@@ -45,7 +47,6 @@ class ParticlesGenerator:
             for particle_2 in particles:
                 if id(particle_1) != id(particle_2):
                     g = rules[(particle_1["color"], particle_2["color"])]
-
                     dx = particle_1["x"] - particle_2["x"]
                     dy = particle_1["y"] - particle_2["y"]
                     if dx != 0 or dy != 0:
@@ -82,6 +83,7 @@ class ParticlesGenerator:
 
 if __name__ == "__main__":
     from multiprocessing import Process
+
     particles_queue = Queue()
 
     WIDTH = 1280

@@ -61,6 +61,8 @@ def on_draw():
         batch.draw()
 
         rules = random_rules(colours)
+        with open("rules.txt", "a") as rule_file:
+            rule_file.write(f"{str(rules)}\n")
 
         process = Process(target=particles_generator.update_particles,
                           args=(rules, init_particles, particles_queue))
