@@ -23,9 +23,6 @@ HEIGHT = 720
 particles_queue = Queue()
 
 
-# TODO maybe use pyglet or  wxPython to render graphics
-
-
 class CanvasWidget(Widget):
 
     def __init__(self, **kwargs):

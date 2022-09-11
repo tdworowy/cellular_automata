@@ -8,11 +8,11 @@ def particle_info(color: str, x: int, y: int, vx: int, vy: int) -> dict:
     return {"color": color, "x": x, "y": y, "vx": vx, "vy": vy}
 
 
-def random_rules(colours: dict) -> dict:
+def random_rules(colours: dict, rule_range: tuple = (-2, 2)) -> dict:
     rules = {}
     colours_pairs = itertools.product(colours.keys(), colours.keys())
     for pair in colours_pairs:
-        rules[pair] = uniform(-2, 2)  # -1, 1
+        rules[pair] = uniform(*rule_range)  # -1, 1
 
     return rules
 
@@ -78,3 +78,35 @@ class ParticlesGenerator:
         while 1:
             particles = self.apply_rules(rule, particles)
             particles_queue.put(particles)
+
+
+if __name__ == "__main__":
+    from multiprocessing import Process
+    particles_queue = Queue()
+
+    WIDTH = 1280
+    HEIGHT = 720
+
+    colours = {"blue": (0, 0, 255, 255),
+               "red": (255, 0, 0, 255),
+               "green": (0, 255, 0, 255),
+               "purple": (255, 0, 255, 255)
+               # "aquamarine": (102, 205, 212, 255),
+               # "gold": (255, 215, 0, 255),
+               }
+
+    particles_generator = ParticlesGenerator(width=WIDTH, height=HEIGHT)
+    init_particles = particles_generator.generate_init_particles(300, "red")
+    init_particles += particles_generator.generate_init_particles(300, "blue")
+    init_particles += particles_generator.generate_init_particles(300, "green")
+    init_particles += particles_generator.generate_init_particles(300, "purple")
+
+    rules = random_rules(colours)
+
+    process = Process(target=particles_generator.update_particles,
+                      args=(rules, init_particles, particles_queue))
+    process.daemon = True
+    process.start()
+
+    while 1:
+        pass
