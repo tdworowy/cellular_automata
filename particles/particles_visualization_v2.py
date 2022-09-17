@@ -5,7 +5,7 @@ from kivy.uix.widget import Widget
 from kivy.graphics import Color, Ellipse
 from kivy.config import Config
 
-from particles.particles_generator import ParticlesGenerator, random_rules
+from particles.particles_generator_v1 import ParticlesGenerator, random_rules
 
 colours = {"blue": (0, 0, 255, 255),
            "red": (255, 0, 0, 255),

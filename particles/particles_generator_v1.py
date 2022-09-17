@@ -39,7 +39,6 @@ class ParticlesGenerator:
             particles.append(particle_info(color, x, y, 0, 0))
         return particles
 
-    # TODO make it multithread ?
     def apply_rules(self, rules: dict, particles: list) -> list:
         for particle_1 in particles:
             fx = 0

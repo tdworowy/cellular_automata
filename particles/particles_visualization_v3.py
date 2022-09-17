@@ -4,7 +4,7 @@ import pyglet
 from pyglet import shapes
 from pyglet import clock
 
-from particles.particles_generator import ParticlesGenerator, random_rules
+from particles.particles_generator_v2 import ParticlesGenerator, random_rules
 
 colours = {"blue": (0, 0, 255),
            "red": (255, 0, 0),
@@ -51,18 +51,19 @@ def on_draw():
     if start[0] == 0:
         particles_generator = ParticlesGenerator(width=WIDTH, height=HEIGHT)
 
-        init_particles = particles_generator.generate_init_particles(150, "red")
-        init_particles += particles_generator.generate_init_particles(150, "blue")
-        init_particles += particles_generator.generate_init_particles(150, "green")
-        init_particles += particles_generator.generate_init_particles(150, "purple")
+        init_particles = particles_generator.generate_init_particles(50, "red")
+        init_particles += particles_generator.generate_init_particles(50, "blue")
+        init_particles += particles_generator.generate_init_particles(50, "green")
+        init_particles += particles_generator.generate_init_particles(50, "purple")
 
         window.clear()
         generate_particles(init_particles)
         batch.draw()
 
         rules = random_rules(colours)
-        with open("rules.txt", "a") as rule_file:
-            rule_file.write(f"{str(rules)}\n")
+
+        # with open("rules.txt", "a") as rule_file:
+        #     rule_file.write(f"{str(rules)}\n")
 
         process = Process(target=particles_generator.update_particles,
                           args=(rules, init_particles, particles_queue))
