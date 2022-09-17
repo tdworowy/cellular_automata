@@ -51,10 +51,10 @@ def on_draw():
     if start[0] == 0:
         particles_generator = ParticlesGenerator(width=WIDTH, height=HEIGHT)
 
-        init_particles = particles_generator.generate_init_particles(50, "red")
-        init_particles += particles_generator.generate_init_particles(50, "blue")
-        init_particles += particles_generator.generate_init_particles(50, "green")
-        init_particles += particles_generator.generate_init_particles(50, "purple")
+        init_particles = particles_generator.generate_init_particles(250, "red")
+        init_particles += particles_generator.generate_init_particles(250, "blue")
+        init_particles += particles_generator.generate_init_particles(250, "green")
+        init_particles += particles_generator.generate_init_particles(250, "purple")
 
         window.clear()
         generate_particles(init_particles)

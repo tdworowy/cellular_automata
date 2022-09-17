@@ -1,12 +1,14 @@
 import itertools
 import math
+import operator
 import uuid
+from functools import reduce
 from multiprocessing import Queue as MultiprocessingQueue
 from threading import Thread
 from random import uniform, randint
 from time import sleep
 
-# TODO fix it
+# TODO performance is still not great
 
 thread_results = []
 
@@ -76,7 +78,6 @@ class ParticlesGenerator:
     def apply_rules(self, rules: dict, particles: list, number_of_threads: int) -> list:
         threads = []
         particles_chunks = list(split(particles, number_of_threads))
-        print(len(particles_chunks))
 
         for i in range(number_of_threads):
             thread = Thread(target=self.apply_rules_thread, args=(rules, particles_chunks[i], particles))
@@ -86,7 +87,9 @@ class ParticlesGenerator:
         for thread in threads:
             thread.join()
 
-        particles_results = [particle for particle in thread_results.pop() for _ in range(number_of_threads)]
+        particles_results = reduce(operator.iconcat, thread_results, [])
+        # list(itertools.chain.from_iterable(thread_results))
+        thread_results.clear()
 
         for particle in particles_results:
             particle["x"] += particle["vx"]
@@ -105,7 +108,7 @@ class ParticlesGenerator:
     def update_particles(self, rule: dict, init_particles: list, particles_queue: MultiprocessingQueue,
                          ):
         particles = init_particles
-        number_of_threads = len(particles) // 10
+        number_of_threads = 4  # len(particles) // 10
         while 1:
             particles = self.apply_rules(rule, particles, number_of_threads)
             particles_queue.put(particles)
