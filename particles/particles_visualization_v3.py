@@ -36,7 +36,7 @@ def generate_particles(particles: list):
         rendered_particles.append(rendered_particle)
 
 
-def update_particles(*args, **Kwargs):
+def update_particles(*args, **kwargs):
     particles = particles_queue.get()
     if particles:
         rendered_particles.clear()
@@ -51,10 +51,10 @@ def on_draw():
     if start[0] == 0:
         particles_generator = ParticlesGenerator(width=WIDTH, height=HEIGHT)
 
-        init_particles = particles_generator.generate_init_particles(250, "red")
-        init_particles += particles_generator.generate_init_particles(250, "blue")
-        init_particles += particles_generator.generate_init_particles(250, "green")
-        init_particles += particles_generator.generate_init_particles(250, "purple")
+        init_particles = particles_generator.generate_init_particles(150, "red")
+        init_particles += particles_generator.generate_init_particles(150, "blue")
+        init_particles += particles_generator.generate_init_particles(150, "green")
+        init_particles += particles_generator.generate_init_particles(150, "purple")
 
         window.clear()
         generate_particles(init_particles)

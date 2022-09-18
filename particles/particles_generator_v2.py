@@ -1,6 +1,7 @@
 import itertools
 import math
 import operator
+import time
 import uuid
 from functools import reduce
 from multiprocessing import Queue as MultiprocessingQueue
@@ -108,7 +109,7 @@ class ParticlesGenerator:
     def update_particles(self, rule: dict, init_particles: list, particles_queue: MultiprocessingQueue,
                          ):
         particles = init_particles
-        number_of_threads = 4  # len(particles) // 10
+        number_of_threads = len(particles) // 10
         while 1:
             particles = self.apply_rules(rule, particles, number_of_threads)
             particles_queue.put(particles)
@@ -131,10 +132,10 @@ if __name__ == "__main__":
                }
 
     particles_generator = ParticlesGenerator(width=WIDTH, height=HEIGHT)
-    init_particles = particles_generator.generate_init_particles(5, "red")
-    init_particles += particles_generator.generate_init_particles(5, "blue")
-    init_particles += particles_generator.generate_init_particles(5, "green")
-    init_particles += particles_generator.generate_init_particles(5, "purple")
+    init_particles = particles_generator.generate_init_particles(200, "red")
+    init_particles += particles_generator.generate_init_particles(200, "blue")
+    init_particles += particles_generator.generate_init_particles(200, "green")
+    init_particles += particles_generator.generate_init_particles(200, "purple")
 
     rules = random_rules(colours)
 
@@ -142,7 +143,6 @@ if __name__ == "__main__":
                       args=(rules, init_particles, particles_queue))
     process.daemon = True
     process.start()
-
-    while 1:
-        sleep(20)
-        break
+    start_time = time.time()
+    particles_queue.get()
+    print("--- %s seconds ---" % (time.time() - start_time))
