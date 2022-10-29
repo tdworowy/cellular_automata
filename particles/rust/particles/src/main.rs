@@ -27,12 +27,12 @@ fn generate_init_particles(
     count: u16,
     color: u8,
     coordinates: Vec<(u16, u16)>,
-) -> Vec<ParticleInfo> {
+) -> (Vec<ParticleInfo>, Vec<(u16, u16)>) {
     let mut init_partilces: Vec<ParticleInfo> = Vec::new();
 
     let coordinates_sample: Vec<(u16, u16)> = coordinates
         .choose_multiple(&mut rand::thread_rng(), count as usize)
-        .cloned() // TODO find way to pop from coordinates
+        .cloned()
         .collect::<Vec<(u16, u16)>>();
 
     for i in 0..count {
@@ -45,7 +45,7 @@ fn generate_init_particles(
             vy: 0,
         });
     }
-    init_partilces
+    (init_partilces, coordinates_sample)
 }
 
 fn main() {
@@ -53,9 +53,12 @@ fn main() {
     let Y: Vec<u16> = (0..HEIGHT).collect();
     let coordinates: Vec<(u16, u16)> = iproduct!(X, Y).collect();
 
-    let init_particles = generate_init_particles(32, 1, coordinates);
+    let result = generate_init_particles(200, 1, coordinates);
+    let init_red_particles = result.0;
+   
+    let used_coordinates = result.1;  // TODO filter coordinates
 
-    println!("{:?}", init_particles)
+    println!("{:?}", init_red_particles)
     //     println!("{:?}", coordinates)
     // for (x,y) in coordinates {
     //     println!("{} {}", x,y);
