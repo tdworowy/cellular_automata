@@ -25,10 +25,13 @@ struct ParticleInfo {
 
 fn generate_init_particles(
     count: u16,
-    color: u8,
+    color_count: u16,
     coordinates: Vec<(u16, u16)>,
-) -> (Vec<ParticleInfo>, Vec<(u16, u16)>) {
+) -> Vec<ParticleInfo> {
+    let count_per_color = count / color_count;
+    let mut j = 0;
     let mut init_partilces: Vec<ParticleInfo> = Vec::new();
+    let mut color = 1;
 
     let coordinates_sample: Vec<(u16, u16)> = coordinates
         .choose_multiple(&mut rand::thread_rng(), count as usize)
@@ -44,8 +47,14 @@ fn generate_init_particles(
             vx: 0,
             vy: 0,
         });
+
+        j += 1;
+        if j >= count_per_color {
+            color += 1;
+            j = 0;
+        }
     }
-    (init_partilces, coordinates_sample)
+    init_partilces
 }
 
 fn main() {
@@ -53,12 +62,9 @@ fn main() {
     let Y: Vec<u16> = (0..HEIGHT).collect();
     let coordinates: Vec<(u16, u16)> = iproduct!(X, Y).collect();
 
-    let result = generate_init_particles(200, 1, coordinates);
-    let init_red_particles = result.0;
-   
-    let used_coordinates = result.1;  // TODO filter coordinates
+    let init_particles = generate_init_particles(800, 4, coordinates);
 
-    println!("{:?}", init_red_particles)
+    println!("{:?}", init_particles)
     //     println!("{:?}", coordinates)
     // for (x,y) in coordinates {
     //     println!("{} {}", x,y);
