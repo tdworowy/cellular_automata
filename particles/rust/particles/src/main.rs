@@ -10,7 +10,7 @@ static WIDTH: u16 = 2560;
 static HEIGHT: u16 = 1440;
 static TIME_SCALE: f32 = 1.0;
 static VELOCITY: f32 = 0.7;
-static ITERATION_DISTANCE: u16 = 2000;
+static ITERATION_DISTANCE: u16 = 3500;
 
 fn get_colors() -> HashMap<u16, (f32, f32, f32)> {
     HashMap::from([
@@ -77,10 +77,10 @@ fn apply_rules(
         result.push(ParticleInfo {
             id: particle1.id,
             color: particle1.color,
-            x: x,
-            y: y,
-            vx: vx,
-            vy: vy,
+            x,
+            y,
+            vx,
+            vy,
         });
     }
     result
@@ -143,7 +143,7 @@ fn main() {
         let mut particles = generate_init_particles(1600, color_count, coordinates);
         let rules = generate_random_rule(color_count, (-2.0, 2.0));
 
-        for i in 0..5000 {
+        for _ in 0..5000 {
             canvas.draw(|gc| {
                 gc.clear_canvas(Color::Rgba(0.0, 0.0, 0.0, 1.0));
                 gc.canvas_height(HEIGHT as f32);
