@@ -12,6 +12,16 @@ static TIME_SCALE: f32 = 1.0;
 static VELOCITY: f32 = 0.7;
 static ITERATION_DISTANCE: u16 = 3500;
 
+#[derive(Debug, Clone)]
+struct ParticleInfo {
+    id: u16,
+    color: u16,
+    x: f32,
+    y: f32,
+    vx: f32,
+    vy: f32,
+}
+
 fn get_colors() -> HashMap<u16, (f32, f32, f32)> {
     HashMap::from([
         (1, (0.0, 0.0, 1.0)), // red
@@ -84,16 +94,6 @@ fn apply_rules(
         });
     }
     result
-}
-
-#[derive(Debug, Clone)]
-struct ParticleInfo {
-    id: u16,
-    color: u16,
-    x: f32,
-    y: f32,
-    vx: f32,
-    vy: f32,
 }
 
 fn generate_init_particles(
