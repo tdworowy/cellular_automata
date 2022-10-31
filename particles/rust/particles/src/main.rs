@@ -140,7 +140,7 @@ fn main() {
         let Y: Vec<u16> = (0..HEIGHT).collect();
         let coordinates: Vec<(u16, u16)> = iproduct!(X, Y).collect();
 
-        let mut particles = generate_init_particles(3200, color_count, coordinates);
+        let mut particles = generate_init_particles(1600, color_count, coordinates);
         let rules = generate_random_rule(color_count, (-2.0, 2.0));
 
         for i in 0..5000 {
