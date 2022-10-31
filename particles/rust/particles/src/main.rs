@@ -3,18 +3,21 @@ use rand::seq::SliceRandom;
 use rand::Rng;
 use std::collections::HashMap;
 
-static WIDTH: u16 = 1280;
-static HEIGHT: u16 = 720;
+use flo_canvas::*;
+use flo_draw::*;
+
+static WIDTH: u16 = 2560;
+static HEIGHT: u16 = 1440;
 static TIME_SCALE: f32 = 1.0;
 static VELOCITY: f32 = 0.7;
 static ITERATION_DISTANCE: u16 = 2000;
 
-fn get_colors() -> HashMap<u8, (u8, u8, u8)> {
+fn get_colors() -> HashMap<u16, (f32, f32, f32)> {
     HashMap::from([
-        (1, (0, 0, 255)),   // red
-        (2, (255, 0, 0)),   // grean
-        (3, (0, 255, 0)),   // blue
-        (4, (255, 215, 0)), // yellow
+        (1, (0.0, 0.0, 1.0)), // red
+        (2, (1.0, 0.0, 0.0)), // grean
+        (3, (0.0, 1.0, 0.0)), // blue
+        (4, (1.0, 0.7, 0.0)), // yellow
     ])
 }
 
@@ -31,7 +34,7 @@ fn generate_random_rule(color_count: u16, rule_range: (f32, f32)) -> HashMap<(u1
 }
 
 fn apply_rules(
-    rules: HashMap<(u16, u16), f32>,
+    rules: &HashMap<(u16, u16), f32>,
     particles_sub_list: Vec<ParticleInfo>,
     all_particles: &Vec<ParticleInfo>,
 ) -> Vec<ParticleInfo> {
@@ -129,22 +132,34 @@ fn generate_init_particles(
 }
 
 fn main() {
-    let color_count: u16 = 4;
+    with_2d_graphics(|| {
+        let canvas = create_drawing_window("Particles");
+        let color_count: u16 = 4;
 
-    let X: Vec<u16> = (0..WIDTH).collect();
-    let Y: Vec<u16> = (0..HEIGHT).collect();
-    let coordinates: Vec<(u16, u16)> = iproduct!(X, Y).collect();
+        let X: Vec<u16> = (0..WIDTH).collect();
+        let Y: Vec<u16> = (0..HEIGHT).collect();
+        let coordinates: Vec<(u16, u16)> = iproduct!(X, Y).collect();
 
-    let init_particles = generate_init_particles(800, color_count, coordinates);
-    let rules = generate_random_rule(color_count, (-2.0, 2.0));
+        let mut particles = generate_init_particles(3200, color_count, coordinates);
+        let rules = generate_random_rule(color_count, (-2.0, 2.0));
 
-    let particles = apply_rules(rules, init_particles.clone(), &init_particles);
+        for i in 0..5000 {
+            canvas.draw(|gc| {
+                gc.clear_canvas(Color::Rgba(0.0, 0.0, 0.0, 1.0));
+                gc.canvas_height(HEIGHT as f32);
+                gc.center_region(0.0, 0.0, WIDTH as f32, HEIGHT as f32);
 
-    // println!("{:?}", init_particles)
-    println!("{:?}", particles)
-    //     println!("{:?}", coordinates)
-    // for (x,y) in coordinates {
-    //     println!("{} {}", x,y);
-    // }
-    // }
+                particles = apply_rules(&rules, particles.clone(), &particles);
+                for particle in &particles {
+                    gc.new_path();
+                    gc.circle(particle.x, particle.y, 2.0);
+
+                    let color = get_colors()[&particle.color];
+                    gc.fill_color(Color::Rgba(color.0, color.1, color.2, 1.0));
+                    gc.fill();
+                    gc.stroke();
+                }
+            });
+        }
+    });
 }

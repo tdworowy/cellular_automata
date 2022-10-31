@@ -1627,6 +1627,7 @@ dependencies = [
 name = "particles"
 version = "0.1.0"
 dependencies = [
+ "flo_canvas",
  "flo_draw",
  "itertools 0.10.5",
  "rand",
