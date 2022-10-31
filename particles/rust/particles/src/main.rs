@@ -1,9 +1,13 @@
 use itertools::iproduct;
 use rand::seq::SliceRandom;
+use rand::Rng;
 use std::collections::HashMap;
 
 static WIDTH: u16 = 1280;
 static HEIGHT: u16 = 720;
+static TIME_SCALE: f32 = 1.0;
+static VELOCITY: f32 = 0.7;
+static ITERATION_DISTANCE: u16 = 2000;
 
 fn get_colors() -> HashMap<u8, (u8, u8, u8)> {
     HashMap::from([
@@ -14,13 +18,79 @@ fn get_colors() -> HashMap<u8, (u8, u8, u8)> {
     ])
 }
 
-#[derive(Debug)]
+fn generate_random_rule(color_count: u16, rule_range: (f32, f32)) -> HashMap<(u16, u16), f32> {
+    let mut rules = HashMap::new();
+    let colour_pairs = iproduct!(1..color_count + 1, 1..color_count + 1);
+    for pair in colour_pairs {
+        rules.insert(
+            pair,
+            rand::thread_rng().gen_range(rule_range.0..rule_range.1 + 1.0),
+        );
+    }
+    rules
+}
+
+fn apply_rules(
+    rules: HashMap<(u16, u16), f32>,
+    particles_sub_list: Vec<ParticleInfo>,
+    all_particles: &Vec<ParticleInfo>,
+) -> Vec<ParticleInfo> {
+    let mut result: Vec<ParticleInfo> = Vec::new();
+
+    for particle1 in particles_sub_list {
+        let mut fx: f32 = 0.0;
+        let mut fy: f32 = 0.0;
+
+        for particle2 in all_particles {
+            if particle1.id != particle2.id {
+                let g = rules[&(particle1.color, particle2.color)];
+                let dx = particle1.x - particle2.x;
+                let dy = particle1.y - particle2.y;
+                if dx != 0.0 || dy != 0.0 {
+                    let distance = dx * dx + dy * dy;
+                    if distance < ITERATION_DISTANCE as f32 {
+                        let F = g / (distance as f32).sqrt();
+                        fx += F * dx as f32;
+                        fy += F * dy as f32;
+                    }
+                }
+            }
+        }
+        let vmix = 1.0 - VELOCITY;
+        let mut vx = particle1.vx * vmix + fx * TIME_SCALE;
+        let mut vy = particle1.vy * vmix + fy * TIME_SCALE;
+        let mut x = particle1.x + particle1.vx;
+        let mut y = particle1.y + particle1.vy;
+
+        if x < 0.0 || x >= WIDTH as f32 {
+            vx *= -1.0;
+            x = if x < 0.0 { 0.0 } else { WIDTH as f32 - 1.0 }
+        }
+
+        if y < 0.0 || y >= HEIGHT as f32 {
+            vy *= -1.0;
+            y = if y < 0.0 { 0.0 } else { HEIGHT as f32 - 1.0 }
+        }
+        result.push(ParticleInfo {
+            id: particle1.id,
+            color: particle1.color,
+            x: x,
+            y: y,
+            vx: vx,
+            vy: vy,
+        });
+    }
+    result
+}
+
+#[derive(Debug, Clone)]
 struct ParticleInfo {
-    color: u8,
-    x: u16,
-    y: u16,
-    vx: u16,
-    vy: u16,
+    id: u16,
+    color: u16,
+    x: f32,
+    y: f32,
+    vx: f32,
+    vy: f32,
 }
 
 fn generate_init_particles(
@@ -41,11 +111,12 @@ fn generate_init_particles(
     for i in 0..count {
         let temp_tuple = coordinates_sample[i as usize];
         init_partilces.push(ParticleInfo {
+            id: i,
             color: color,
-            x: temp_tuple.0,
-            y: temp_tuple.1,
-            vx: 0,
-            vy: 0,
+            x: temp_tuple.0 as f32,
+            y: temp_tuple.1 as f32,
+            vx: 0.0,
+            vy: 0.0,
         });
 
         j += 1;
@@ -58,13 +129,19 @@ fn generate_init_particles(
 }
 
 fn main() {
+    let color_count: u16 = 4;
+
     let X: Vec<u16> = (0..WIDTH).collect();
     let Y: Vec<u16> = (0..HEIGHT).collect();
     let coordinates: Vec<(u16, u16)> = iproduct!(X, Y).collect();
 
-    let init_particles = generate_init_particles(800, 4, coordinates);
+    let init_particles = generate_init_particles(800, color_count, coordinates);
+    let rules = generate_random_rule(color_count, (-2.0, 2.0));
 
-    println!("{:?}", init_particles)
+    let particles = apply_rules(rules, init_particles.clone(), &init_particles);
+
+    // println!("{:?}", init_particles)
+    println!("{:?}", particles)
     //     println!("{:?}", coordinates)
     // for (x,y) in coordinates {
     //     println!("{} {}", x,y);
