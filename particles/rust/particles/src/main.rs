@@ -6,11 +6,11 @@ use std::collections::HashMap;
 use flo_canvas::*;
 use flo_draw::*;
 
-static WIDTH: u16 = 2560;
-static HEIGHT: u16 = 1440;
-static TIME_SCALE: f32 = 1.0;
-static VELOCITY: f32 = 0.7;
-static ITERATION_DISTANCE: u16 = 3500;
+const WIDTH: u16 = 2560;
+const HEIGHT: u16 = 1440;
+const TIME_SCALE: f32 = 1.0;
+const VELOCITY: f32 = 0.7;
+const ITERATION_DISTANCE: u16 = 3500;
 
 #[derive(Debug, Clone)]
 struct ParticleInfo {
@@ -140,10 +140,10 @@ fn main() {
         let Y: Vec<u16> = (0..HEIGHT).collect();
         let coordinates: Vec<(u16, u16)> = iproduct!(X, Y).collect();
 
-        let mut particles = generate_init_particles(1600, color_count, coordinates);
+        let mut particles = generate_init_particles(3200, color_count, coordinates);
         let rules = generate_random_rule(color_count, (-2.0, 2.0));
 
-        for _ in 0..5000 {
+        for _ in 0.. {
             canvas.draw(|gc| {
                 gc.clear_canvas(Color::Rgba(0.0, 0.0, 0.0, 1.0));
                 gc.canvas_height(HEIGHT as f32);
