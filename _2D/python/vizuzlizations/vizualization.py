@@ -1,7 +1,7 @@
-from _2D.general_2d_automata import rules
-from _2D.vizuzlizations.general_visualization import CellularAutomata2DVisualization
-from _2D.vizuzlizations.langton_ant_visualization import LangtonAnt
-from _2D.vizuzlizations.snowflake_visualization import SnowflakeVisualization
+from _2D.python.general_2d_automata import rules
+from _2D.python.vizuzlizations.general_visualization import CellularAutomata2DVisualization
+from _2D.python.vizuzlizations.langton_ant_visualization import LangtonAnt
+from _2D.python.vizuzlizations.snowflake_visualization import SnowflakeVisualization
 
 if __name__ == '__main__':
     visualizations = {i: rule for i, rule in enumerate(rules.keys())}

@@ -2,7 +2,7 @@ import tkinter
 from collections import defaultdict
 from doctest import master
 import numpy as np
-from _2D.general_2d_automata import generate_grid_random_cells, update_grid_two_d
+from _2D.python.general_2d_automata import generate_grid_random_cells, update_grid_two_d
 
 
 # TODO use pyglet to increase performance

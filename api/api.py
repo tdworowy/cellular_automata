@@ -2,11 +2,11 @@ from flask import Flask, request, jsonify
 from flask_restx import Api, fields, Resource
 
 from _1D.cellular_automata import generate_random, generate_rule, cellular_automata_step_1d
-from _2D.general_2d_automata import generate_grid_random_cells, generate_grid_central, update_grid_two_d, rules
+from _2D.python.general_2d_automata import generate_grid_random_cells, generate_grid_central, update_grid_two_d, rules
 import numpy as np
 import random
 
-from _2D.langton_ant import generate_grid_ant, update_grid_ant
+from _2D.python.langton_ant import generate_grid_ant, update_grid_ant
 
 api = Api(title='Cellular automata', default="CellularAutomata")
 app = Flask(__name__)

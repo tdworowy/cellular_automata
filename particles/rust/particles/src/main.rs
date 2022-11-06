@@ -103,7 +103,7 @@ fn generate_init_particles(
 ) -> Vec<ParticleInfo> {
     let count_per_color = count / color_count;
     let mut j = 0;
-    let mut init_partilces: Vec<ParticleInfo> = Vec::new();
+    let mut init_particles: Vec<ParticleInfo> = Vec::new();
     let mut color = 1;
 
     let coordinates_sample: Vec<(u16, u16)> = coordinates
@@ -113,7 +113,7 @@ fn generate_init_particles(
 
     for i in 0..count {
         let temp_tuple = coordinates_sample[i as usize];
-        init_partilces.push(ParticleInfo {
+        init_particles.push(ParticleInfo {
             id: i,
             color: color,
             x: temp_tuple.0 as f32,
@@ -128,7 +128,7 @@ fn generate_init_particles(
             j = 0;
         }
     }
-    init_partilces
+    init_particles
 }
 
 fn main() {

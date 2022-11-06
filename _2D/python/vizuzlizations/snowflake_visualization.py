@@ -1,9 +1,9 @@
 import tkinter
 from doctest import master
 
-from _2D.general_2d_automata import update_grid_two_d, \
+from _2D.python.general_2d_automata import update_grid_two_d, \
     generate_snowflake_rule, generate_grid_central
-from _2D.vizuzlizations.general_visualization import CellularAutomata2DVisualization
+from _2D.python.vizuzlizations.general_visualization import CellularAutomata2DVisualization
 
 
 class SnowflakeVisualization(CellularAutomata2DVisualization):

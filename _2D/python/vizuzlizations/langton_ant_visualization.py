@@ -4,7 +4,7 @@ from doctest import master
 
 import numpy as np
 
-from _2D.langton_ant import generate_grid_ant, update_grid_ant
+from _2D.python.langton_ant import generate_grid_ant, update_grid_ant
 
 
 class LangtonAnt:
