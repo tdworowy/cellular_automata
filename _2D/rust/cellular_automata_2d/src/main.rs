@@ -7,9 +7,9 @@ fn get_game_of_live_rules() -> HashMap<(u8, u8), u8> {
 
 fn generate_gird_random(width: usize, height: usize, probability_of_one: f64) -> Vec<Vec<u8>> {
     let mut grid: Vec<Vec<u8>> = Vec::new();
-    for i in 0..width {
+    for i in 0..height {
         grid.push(vec![]);
-        for _ in 0..height {
+        for _ in 0..width {
             let is_one = rand::thread_rng().gen_bool(probability_of_one);
             let cell_type = if is_one { 1 } else { 0 };
             grid[i].push(cell_type as u8);
@@ -17,10 +17,13 @@ fn generate_gird_random(width: usize, height: usize, probability_of_one: f64) ->
     }
     grid
 }
+
 #[test]
 fn test_generate_gird_random() {
     assert_eq!(generate_gird_random(2, 2, 0.0), [[0, 0], [0, 0]]);
     assert_eq!(generate_gird_random(2, 2, 1.0), [[1, 1], [1, 1]]);
+    assert_eq!(generate_gird_random(3, 2, 1.0), [[1, 1, 1], [1, 1, 1]]);
+    assert_eq!(generate_gird_random(2, 3, 1.0), [[1, 1], [1, 1], [1, 1]]);
 }
 
 fn generate_gird_one_cell(width: usize, height: usize) -> Vec<Vec<u8>> {
@@ -97,7 +100,6 @@ fn test_count_colored_neighbours() {
         ),
         2
     );
-
     assert_eq!(
         count_colored_neighbours(
             1,
@@ -123,6 +125,8 @@ fn test_count_colored_neighbours() {
         2
     );
 }
+
+
 fn update_grid(grid: &Vec<Vec<u8>>, rules: HashMap<(u8, u8), u8>) -> Vec<Vec<u8>> {
     let mut new_grid = grid.clone();
     for (i, row) in grid.iter().enumerate() {
@@ -135,6 +139,7 @@ fn update_grid(grid: &Vec<Vec<u8>>, rules: HashMap<(u8, u8), u8>) -> Vec<Vec<u8>
     }
     new_grid
 }
+
 #[test]
 fn test_update_grid() {
     assert_eq!(
