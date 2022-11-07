@@ -131,7 +131,7 @@ def generate_grid_central(width: int, height: int, cell_count: int = 1) -> np.nd
             grid[x + i][y + j] = 1
     return grid
 
-
+# TODO test for small grids, does it work for edges ?
 def count_colored_neighbours(x: int, y: int, grid: np.ndarray) -> int:
     colored_neighbours = 0
     for i in range((x - 1) % grid.shape[0], (x + 2) % grid.shape[0]):
@@ -159,7 +159,10 @@ if __name__ == "__main__":
     #     grid = update_grid_two_d(grid, game_of_live_rules)
     #     end = time.time()
     #     print(f"Step time: {end - start}")
-    print(generate_snowflake_rule([1]))
-    print(generate_snowflake_rule([1, 5]))
-    print(generate_snowflake_rule([1, 3, 5]))
-    print(generate_snowflake_rule([1, 4]))
+    # print(generate_snowflake_rule([1]))
+    # print(generate_snowflake_rule([1, 5]))
+    # print(generate_snowflake_rule([1, 3, 5]))
+    # print(generate_snowflake_rule([1, 4]))
+
+    grid = generate_grid_random_cells(4, 3, 0.7)
+    count_colored_neighbours(0, 0, grid)

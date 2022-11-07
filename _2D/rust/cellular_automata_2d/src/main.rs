@@ -51,7 +51,7 @@ fn count_colored_neighbours(x: usize, y: usize, grid: &Vec<Vec<u8>>) -> u8 {
 
     for i in x_start..x_end {
         for j in y_start..y_end {
-            print!("{}{}", i,j); // DEBUG
+            print!("{}{}", i,j); //
             if grid[i][j] == 1 && (i, j) != (x, y) {
                 count += 1;
             }
