@@ -13,11 +13,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v3
     - uses: Swatinem/rust-cache@v2
       with:
-        workspaces: " cellular_automata/_2D/rust/cellular_automata_2d"
-
-    - uses: actions/checkout@v3
+        workspaces: "cellular_automata/_2D/rust/cellular_automata_2d"
+  
     - name: Build 
       run: cargo build --manifest-path _2D/rust/cellular_automata_2d/Cargo.toml --verbose
     - name: Run tests
