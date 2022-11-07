@@ -36,11 +36,22 @@ fn test_generate_gird_one_cell() {
         [[0, 0, 0], [0, 1, 0], [0, 0, 0]]
     );
 }
-// TODO need fix 'attempt to subtract with overflow'
+
+// TODO don't work as it should 
 fn count_colored_neighbours(x: usize, y: usize, grid: &Vec<Vec<u8>>) -> u8 {
     let mut count: u8 = 0;
-    for i in (x - 1) % grid[0].iter().len()..(x + 2) % grid[0].iter().len() {
-        for j in (y - 1) % grid[1].iter().len()..(y + 2) % grid[1].iter().len() {
+    // let x_start: usize = ((x as isize - 1) % grid[0].iter().len() as isize) as usize;
+    // let x_end: usize = ((x as isize + 2) % grid[0].iter().len() as isize) as usize;
+    // let y_start: usize = ((y as isize - 1) % grid[1].iter().len() as isize) as usize;
+    // let y_end: usize = ((y as isize + 2) % grid[1].iter().len() as isize) as usize;
+    let x_start: usize = ((x as isize - 1).rem_euclid(grid[0].iter().len() as isize)) as usize;
+    let x_end: usize = ((x as isize + 2).rem_euclid(grid[0].iter().len()  as isize)) as usize;
+    let y_start: usize = ((y as isize - 1).rem_euclid(grid[1].iter().len() as isize)) as usize;
+    let y_end: usize = ((y as isize + 2).rem_euclid(grid[1].iter().len()  as isize)) as usize;
+
+    for i in x_start..x_end {
+        for j in y_start..y_end {
+            print!("{}{}", i,j); // DEBUG
             if grid[i][j] == 1 && (i, j) != (x, y) {
                 count += 1;
             }
@@ -67,6 +78,14 @@ fn test_count_colored_neighbours() {
         ),
         8
     );
+    assert_eq!(
+        count_colored_neighbours(
+            0,
+            0,
+            &vec![vec![1, 1, 0, 0], vec![1, 0, 0, 1], vec![0, 0, 1, 0]],
+        ),
+        2
+    );
 }
 
 fn update_grid(grid: &Vec<Vec<u8>>, rules: HashMap<(u8, u8), u8>) -> Vec<Vec<u8>> {
@@ -75,6 +94,7 @@ fn update_grid(grid: &Vec<Vec<u8>>, rules: HashMap<(u8, u8), u8>) -> Vec<Vec<u8>
         for (j, cell) in row.iter().enumerate() {
             let live_neighbours = count_colored_neighbours(i, j, &grid);
             let state = *cell;
+            print!("{}{} ", state, live_neighbours);
             new_grid[i][j] = *rules.get(&(state, live_neighbours)).clone().unwrap_or(&0);
         }
     }
