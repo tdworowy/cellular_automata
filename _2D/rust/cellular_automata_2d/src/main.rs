@@ -37,13 +37,8 @@ fn test_generate_gird_one_cell() {
     );
 }
 
-// TODO check if work as it should
-fn count_colored_neighbours(x: usize, y: usize, grid: &Vec<Vec<u8>>) -> u8 {
+fn count_colored_neighbours(y: usize, x: usize, grid: &Vec<Vec<u8>>) -> u8 {
     let mut count: u8 = 0;
-    // let x_start: usize = ((x as isize - 1) % grid[0].iter().len() as isize) as usize;
-    // let x_end: usize = ((x as isize + 2) % grid[0].iter().len() as isize) as usize;
-    // let y_start: usize = ((y as isize - 1) % grid[1].iter().len()  as isize) as usize;
-    // let y_end: usize = ((y as isize + 2) % grid[1].iter().len()  as isize  ) as usize;
     let x_start = if x as isize - 1 <= 0 {
         0
     } else {
@@ -56,20 +51,19 @@ fn count_colored_neighbours(x: usize, y: usize, grid: &Vec<Vec<u8>>) -> u8 {
     };
 
     let x_end = if x + 2 >= grid[0].iter().len() {
-        grid[0].iter().len() - 1
+        grid[0].iter().len()
     } else {
         x + 2
     };
-    let y_end = if y + 2 >= grid[1].iter().len() {
-        grid[1].iter().len() - 1
+    let y_end = if y + 2 >= grid.iter().len() {
+        grid.iter().len()
     } else {
         y + 2
     };
 
-    for i in x_start as usize..x_end {
-        for j in y_start as usize..y_end {
-            print!("{}{}", i, j); //
-            if grid[i][j] == 1 && (i, j) != (x, y) {
+    for i in y_start as usize..y_end {
+        for j in x_start as usize..x_end {
+            if grid[i][j] == 1 && (i, j) != (y, x) {
                 count += 1;
             }
         }
@@ -103,15 +97,39 @@ fn test_count_colored_neighbours() {
         ),
         2
     );
+
+    assert_eq!(
+        count_colored_neighbours(
+            1,
+            2,
+            &vec![vec![1, 1, 0, 0], vec![1, 0, 0, 1], vec![0, 0, 1, 0]],
+        ),
+        3
+    );
+    assert_eq!(
+        count_colored_neighbours(
+            0,
+            3,
+            &vec![vec![1, 1, 0, 0], vec![1, 0, 0, 1], vec![0, 0, 1, 0]],
+        ),
+        1
+    );
+    assert_eq!(
+        count_colored_neighbours(
+            2,
+            3,
+            &vec![vec![1, 1, 0, 0], vec![1, 0, 0, 1], vec![0, 0, 1, 0]],
+        ),
+        2
+    );
 }
-// TODO test it
 fn update_grid(grid: &Vec<Vec<u8>>, rules: HashMap<(u8, u8), u8>) -> Vec<Vec<u8>> {
     let mut new_grid = grid.clone();
     for (i, row) in grid.iter().enumerate() {
         for (j, cell) in row.iter().enumerate() {
             let live_neighbours = count_colored_neighbours(i, j, &grid);
             let state = *cell;
-            print!("{}{} ", state, live_neighbours);
+            // print!("{}\n", live_neighbours);
             new_grid[i][j] = *rules.get(&(state, live_neighbours)).clone().unwrap_or(&0);
         }
     }
@@ -124,8 +142,8 @@ fn test_update_grid() {
             &vec![vec![1, 1, 0, 0], vec![1, 0, 0, 1], vec![0, 0, 1, 0]],
             get_game_of_live_rules()
         ),
-        [[1, 0, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]
-    )
+        [[1, 1, 0, 0], [1, 0, 1, 0], [0, 0, 0, 0]]
+    );
 }
 
 fn main() {
