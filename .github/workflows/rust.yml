@@ -18,4 +18,4 @@ jobs:
     - name: Build 
       run: cargo build --manifest-path _2D/rust/cellular_automata_2d/Cargo.toml --verbose
     - name: Run tests
-      run: cargo test --manifest-path _2D/rust/cellular_automata_2d/Cargo.tom --verbose
+      run: cargo test --manifest-path _2D/rust/cellular_automata_2d/Cargo.toml --verbose
