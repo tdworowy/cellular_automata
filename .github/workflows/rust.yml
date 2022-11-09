@@ -10,22 +10,26 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
+  cellular_automata_2d:
     runs-on: windows-latest #ubuntu-latest
     steps:
     - uses: actions/checkout@v3
     - uses: Swatinem/rust-cache@v2
       with:
-        workspaces: | 
-          _2D/rust/cellular_automata_2d
-          particles_simulation/rust/particles
-  
-    - name: Build cellular_automata_2d 
+        workspaces: _2D/rust/cellular_automata_2d
+    - name: Build 
       run: cargo build --manifest-path _2D/rust/cellular_automata_2d/Cargo.toml --verbose
-    - name: Run tests cellular_automata_2d
+    - name: Run tests
       run: cargo test --manifest-path _2D/rust/cellular_automata_2d/Cargo.toml --verbose
-      
-    - name: Build particles 
+
+  particles:
+    runs-on: windows-latest #ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: Swatinem/rust-cache@v2
+      with:
+        workspaces: particles_simulation/rust/particles
+    - name: Build 
       run: cargo build --manifest-path particles_simulation/rust/particles/Cargo.toml --verbose
-    - name: Run tests particles
+    - name: Run tests
       run: cargo test --manifest-path particles_simulation/rust/particles/Cargo.toml --verbose
