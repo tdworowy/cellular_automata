@@ -133,7 +133,6 @@ fn update_grid(grid: &Vec<Vec<u8>>, rules: HashMap<(u8, u8), u8>) -> Vec<Vec<u8>
         for (j, cell) in row.iter().enumerate() {
             let live_neighbours = count_colored_neighbours(i, j, &grid);
             let state = *cell;
-            // print!("{}\n", live_neighbours);
             new_grid[i][j] = *rules.get(&(state, live_neighbours)).clone().unwrap_or(&0);
         }
     }

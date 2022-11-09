@@ -1,7 +1,8 @@
+#![allow(non_snake_case)]
+
 use itertools::iproduct;
-use rand::seq::SliceRandom;
-use rand::Rng;
-use std::collections::HashMap;
+use rand::{seq::SliceRandom, Rng};
+use std::{collections::HashMap, collections::HashSet, hash::Hash, ops::Range};
 
 use flo_canvas::*;
 use flo_draw::*;
@@ -41,6 +42,26 @@ fn generate_random_rule(color_count: u16, rule_range: (f32, f32)) -> HashMap<(u1
         );
     }
     rules
+}
+#[test]
+fn test_generate_random_rule() {
+    fn keys_match<T: Eq + Hash, U, V>(map1: &HashMap<T, U>, map2: &HashMap<T, V>) -> bool {
+        map1.len() == map2.len() && map1.keys().all(|k| map2.contains_key(k))
+    }
+
+    let expected: HashMap<(u16, u16), f32> = HashMap::from([
+        ((2, 1), 0.0),
+        ((2, 2), 0.0),
+        ((1, 1), 0.0),
+        ((1, 2), 0.0), // values are discarded
+    ]);
+    let actual: HashMap<(u16, u16), f32> = generate_random_rule(2, (-1.0, 1.0));
+
+    assert_eq!(keys_match(&&actual, &expected), true);
+    let range: Range<f32> = -1.0..2.0;
+    for value in actual.values() {
+        assert!(range.contains(&value));
+    }
 }
 
 fn apply_rules(
@@ -131,7 +152,48 @@ fn generate_init_particles(
     init_particles
 }
 
+#[test]
+fn test_generate_init_particles() {
+    fn has_unique_elements<T>(iter: T) -> bool
+    where
+        T: IntoIterator,
+        T::Item: Eq + Hash,
+    {
+        let mut uniq = HashSet::new();
+        iter.into_iter().all(move |x| uniq.insert(x))
+    }
+
+    let X: Vec<u16> = (0..10).collect();
+    let Y: Vec<u16> = (0..10).collect();
+    let coordinates: Vec<(u16, u16)> = iproduct!(X, Y).collect();
+
+    let actual_particles = generate_init_particles(10, 2, coordinates);
+
+    assert_eq!(actual_particles.len(), 10);
+
+    let ids: Vec<u16> = actual_particles.iter().map(|p| p.id).collect();
+    let colors: Vec<u16> = actual_particles.iter().map(|p| p.color).collect();
+    let xys: Vec<(u16, u16)> = actual_particles
+        .iter()
+        .map(|p| (p.x as u16, p.y as u16))
+        .collect();
+    let vxs: Vec<f32> = actual_particles.iter().map(|p| p.vx).collect();
+    let vys: Vec<f32> = actual_particles.iter().map(|p| p.vy).collect();
+
+    assert!(has_unique_elements(ids));
+    assert!(has_unique_elements(xys));
+
+    assert!(vxs.into_iter().all(|b| b == 0.0));
+    assert!(vys.into_iter().all(|b| b == 0.0));
+
+    assert_eq!(
+        colors.iter().filter(|&c| *c == 1).count(),
+        colors.iter().filter(|&c| *c == 2).count()
+    );
+}
+
 fn main() {
+    print!("{:?}", generate_random_rule(2, (-1.0, 1.0)));
     with_2d_graphics(|| {
         let canvas = create_drawing_window("Particles");
         let color_count: u16 = 4;
