@@ -2,6 +2,7 @@
 
 use itertools::iproduct;
 use rand::{seq::SliceRandom, Rng};
+#[allow(unused_imports)]
 use std::{collections::HashMap, collections::HashSet, hash::Hash, ops::Range};
 
 use flo_canvas::*;
