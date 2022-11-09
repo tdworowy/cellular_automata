@@ -16,9 +16,16 @@ jobs:
     - uses: actions/checkout@v3
     - uses: Swatinem/rust-cache@v2
       with:
-        workspaces: "cellular_automata/_2D/rust/cellular_automata_2d"
+        workspaces: | 
+          cellular_automata/_2D/rust/cellular_automata_2d
+          cellular_automata/particles/rust/particles
   
-    - name: Build 
+    - name: Build cellular_automata_2d 
       run: cargo build --manifest-path _2D/rust/cellular_automata_2d/Cargo.toml --verbose
-    - name: Run tests
+    - name: Run tests cellular_automata_2d
       run: cargo test --manifest-path _2D/rust/cellular_automata_2d/Cargo.toml --verbose
+      
+    - name: Build particles 
+      run: cargo build --manifest-path particles/rust/particles --verbose
+    - name: Run tests particles
+      run: cargo test --manifest-path particles/rust/particles --verbose
