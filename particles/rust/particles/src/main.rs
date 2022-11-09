@@ -193,7 +193,6 @@ fn test_generate_init_particles() {
 }
 
 fn main() {
-    print!("{:?}", generate_random_rule(2, (-1.0, 1.0)));
     with_2d_graphics(|| {
         let canvas = create_drawing_window("Particles");
         let color_count: u16 = 4;
