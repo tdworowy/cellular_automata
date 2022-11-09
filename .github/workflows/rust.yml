@@ -26,6 +26,6 @@ jobs:
       run: cargo test --manifest-path _2D/rust/cellular_automata_2d/Cargo.toml --verbose
       
     - name: Build particles 
-      run: cargo build --manifest-path particles/rust/particles --verbose
+      run: cargo build --manifest-path particles/rust/particles/Cargo.toml --verbose
     - name: Run tests particles
-      run: cargo test --manifest-path particles/rust/particles --verbose
+      run: cargo test --manifest-path particles/rust/particles/Cargo.toml --verbose
