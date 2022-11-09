@@ -17,8 +17,8 @@ jobs:
     - uses: Swatinem/rust-cache@v2
       with:
         workspaces: | 
-          cellular_automata/_2D/rust/cellular_automata_2d
-          cellular_automata/particles_simulation/rust/particles
+          _2D/rust/cellular_automata_2d
+          particles_simulation/rust/particles
   
     - name: Build cellular_automata_2d 
       run: cargo build --manifest-path _2D/rust/cellular_automata_2d/Cargo.toml --verbose
