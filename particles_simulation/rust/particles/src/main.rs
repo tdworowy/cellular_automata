@@ -195,6 +195,7 @@ fn test_generate_init_particles() {
 
 fn main() {
     with_2d_graphics(|| {
+        let background_color = Color::Rgba(0.0, 0.0, 0.0, 1.0);
         let canvas = create_drawing_window("Particles");
         let color_count: u16 = 4;
 
@@ -202,19 +203,19 @@ fn main() {
         let Y: Vec<u16> = (0..HEIGHT).collect();
         let coordinates: Vec<(u16, u16)> = iproduct!(X, Y).collect();
 
-        let mut particles = generate_init_particles(3200, color_count, coordinates);
+        let mut particles = generate_init_particles(4400, color_count, coordinates);
         let rules = generate_random_rule(color_count, (-2.0, 2.0));
 
         for _ in 0.. {
             canvas.draw(|gc| {
-                gc.clear_canvas(Color::Rgba(0.0, 0.0, 0.0, 1.0));
+                gc.clear_canvas(background_color);
                 gc.canvas_height(HEIGHT as f32);
                 gc.center_region(0.0, 0.0, WIDTH as f32, HEIGHT as f32);
 
                 particles = apply_rules(&rules, particles.clone(), &particles);
                 for particle in &particles {
                     gc.new_path();
-                    gc.circle(particle.x, particle.y, 2.0);
+                    gc.circle(particle.x, particle.y, 1.5);
 
                     let color = get_colors()[&particle.color];
                     gc.fill_color(Color::Rgba(color.0, color.1, color.2, 1.0));
