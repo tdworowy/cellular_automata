@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-flo_canvas = "0.3.0"
-flo_draw = "0.3.0"
+iced = "0.5.1" #need nightly
+
 itertools ="0.10.5"
 rand ="0.8.5"

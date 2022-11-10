@@ -1,5 +1,11 @@
+use iced::{Sandbox, Length, Rectangle, futures::io::Cursor, Point, Size};
+
 use rand::Rng;
-use std::collections::HashMap;
+use std::{collections::HashMap, path::Path};
+
+
+const WIDTH: usize = 200;
+const HEIGHT: usize = 200;
 
 fn get_game_of_live_rules() -> HashMap<(u8, u8), u8> {
     HashMap::from([((0, 3), 1), ((1, 3), 1), ((1, 2), 1)])
@@ -126,8 +132,7 @@ fn test_count_colored_neighbours() {
     );
 }
 
-
-fn update_grid(grid: &Vec<Vec<u8>>, rules: HashMap<(u8, u8), u8>) -> Vec<Vec<u8>> {
+fn update_grid(grid: &Vec<Vec<u8>>, rules: &HashMap<(u8, u8), u8>) -> Vec<Vec<u8>> {
     let mut new_grid = grid.clone();
     for (i, row) in grid.iter().enumerate() {
         for (j, cell) in row.iter().enumerate() {
@@ -144,14 +149,68 @@ fn test_update_grid() {
     assert_eq!(
         update_grid(
             &vec![vec![1, 1, 0, 0], vec![1, 0, 0, 1], vec![0, 0, 1, 0]],
-            get_game_of_live_rules()
+            &get_game_of_live_rules()
         ),
         [[1, 1, 0, 0], [1, 0, 1, 0], [0, 0, 0, 0]]
     );
 }
 
+fn test_console() {
+    let mut grid = generate_gird_random(WIDTH, HEIGHT, 0.4);
+    let rules = get_game_of_live_rules();
+    for i in 0..100 {
+        grid = update_grid(&grid, &rules);
+        println!("Step {}", i);
+    }
+}
+
+
+// TODO make it work
+// struct RectangleApp;
+
+// impl Sandbox for RectangleApp {
+//     type Message = ();
+
+//     fn new() -> Self {
+//         Self
+//     }
+
+//     fn title(&self) -> String {
+//         "My simple rectangle".into()
+//     }
+
+//     fn update(&mut self, _: ()) {}
+
+//     fn view(&mut self) -> iced::Element<'_, Self::Message> {
+//         Canvas::new(RectangleProgram)
+//             .width(Length::Fill)
+//             .height(Length::Fill)
+//             .into()
+//     }
+// }
+
+// struct RectangleProgram;
+
+// impl Program<()> for RectangleProgram {
+//     fn draw(&self, bounds: Rectangle, _: Cursor) -> Vec<Geometry> {
+//         let mut frame = Frame::new(bounds.size());
+//         frame.stroke(
+//             &Path::rectangle(
+//                 Point {
+//                     x: bounds.width / 10.,
+//                     y: bounds.height / 10.,
+//                 },
+//                 Size {
+//                     width: 4. * bounds.width / 5.,
+//                     height: 4. * bounds.height / 5.,
+//                 },
+//             ),
+//             Stroke::default(),
+//         );
+//         vec![frame.into_geometry()]
+//     }
+// }
+
 fn main() {
-    let grid = generate_gird_random(5, 5, 1.0);
-    println!("{:?}", &grid);
-    println!("{:?}", count_colored_neighbours(2, 2, &grid));
+    //RectangleApp::run(Settings::default());
 }
