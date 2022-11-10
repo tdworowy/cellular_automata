@@ -18,7 +18,7 @@ jobs:
       with:
         workspaces: _2D/rust/cellular_automata_2d
     - name: Build 
-      run: cargo build --manifest-path _2D/rust/cellular_automata_2d/Cargo.toml --verbose
+      run: rustup override set nightly && cargo build --manifest-path _2D/rust/cellular_automata_2d/Cargo.toml --verbose
     - name: Run tests
       run: cargo test --manifest-path _2D/rust/cellular_automata_2d/Cargo.toml --verbose
 
