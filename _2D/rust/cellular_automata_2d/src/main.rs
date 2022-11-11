@@ -1,11 +1,15 @@
-use iced::{Sandbox, Length, Rectangle, futures::io::Cursor, Point, Size};
+use rand::{thread_rng, Rng};
+use std::collections::HashMap;
 
-use rand::Rng;
-use std::{collections::HashMap, path::Path};
+use iced::widget::canvas::{self, Cache, Canvas, Cursor, Frame, Geometry};
+use iced::{
+    executor, Application, Color, Command, Element, Length, Point, Rectangle, Renderer, Settings,
+    Size, Subscription, Theme,
+};
 
-
-const WIDTH: usize = 200;
-const HEIGHT: usize = 200;
+const WIDTH: usize = 500;
+const HEIGHT: usize = 500;
+const TICK_TIME: u64 = 200;
 
 fn get_game_of_live_rules() -> HashMap<(u8, u8), u8> {
     HashMap::from([((0, 3), 1), ((1, 3), 1), ((1, 2), 1)])
@@ -16,7 +20,7 @@ fn generate_gird_random(width: usize, height: usize, probability_of_one: f64) ->
     for i in 0..height {
         grid.push(vec![]);
         for _ in 0..width {
-            let is_one = rand::thread_rng().gen_bool(probability_of_one);
+            let is_one = thread_rng().gen_bool(probability_of_one);
             let cell_type = if is_one { 1 } else { 0 };
             grid[i].push(cell_type as u8);
         }
@@ -164,53 +168,107 @@ fn test_console() {
     }
 }
 
+#[derive(Debug, Clone, Copy)]
+enum Message {
+    Tick(time::OffsetDateTime),
+}
+struct CellularAutomata2D {
+    cache: Cache,
+    grid: Vec<Vec<u8>>,
+    rules: HashMap<(u8, u8), u8>,
+}
 
-// TODO make it work
-// struct RectangleApp;
+impl Application for CellularAutomata2D {
+    type Executor = executor::Default;
+    type Message = Message;
+    type Theme = Theme;
+    type Flags = ();
 
-// impl Sandbox for RectangleApp {
-//     type Message = ();
+    fn new(_flags: Self::Flags) -> (Self, Command<Self::Message>) {
+        (
+            CellularAutomata2D {
+                cache: Default::default(),
+                grid: generate_gird_random(WIDTH, HEIGHT, 0.4),
+                rules: get_game_of_live_rules(),
+            },
+            Command::none(),
+        )
+    }
 
-//     fn new() -> Self {
-//         Self
-//     }
+    fn title(&self) -> String {
+        String::from("Cellular Automata 2D")
+    }
 
-//     fn title(&self) -> String {
-//         "My simple rectangle".into()
-//     }
+    fn update(&mut self, message: Message) -> Command<Message> {
+        match message {
+            Message::Tick(local_time) => {
+                self.grid = update_grid(&self.grid, &self.rules);
+                self.cache.clear();
+            }
+        }
 
-//     fn update(&mut self, _: ()) {}
+        Command::none()
+    }
 
-//     fn view(&mut self) -> iced::Element<'_, Self::Message> {
-//         Canvas::new(RectangleProgram)
-//             .width(Length::Fill)
-//             .height(Length::Fill)
-//             .into()
-//     }
-// }
+    fn view(&self) -> Element<'_, Self::Message, Renderer<Self::Theme>> {
+        Canvas::new(self)
+            .width(Length::Units(WIDTH as u16 * 2))
+            .height(Length::Units(HEIGHT as u16 * 2))
+            .into()
+    }
 
-// struct RectangleProgram;
+    fn subscription(&self) -> Subscription<Message> {
+        iced::time::every(std::time::Duration::from_millis(TICK_TIME)).map(|_| {
+            Message::Tick(
+                time::OffsetDateTime::now_local()
+                    .unwrap_or_else(|_| time::OffsetDateTime::now_utc()),
+            )
+        })
+    }
+}
 
-// impl Program<()> for RectangleProgram {
-//     fn draw(&self, bounds: Rectangle, _: Cursor) -> Vec<Geometry> {
-//         let mut frame = Frame::new(bounds.size());
-//         frame.stroke(
-//             &Path::rectangle(
-//                 Point {
-//                     x: bounds.width / 10.,
-//                     y: bounds.height / 10.,
-//                 },
-//                 Size {
-//                     width: 4. * bounds.width / 5.,
-//                     height: 4. * bounds.height / 5.,
-//                 },
-//             ),
-//             Stroke::default(),
-//         );
-//         vec![frame.into_geometry()]
-//     }
-// }
+impl<Message> canvas::Program<Message> for CellularAutomata2D {
+    type State = ();
 
-fn main() {
-    //RectangleApp::run(Settings::default());
+    fn draw(
+        &self,
+        _state: &Self::State,
+        _theme: &Theme,
+        bounds: Rectangle,
+        _cursor: Cursor,
+    ) -> Vec<Geometry> {
+        let geometry = self.cache.draw(bounds.size(), |frame| {
+            let mut x: f32 = 0.0;
+            let mut y: f32 = 0.0;
+            for row in &self.grid {
+                for cell in row {
+                    let color = if cell == &1 {
+                        Color::from_rgb(1.0, 0.0, 0.0)
+                    } else {
+                        Color::from_rgb(0.0, 0.0, 1.0)
+                    };
+                    generate_box(frame, x, y, color);
+                    x += 2.0;
+                }
+                x = 0.0;
+                y += 2.0;
+            }
+        });
+
+        vec![geometry]
+    }
+}
+
+fn generate_box(frame: &mut Frame, x: f32, y: f32, color: Color) {
+    let top_left = Point::new(x, y);
+    let size = Size::new(2.0, 2.0);
+    frame.fill_rectangle(top_left, size, color);
+}
+fn main() -> iced::Result {
+    env_logger::builder().format_timestamp(None).init();
+
+    CellularAutomata2D::run(Settings {
+        antialiasing: true,
+        ..Settings::default()
+    })
 }
