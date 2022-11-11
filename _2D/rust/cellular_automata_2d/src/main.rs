@@ -172,6 +172,7 @@ fn test_console() {
 enum Message {
     Tick(time::OffsetDateTime),
 }
+
 struct CellularAutomata2D {
     cache: Cache,
     grid: Vec<Vec<u8>>,
