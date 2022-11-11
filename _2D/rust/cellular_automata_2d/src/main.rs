@@ -9,10 +9,26 @@ use iced::{
 
 const WIDTH: usize = 500;
 const HEIGHT: usize = 500;
-const TICK_TIME: u64 = 200;
+const TICK_TIME: u64 = 100;
 
-fn get_game_of_live_rules() -> HashMap<(u8, u8), u8> {
-    HashMap::from([((0, 3), 1), ((1, 3), 1), ((1, 2), 1)])
+struct Rules {
+    game_of_live: HashMap<(u8, u8), u8>,
+}
+
+impl Rules {
+    fn new() -> Self {
+        Self {
+            game_of_live: HashMap::from([((0, 3), 1), ((1, 3), 1), ((1, 2), 1)]),
+        }
+    }
+}
+
+fn get_rule(rule_name: &str) -> HashMap<(u8, u8), u8> {
+    let rules = Rules::new();
+    match rule_name {
+        "game_of_live" => rules.game_of_live,
+        _ => panic!("unknown rule"),
+    }
 }
 
 fn generate_gird_random(width: usize, height: usize, probability_of_one: f64) -> Vec<Vec<u8>> {
@@ -153,7 +169,7 @@ fn test_update_grid() {
     assert_eq!(
         update_grid(
             &vec![vec![1, 1, 0, 0], vec![1, 0, 0, 1], vec![0, 0, 1, 0]],
-            &get_game_of_live_rules()
+            &get_rule("game_of_live")
         ),
         [[1, 1, 0, 0], [1, 0, 1, 0], [0, 0, 0, 0]]
     );
@@ -161,7 +177,7 @@ fn test_update_grid() {
 
 fn test_console() {
     let mut grid = generate_gird_random(WIDTH, HEIGHT, 0.4);
-    let rules = get_game_of_live_rules();
+    let rules = get_rule("game_of_live");
     for i in 0..100 {
         grid = update_grid(&grid, &rules);
         println!("Step {}", i);
@@ -190,7 +206,7 @@ impl Application for CellularAutomata2D {
             CellularAutomata2D {
                 cache: Default::default(),
                 grid: generate_gird_random(WIDTH, HEIGHT, 0.4),
-                rules: get_game_of_live_rules(),
+                rules: get_rule("game_of_live"),
             },
             Command::none(),
         )
