@@ -143,7 +143,7 @@ function countColoredNeighbours(x, y, grid_x_axis, grid_y_axis, grid) {
       j < (y + 2) % grid_y_axis;
       j++
     ) {
-      if (grid[i][j] === 1 && i != x && j != y) colored_neighbours += 1;
+      if (grid[i][j] === 1 && (i != x || j != y)) colored_neighbours += 1;
     }
   }
   return colored_neighbours;

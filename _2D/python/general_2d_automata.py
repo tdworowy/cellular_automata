@@ -137,7 +137,7 @@ def count_colored_neighbours(x: int, y: int, grid: np.ndarray) -> int:
     start_x = (0 if x -1 < 0 else x -1)  % grid.shape[0]
     start_y = (0 if y - 1 < 0 else y - 1) % grid.shape[1]
     for i in range(start_x, (x + 2) % grid.shape[0]):
-        for j in range(start_x, (y + 2) % grid.shape[1]):
+        for j in range(start_y, (y + 2) % grid.shape[1]):
             if grid[i][j] == 1 and (i, j) != (x, y): colored_neighbours += 1
     return colored_neighbours
 
@@ -166,5 +166,6 @@ if __name__ == "__main__":
     # print(generate_snowflake_rule([1, 3, 5]))
     # print(generate_snowflake_rule([1, 4]))
 
-    grid = generate_grid_random_cells(3, 3, 1)
-    print(count_colored_neighbours(0, 0, grid))
+    grid = generate_grid_random_cells(5, 5, 1)
+    print(grid)
+    print(count_colored_neighbours(1, 1, grid))

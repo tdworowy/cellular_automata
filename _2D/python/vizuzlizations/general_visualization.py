@@ -8,7 +8,7 @@ from _2D.python.general_2d_automata import generate_grid_random_cells, update_gr
 # TODO use pyglet to increase performance
 class CellularAutomata2DVisualization:
     def __init__(self, rules: defaultdict, width: int = 1085, height: int = 1085, cell_size: int = 10,
-                 probability_of_one: float = 0.7, init_grid=None):
+                 probability_of_one: float = 0.4, init_grid=None):
         self.top = tkinter.Tk()
         self.top_frame = tkinter.Frame()
         self.button_frame = tkinter.Frame()
