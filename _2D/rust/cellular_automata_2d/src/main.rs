@@ -284,10 +284,11 @@ impl Application for CellularAutomata2D {
 
     fn new(_flags: Self::Flags) -> (Self, Command<Self::Message>) {
         let rule = read_rule();
+        let init_grid = generate_gird_random(WIDTH, HEIGHT, PROB_OF_ONE);
         (
             CellularAutomata2D {
                 cache: Default::default(),
-                grid: generate_gird_random(WIDTH, HEIGHT, PROB_OF_ONE),
+                grid: init_grid,
                 rules: rule,
             },
             Command::none(),
@@ -389,6 +390,7 @@ fn read_rule() -> HashMap<(u8, u8), u8> {
     }
     rule
 }
+
 fn main() -> iced::Result {
     env_logger::builder().format_timestamp(None).init();
 
