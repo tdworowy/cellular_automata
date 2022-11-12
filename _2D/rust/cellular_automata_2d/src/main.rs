@@ -11,7 +11,7 @@ use iced::{
 const WIDTH: usize = 500;
 const HEIGHT: usize = 500;
 const TICK_TIME: u64 = 100;
-const PROB_OF_ONE:f64 = 0.4;
+const PROB_OF_ONE: f64 = 0.4;
 
 const RULES_NAMES: [&str; 8] = [
     "game_of_live",
@@ -108,7 +108,10 @@ fn get_rule(rule_name: &str) -> HashMap<(u8, u8), u8> {
         "mazectric" => rules.mazectric,
         "_move" => rules._move,
         "walled_cities" => rules.walled_cities,
-        _ => panic!("unknown rule"),
+        _ => panic!(
+            "rule {} doesn't exist, avilable rules: {:?}",
+            &rule_name, RULES_NAMES
+        ),
     }
 }
 
@@ -369,24 +372,11 @@ fn read_rule() -> HashMap<(u8, u8), u8> {
     let args: Vec<String> = env::args().collect();
     let mut rule: HashMap<(u8, u8), u8> = get_rule("game_of_live");
     if args.len() != 2 {
-        println!("using default rule: game_of_live")
+        println!("using default rule: game_of_live");
+        println!("avilable rules: {:?}", RULES_NAMES);
     } else {
-        let mut flag = true;
-        for rule_name in RULES_NAMES {
-            if &args[1] == rule_name {
-                println!("using rule: {:?}", rule_name);
-                rule = get_rule(rule_name);
-                flag = false;
-                break;
-            }
-        }
-        if flag {
-            println!(
-                "rule {} doesn't exist, avilable rules: {:?}",
-                &args[1], RULES_NAMES
-            );
-            std::process::exit(1);
-        }
+        rule = get_rule(&args[1]);
+        println!("Using rule:{}", &args[1]);
     }
     rule
 }
