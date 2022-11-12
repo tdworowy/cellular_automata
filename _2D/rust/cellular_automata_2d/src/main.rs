@@ -1,5 +1,6 @@
 use rand::{thread_rng, Rng};
 use std::collections::HashMap;
+use std::env;
 
 use iced::widget::canvas::{self, Cache, Canvas, Cursor, Frame, Geometry};
 use iced::{
@@ -11,14 +12,86 @@ const WIDTH: usize = 500;
 const HEIGHT: usize = 500;
 const TICK_TIME: u64 = 100;
 
+const RULES_NAMES: [&str; 8] = [
+    "game_of_live",
+    "ameba",
+    "_2x2",
+    "_34_live",
+    "coagulations",
+    "mazectric",
+    "_move",
+    "walled_cities",
+];
+
 struct Rules {
     game_of_live: HashMap<(u8, u8), u8>,
+    ameba: HashMap<(u8, u8), u8>,
+    _2x2: HashMap<(u8, u8), u8>,
+    _34_live: HashMap<(u8, u8), u8>,
+    coagulations: HashMap<(u8, u8), u8>,
+    mazectric: HashMap<(u8, u8), u8>,
+    _move: HashMap<(u8, u8), u8>,
+    walled_cities: HashMap<(u8, u8), u8>,
 }
 
 impl Rules {
     fn new() -> Self {
         Self {
             game_of_live: HashMap::from([((0, 3), 1), ((1, 3), 1), ((1, 2), 1)]),
+            ameba: HashMap::from([
+                ((0, 3), 1),
+                ((0, 5), 1),
+                ((0, 5), 1),
+                ((1, 1), 1),
+                ((1, 3), 1),
+                ((1, 5), 1),
+                ((1, 8), 1),
+            ]),
+            _2x2: HashMap::from([
+                ((0, 3), 1),
+                ((0, 6), 1),
+                ((1, 1), 1),
+                ((1, 2), 1),
+                ((1, 5), 1),
+            ]),
+            _34_live: HashMap::from([((0, 3), 1), ((0, 4), 1), ((1, 3), 1), ((1, 4), 1)]),
+            coagulations: HashMap::from([
+                ((0, 3), 1),
+                ((0, 7), 1),
+                ((0, 8), 1),
+                ((1, 2), 1),
+                ((1, 3), 1),
+                ((1, 5), 1),
+                ((1, 6), 1),
+                ((1, 7), 1),
+                ((1, 8), 1),
+            ]),
+            mazectric: HashMap::from([
+                ((0, 3), 1),
+                ((1, 1), 1),
+                ((1, 2), 1),
+                ((1, 3), 1),
+                ((1, 4), 1),
+            ]),
+            _move: HashMap::from([
+                ((0, 3), 1),
+                ((0, 6), 1),
+                ((0, 8), 1),
+                ((1, 2), 1),
+                ((1, 4), 1),
+                ((1, 5), 1),
+            ]),
+            walled_cities: HashMap::from([
+                ((0, 4), 1),
+                ((0, 5), 1),
+                ((0, 6), 1),
+                ((0, 7), 1),
+                ((0, 8), 1),
+                ((1, 2), 1),
+                ((1, 3), 1),
+                ((1, 4), 1),
+                ((1, 5), 1),
+            ]),
         }
     }
 }
@@ -27,6 +100,13 @@ fn get_rule(rule_name: &str) -> HashMap<(u8, u8), u8> {
     let rules = Rules::new();
     match rule_name {
         "game_of_live" => rules.game_of_live,
+        "ameba" => rules.ameba,
+        "_2x2" => rules._2x2,
+        "_34_live" => rules._34_live,
+        "coagulations" => rules.coagulations,
+        "mazectric" => rules.mazectric,
+        "_move" => rules._move,
+        "walled_cities" => rules.walled_cities,
         _ => panic!("unknown rule"),
     }
 }
@@ -282,6 +362,30 @@ fn generate_box(frame: &mut Frame, x: f32, y: f32, color: Color) {
     frame.fill_rectangle(top_left, size, color);
 }
 fn main() -> iced::Result {
+    let mut rule: HashMap<(u8, u8), u8> = get_rule("game_of_live");
+
+    let args: Vec<String> = env::args().collect();
+    if args.len() != 2 {
+        println!("using default rule: game_of_live")
+    } else {
+        let mut flag = true;
+        for rule_name in RULES_NAMES {
+            if &args[1] == rule_name {
+                println!("using rule: {:?}", rule_name);
+                rule = get_rule(rule_name);
+                flag = false;
+                break;
+            }
+        }
+        if flag {
+            println!(
+                "rule {} doesn't exist, avilable rules: {:?}",
+                &args[1], RULES_NAMES
+            );
+            std::process::exit(1);
+        }
+    }
+
     env_logger::builder().format_timestamp(None).init();
 
     CellularAutomata2D::run(Settings {
