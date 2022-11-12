@@ -11,6 +11,7 @@ use iced::{
 const WIDTH: usize = 500;
 const HEIGHT: usize = 500;
 const TICK_TIME: u64 = 100;
+const PROB_OF_ONE:f64 = 0.4;
 
 const RULES_NAMES: [&str; 8] = [
     "game_of_live",
@@ -282,11 +283,12 @@ impl Application for CellularAutomata2D {
     type Flags = ();
 
     fn new(_flags: Self::Flags) -> (Self, Command<Self::Message>) {
+        let rule = read_rule();
         (
             CellularAutomata2D {
                 cache: Default::default(),
-                grid: generate_gird_random(WIDTH, HEIGHT, 0.4),
-                rules: get_rule("game_of_live"),
+                grid: generate_gird_random(WIDTH, HEIGHT, PROB_OF_ONE),
+                rules: rule,
             },
             Command::none(),
         )
@@ -361,10 +363,10 @@ fn generate_box(frame: &mut Frame, x: f32, y: f32, color: Color) {
     let size = Size::new(2.0, 2.0);
     frame.fill_rectangle(top_left, size, color);
 }
-fn main() -> iced::Result {
-    let mut rule: HashMap<(u8, u8), u8> = get_rule("game_of_live");
 
+fn read_rule() -> HashMap<(u8, u8), u8> {
     let args: Vec<String> = env::args().collect();
+    let mut rule: HashMap<(u8, u8), u8> = get_rule("game_of_live");
     if args.len() != 2 {
         println!("using default rule: game_of_live")
     } else {
@@ -385,7 +387,9 @@ fn main() -> iced::Result {
             std::process::exit(1);
         }
     }
-
+    rule
+}
+fn main() -> iced::Result {
     env_logger::builder().format_timestamp(None).init();
 
     CellularAutomata2D::run(Settings {
