@@ -71,7 +71,7 @@ class CellularAutomata2DVisualization:
             self.step_call_back()
             self.top.update()
             # print(f"step: {self.step}")
-            self.step += 1
+            #self.step += 1
 
     def main_loop(self):
 
