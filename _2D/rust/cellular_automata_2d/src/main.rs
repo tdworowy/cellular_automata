@@ -156,12 +156,12 @@ fn count_colored_neighbours(y: usize, x: usize, grid: &Vec<Vec<u8>>) -> u8 {
         0
     } else {
         x as isize - 1
-    };
+    } as usize;
     let y_start = if y as isize - 1 <= 0 {
         0
     } else {
         y as isize - 1
-    };
+    } as usize;
 
     let x_end = if x + 2 >= grid[0].iter().len() {
         grid[0].iter().len()
@@ -174,8 +174,8 @@ fn count_colored_neighbours(y: usize, x: usize, grid: &Vec<Vec<u8>>) -> u8 {
         y + 2
     };
 
-    for i in y_start as usize..y_end {
-        for j in x_start as usize..x_end {
+    for i in y_start..y_end {
+        for j in x_start..x_end {
             if grid[i][j] == 1 && (i, j) != (y, x) {
                 count += 1;
             }
@@ -237,13 +237,15 @@ fn test_count_colored_neighbours() {
 }
 
 fn update_grid(grid: &Vec<Vec<u8>>, rules: &HashMap<(u8, u8), u8>) -> Vec<Vec<u8>> {
-    let mut new_grid = grid.clone();
+    let mut new_grid:Vec<Vec<u8>> = Vec::new();
     for (i, row) in grid.iter().enumerate() {
+        let mut new_row:Vec<u8> = Vec::new(); 
         for (j, cell) in row.iter().enumerate() {
             let live_neighbours = count_colored_neighbours(i, j, &grid);
             let state = *cell;
-            new_grid[i][j] = *rules.get(&(state, live_neighbours)).clone().unwrap_or(&0);
+            new_row.push(*rules.get(&(state, live_neighbours)).unwrap_or(&0));
         }
+        new_grid.push(new_row);
     }
     new_grid
 }
