@@ -11,7 +11,7 @@ env:
 
 jobs:
   cellular_automata_2d:
-    runs-on: windows-latest #ubuntu-latest
+    runs-on: ubuntu-latest #ubuntu-latest
     steps:
     - uses: actions/checkout@v3
     - uses: Swatinem/rust-cache@v2
@@ -23,7 +23,7 @@ jobs:
       run: cargo test --manifest-path _2D/rust/cellular_automata_2d/Cargo.toml --verbose
 
   cellular_automata_1d:
-    runs-on: windows-latest #ubuntu-latest
+    runs-on: ubuntu-latest #ubuntu-latest
     steps:
     - uses: actions/checkout@v3
     - uses: Swatinem/rust-cache@v2
@@ -35,7 +35,7 @@ jobs:
       run: cargo test --manifest-path _1D/rust/cellular_automata_1d/Cargo.toml --verbose
 
   particles:
-    runs-on: windows-latest #ubuntu-latest
+    runs-on: ubuntu-latest #ubuntu-latest
     steps:
     - uses: actions/checkout@v3
     - uses: Swatinem/rust-cache@v2
