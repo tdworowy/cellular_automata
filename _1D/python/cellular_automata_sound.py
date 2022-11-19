@@ -1,5 +1,5 @@
 import winsound
-from _1D.cellular_automata import generate_rule, cellular_automata_step_1d
+from _1D.python.cellular_automata import generate_rule, cellular_automata_step_1d
 import numpy as np
 
 if __name__ == "__main__":

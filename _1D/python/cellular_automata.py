@@ -58,9 +58,9 @@ def generate_random(input_list: tuple, length: int) -> np.ndarray:
 
 if __name__ == "__main__":
     # input_list = generate_random((0, 1, 2), 100)
-    rule = generate_rule(110, 3)
-    for seg in rule:
-        print(f"{seg.neighborhood} {seg.type} ")
+    # rule = generate_rule(110, 3)
+    # for seg in rule:
+    #     print(f"{seg.neighborhood} {seg.type} ")
     #
     # for i in range(20):
     #     input_list = cellular_automata_step_1d(input_list, rule)
@@ -68,6 +68,9 @@ if __name__ == "__main__":
     # input_list1 = np.full((20, 1), 0)
     # input_list1[len(input_list1) // 2] = 1
     # print(input_list1)
-    # print(wolfram_number_to_bin(110, 8, 2))
-    # print(n_nary(110,2))
-    #print(list(product([1, 2, 3], repeat=3)))
+    print(wolfram_number_to_bin(110, 8, 2))
+    # print(n_nary(110, 2))
+    # print(n_nary(0, 2))
+    # print(n_nary(10, 3))
+
+    # print(list(product([1, 2, 3], repeat=3)))

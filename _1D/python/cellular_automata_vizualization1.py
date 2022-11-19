@@ -8,7 +8,7 @@ from typing import Iterable
 
 from PIL import Image
 
-from _1D.cellular_automata import generate_rule, \
+from _1D.python.cellular_automata import generate_rule, \
     cellular_automata_step_1d, generate_random
 
 

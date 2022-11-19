@@ -1,7 +1,7 @@
 import yaml
 import pygame
-from _1D.cellular_automata import cellular_automata_step_1d, generate_rule
-from _1D.cellular_automata_vizualization1 import generate_random
+from _1D.python.cellular_automata import cellular_automata_step_1d, generate_rule
+from _1D.python.cellular_automata_vizualization1 import generate_random
 import numpy as np
 
 
