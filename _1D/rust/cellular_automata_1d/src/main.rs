@@ -1,6 +1,9 @@
 use itertools::{Itertools, MultiProduct};
 use std::collections::HashMap;
 
+const WIDTH: usize = 500;
+const HEIGHT: usize = 500;
+
 #[derive(Debug, PartialEq)]
 struct RuleSegment {
     neighborhood: Vec<u32>,
@@ -35,6 +38,17 @@ where
 }
 
 impl<T: Iterator + Clone> ProductRepeat for T where T::Item: Clone {}
+
+fn generate_row_random(width: usize, probability_of_one: f64) -> Vec<u8> {
+    let mut row: Vec<u8> = Vec::new();
+    for i in 0..width {
+        let is_one = thread_rng().gen_bool(probability_of_one);
+        let cell_type = if is_one { 1 } else { 0 };
+        row[i].push(cell_type as u8);
+    }
+
+    row
+}
 
 fn n_nary(mut number: u32, n: u32) -> Vec<u32> {
     let mut result = Vec::new();
@@ -159,6 +173,7 @@ fn test_get_neighborhood() {
     assert_eq!(get_neighborhood(&[0, 1, 0, 1, 0].to_vec(), 0, 1), [0, 0, 1]);
     assert_eq!(get_neighborhood(&[0, 1, 0, 1, 0].to_vec(), 4, 1), [1, 0, 0]);
 }
+
 fn step(input: &Vec<u32>, rules: Vec<RuleSegment>) -> Vec<u32> {
     let input_lenght = input.len();
     let mut output: Vec<u32> = vec![0; input_lenght];
@@ -175,6 +190,90 @@ fn step(input: &Vec<u32>, rules: Vec<RuleSegment>) -> Vec<u32> {
     output
 }
 
-fn main() {
-    println!("{:?}", generate_rule(103, 3, 2));
+#[derive(Debug, Clone, Copy)]
+enum Message {
+    Tick(time::OffsetDateTime),
+}
+
+struct CellularAutomata1D {
+    cache: Cache,
+    rule: HashMap<(u8, u8), u8>,
+}
+
+impl Application for CellularAutomata1D {
+    type Executor = executor::Default;
+    type Message = Message;
+    type Theme = Theme;
+    type Flags = ();
+
+    fn new(_flags: Self::Flags) -> (Self, Command<Self::Message>) {
+        let rule = generate_rule(110, 3, 2);
+        (
+            CellularAutomata1D {
+                cache: Default::default(),
+                rule: rule,
+            },
+            Command::none(),
+        )
+    }
+
+    fn title(&self) -> String {
+        String::from("Cellular Automata 1D")
+    }
+
+    fn update(&mut self, message: Message) -> Command<Message> {
+        Command::none()
+    }
+
+    fn view(&self) -> Element<'_, Self::Message, Renderer<Self::Theme>> {
+        Canvas::new(self)
+            .width(Length::Units(WIDTH as u16 * 2))
+            .height(Length::Units(HEIGHT as u16 * 2))
+            .into()
+    }
+}
+
+impl<Message> canvas::Program<Message> for CellularAutomata1D {
+    type State = ();
+
+    fn draw(
+        &self,
+        _state: &Self::State,
+        _theme: &Theme,
+        bounds: Rectangle,
+        _cursor: Cursor,
+    ) -> Vec<Geometry> {
+        let geometry = self.cache.draw(bounds.size(), |frame| {
+            let mut x: f32 = 0.0;
+            let mut y: f32 = 0.0;
+            let mut row = generate_row_random(WIDTH, 0.3);
+            for _ in 0..HEIGHT {
+                for cell in row {
+                    let color = get_colors()[cell];
+                    generate_box(frame, x, y, Color::from_rgb(color.0, color.1, color.2));
+                    x += 2.0;
+                }
+                row = step(row, rule);
+                x = 0.0;
+                y += 2.0;
+            }
+        });
+
+        vec![geometry]
+    }
+}
+
+fn generate_box(frame: &mut Frame, x: f32, y: f32, color: Color) {
+    let top_left = Point::new(x, y);
+    let size = Size::new(2.0, 2.0);
+    frame.fill_rectangle(top_left, size, color);
+}
+
+fn main() -> iced::Result {
+    env_logger::builder().format_timestamp(None).init();
+
+    CellularAutomata2D::run(Settings {
+        antialiasing: true,
+        ..Settings::default()
+    })
 }
