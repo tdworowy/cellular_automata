@@ -36,20 +36,19 @@ def generate_rule(wolfram_number: int, neighborhood_size: int = 3, colours: list
         rule.append(RuleSegment(comb, int(wolfram_number[i])))
     return rule
 
-#TODO make it round (like in rust solution)
-def get_current_neighborhood(input_list: np.ndarray, i: int, neighborhood_center: int):
+
+# TODO make it round (like in rust solution)
+def get_current_neighborhood(input_list: np.ndarray, i: int, neighborhood_center: int) -> tuple:
     width = input_list.shape[0]
     return tuple(input_list[j] for j in range((i - neighborhood_center) % width, (i + neighborhood_center + 1) % width))
 
 
 def cellular_automata_step_1d(input_list: np.ndarray, rules: list) -> np.ndarray:
     output_list = np.zeros(shape=input_list.shape)
-    width = input_list.shape[0]
     neighborhood_size = len(rules[0].neighborhood)
     neighborhood_center = (neighborhood_size - 1) // 2
     for i in range(len(input_list)):
-        current_neighborhood = tuple(
-            input_list[j] for j in range((i - neighborhood_center) % width, (i + neighborhood_center + 1) % width))
+        current_neighborhood = get_current_neighborhood(input_list, i, neighborhood_center)
         for rule in rules:
             if current_neighborhood == rule.neighborhood:
                 output_list[i] = rule.type
