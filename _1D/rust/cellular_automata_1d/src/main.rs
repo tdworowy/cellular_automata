@@ -1,5 +1,12 @@
 use itertools::{Itertools, MultiProduct};
+use rand::{thread_rng, Rng};
 use std::collections::HashMap;
+
+use iced::widget::canvas::{self, Cache, Canvas, Cursor, Frame, Geometry};
+use iced::{
+    executor, Application, Color, Command, Element, Length, Point, Rectangle, Renderer, Settings,
+    Size, Theme,
+};
 
 const WIDTH: usize = 500;
 const HEIGHT: usize = 500;
@@ -10,11 +17,11 @@ struct RuleSegment {
     cell_type: u32,
 }
 
-fn get_colors() -> HashMap<u16, (f32, f32, f32)> {
+fn get_colors() -> HashMap<u32, (f32, f32, f32)> {
     HashMap::from([
-        (0, (0.0, 1.0, 0.0)), // blue
-        (1, (0.0, 0.0, 1.0)), // red
-        (2, (1.0, 0.0, 0.0)), // grean
+        (0, (0.0, 0.0, 1.0)), // blue
+        (1, (1.0, 0.0, 0.0)), // red
+        (2, (0.0, 1.0, 0.0)), // grean
         (3, (1.0, 0.7, 0.0)), // yellow
     ])
 }
@@ -39,14 +46,19 @@ where
 
 impl<T: Iterator + Clone> ProductRepeat for T where T::Item: Clone {}
 
-fn generate_row_random(width: usize, probability_of_one: f64) -> Vec<u8> {
-    let mut row: Vec<u8> = Vec::new();
-    for i in 0..width {
+fn generate_row_random(width: usize, probability_of_one: f64) -> Vec<u32> {
+    let mut row: Vec<u32> = Vec::new();
+    for _ in 0..width {
         let is_one = thread_rng().gen_bool(probability_of_one);
         let cell_type = if is_one { 1 } else { 0 };
-        row[i].push(cell_type as u8);
+        row.push(cell_type as u32);
     }
+    row
+}
 
+fn generate_row_one_cell(width: usize) -> Vec<u32> {
+    let mut row: Vec<u32> = vec![0; width];
+    row[width / 2] = 1;
     row
 }
 
@@ -174,14 +186,14 @@ fn test_get_neighborhood() {
     assert_eq!(get_neighborhood(&[0, 1, 0, 1, 0].to_vec(), 4, 1), [1, 0, 0]);
 }
 
-fn step(input: &Vec<u32>, rules: Vec<RuleSegment>) -> Vec<u32> {
+fn step(input: &Vec<u32>, rules: &Vec<RuleSegment>) -> Vec<u32> {
     let input_lenght = input.len();
-    let mut output: Vec<u32> = vec![0; input_lenght];
+    let mut output: Vec<u32> = Vec::new();
     let neighborhood_size: usize = rules[0].neighborhood.len();
     let neighborhood_center = (neighborhood_size - 1) / 2;
     for i in 0..input_lenght {
-        for rule in &rules {
-            let current_neighborhood = get_neighborhood(input, i, neighborhood_center);
+        let current_neighborhood = get_neighborhood(input, i, neighborhood_center);
+        for rule in rules {
             if current_neighborhood == rule.neighborhood {
                 output.push(rule.cell_type);
             }
@@ -189,15 +201,21 @@ fn step(input: &Vec<u32>, rules: Vec<RuleSegment>) -> Vec<u32> {
     }
     output
 }
+#[test]
+fn test_step() {
+    let row = generate_row_random(10, 0.3);
+    let rule = generate_rule(110, 3, 2); // TODO parametrize it
+    let result_row = step(&row, &rule);
+
+    assert_eq!(row.len(), result_row.len());
+}
 
 #[derive(Debug, Clone, Copy)]
-enum Message {
-    Tick(time::OffsetDateTime),
-}
+enum Message {}
 
 struct CellularAutomata1D {
     cache: Cache,
-    rule: HashMap<(u8, u8), u8>,
+    rule: Vec<RuleSegment>,
 }
 
 impl Application for CellularAutomata1D {
@@ -207,7 +225,7 @@ impl Application for CellularAutomata1D {
     type Flags = ();
 
     fn new(_flags: Self::Flags) -> (Self, Command<Self::Message>) {
-        let rule = generate_rule(110, 3, 2);
+        let rule = generate_rule(167, 3, 2);
         (
             CellularAutomata1D {
                 cache: Default::default(),
@@ -224,7 +242,6 @@ impl Application for CellularAutomata1D {
     fn update(&mut self, message: Message) -> Command<Message> {
         Command::none()
     }
-
     fn view(&self) -> Element<'_, Self::Message, Renderer<Self::Theme>> {
         Canvas::new(self)
             .width(Length::Units(WIDTH as u16 * 2))
@@ -246,14 +263,14 @@ impl<Message> canvas::Program<Message> for CellularAutomata1D {
         let geometry = self.cache.draw(bounds.size(), |frame| {
             let mut x: f32 = 0.0;
             let mut y: f32 = 0.0;
-            let mut row = generate_row_random(WIDTH, 0.3);
+            let mut row = generate_row_one_cell(WIDTH);
             for _ in 0..HEIGHT {
-                for cell in row {
+                for cell in &row {
                     let color = get_colors()[cell];
                     generate_box(frame, x, y, Color::from_rgb(color.0, color.1, color.2));
                     x += 2.0;
                 }
-                row = step(row, rule);
+                row = step(&row, &self.rule);
                 x = 0.0;
                 y += 2.0;
             }
@@ -272,7 +289,7 @@ fn generate_box(frame: &mut Frame, x: f32, y: f32, color: Color) {
 fn main() -> iced::Result {
     env_logger::builder().format_timestamp(None).init();
 
-    CellularAutomata2D::run(Settings {
+    CellularAutomata1D::run(Settings {
         antialiasing: true,
         ..Settings::default()
     })

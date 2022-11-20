@@ -7,7 +7,6 @@ edition = "2021"
 
 [dependencies]
 iced = { version = "0.5.1", features = ["canvas", "tokio", "debug"]}   
-
 itertools ="0.10.5"
 rand ="0.8.5"
 env_logger = "0.9"
