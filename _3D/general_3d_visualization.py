@@ -4,6 +4,7 @@ from vpython import box, vector, color
 from time import sleep
 
 from _3D import _3d_rules
+from _3D._3d_rules import random_rule
 from _3D.general_3d_automata import generate_grid_center_cell_start, update_grid
 
 
@@ -36,7 +37,7 @@ class CellularAutomataCDVisualization:
 if __name__ == "__main__":
 
     grid = generate_grid_center_cell_start()
-    rules = _3d_rules.rule_3  # _3d_rules.rule_1  # random_rule()
+    rules = random_rule()  #_3d_rules.rule_3  # _3d_rules.rule_1  # random_rule()
     print(rules)
     visualization_3d = CellularAutomataCDVisualization()
     visualization_3d.generate_stage()

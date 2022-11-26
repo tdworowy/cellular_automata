@@ -4,7 +4,7 @@ import pyglet
 from pyglet import shapes
 from pyglet import clock
 
-from particles.particles_generator_v2 import ParticlesGenerator, random_rules
+from particles_generator_v2 import ParticlesGenerator, random_rules
 
 colours = {"blue": (0, 0, 255),
            "red": (255, 0, 0),
