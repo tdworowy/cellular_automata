@@ -1,3 +1,6 @@
 prettier --write .
 
 sass style.scss style.css
+
+
+pylint $(git ls-files '*.py')

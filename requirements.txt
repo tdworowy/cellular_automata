@@ -1,9 +1,7 @@
-Flask
-flask_restx
-Kivy
 numpy
 Pillow
-pygame
 pyglet
 PyYAML
 vpython
+pytest
+pylint
