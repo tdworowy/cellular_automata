@@ -1,4 +1,4 @@
-name: Rust
+name: Rust Cellular Automata
 
 on:
   push:
