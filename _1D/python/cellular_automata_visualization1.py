@@ -16,11 +16,6 @@ def count_rules(neighborhood_size: int, color_count: int) -> int:
     return 2 ** (color_count ** neighborhood_size)
 
 
-# def generate_random(input_list: list, weights: list, length: int):
-#     temp = [choices(input_list, weights) for i in range(length)]
-#     return [ele[0] for ele in temp]
-
-
 def take_screenshot(folder: str, file_name: str, canvas: tkinter.Canvas):
     if not path.isdir(folder):
         mkdir(folder)
@@ -162,16 +157,16 @@ class GUI:
     def play_all(self, rules_iter: Iterable):
         self.silent = False
 
-        folder = f"1d_neighborhood_size_{self.neighborhood_size.get()}_colours_{self.color_count.get()}"
-        if not path.isdir(folder):
-            mkdir(folder)
-        files_list = os.listdir(folder)
+        # folder = f"1d_neighborhood_size_{self.neighborhood_size.get()}_colours_{self.color_count.get()}"
+        # if not path.isdir(folder):
+        #     mkdir(folder)
+        # files_list = os.listdir(folder)
 
         for rule in rules_iter:
             rule_file = f"rule_{rule}_{self.init_way}"
 
-            if not self.replay and rule_file + ".png" in files_list:
-                continue
+            # if not self.replay and rule_file + ".png" in files_list:
+            #     continue
 
             self.rule = generate_rule(rule,
                                       int(self.neighborhood_size.get()),
@@ -183,9 +178,9 @@ class GUI:
             self.play_call_back()
             self.top.update()
 
-            take_screenshot(folder,
-                            rule_file,
-                            self.canvas)
+            # take_screenshot(folder,
+            #                 rule_file,
+            #                 self.canvas)
 
             self.clear_call_back()
 
