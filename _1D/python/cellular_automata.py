@@ -72,15 +72,16 @@ def generate_random(input_list: tuple, length: int) -> np.ndarray:
 
 
 if __name__ == "__main__":
-    # input_list = generate_random((0, 1, 2), 100)
-    # rule = generate_rule(110, 3)
+    #input_list = generate_random((0, 1, 2), 100)
+
     # output_list = cellular_automata_step_1d(input_list, rule)
     #
     # print(len(input_list))
     # print(len(output_list))
-    # for seg in rule:
-    #     print(f"{seg.neighborhood} {seg.type} ")
-    #
+    rule = generate_rule(110, 3)
+    for seg in rule:
+        print(f"{seg.neighborhood} {seg.type} ")
+
     # for i in range(20):
     #     input_list = cellular_automata_step_1d(input_list, rule)
     #     print("".join(["*" if i == 1 else " " for i in input_list]))
@@ -96,4 +97,4 @@ if __name__ == "__main__":
     # print(generate_rule(110, 3))
     # print(get_current_neighborhood(np.array([0, 1, 0, 1, 0]), 2, 1))
     # print(get_current_neighborhood(np.array([0, 1, 0, 1, 0]), 0, 1))
-    print(wolfram_number_to_bin(215, 2 ** 3, 2))
+   # print(wolfram_number_to_bin(215, 2 ** 3, 2))
