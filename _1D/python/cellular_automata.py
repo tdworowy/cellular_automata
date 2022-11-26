@@ -37,10 +37,21 @@ def generate_rule(wolfram_number: int, neighborhood_size: int = 3, colours: list
     return rule
 
 
-# TODO make it round (like in rust solution)
+def match_index(index: int, width: int) -> int:
+    match index:
+        case x if x < 0:
+            return index + width
+        case x if x >= width:
+            return index - width
+        case _:
+            return index
+
+
 def get_current_neighborhood(input_list: np.ndarray, i: int, neighborhood_center: int) -> tuple:
     width = input_list.shape[0]
-    return tuple(input_list[j] for j in range((i - neighborhood_center) % width, (i + neighborhood_center + 1) % width))
+
+    return tuple(input_list[match_index(j, width)] for j in
+                 range((i - neighborhood_center) % width, (i + neighborhood_center + 1) % width))
 
 
 def cellular_automata_step_1d(input_list: np.ndarray, rules: list) -> np.ndarray:
@@ -61,12 +72,12 @@ def generate_random(input_list: tuple, length: int) -> np.ndarray:
 
 
 if __name__ == "__main__":
-    input_list = generate_random((0, 1, 2), 100)
-    rule = generate_rule(110, 3)
-    output_list = cellular_automata_step_1d(input_list, rule)
-
-    print(len(input_list))
-    print(len(output_list))
+    # input_list = generate_random((0, 1, 2), 100)
+    # rule = generate_rule(110, 3)
+    # output_list = cellular_automata_step_1d(input_list, rule)
+    #
+    # print(len(input_list))
+    # print(len(output_list))
     # for seg in rule:
     #     print(f"{seg.neighborhood} {seg.type} ")
     #
@@ -85,3 +96,4 @@ if __name__ == "__main__":
     # print(generate_rule(110, 3))
     # print(get_current_neighborhood(np.array([0, 1, 0, 1, 0]), 2, 1))
     # print(get_current_neighborhood(np.array([0, 1, 0, 1, 0]), 0, 1))
+    print(wolfram_number_to_bin(215, 2 ** 3, 2))

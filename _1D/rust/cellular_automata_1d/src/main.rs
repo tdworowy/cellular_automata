@@ -165,13 +165,13 @@ fn test_generate_rule() {
 
 fn get_neighborhood(input: &Vec<u32>, i: usize, neighborhood_center: usize) -> Vec<u32> {
     let mut current_neighborhood: Vec<u32> = Vec::new();
-    let input_lenght: isize = input.len() as isize;
+    let input_length: isize = input.len() as isize;
     let neighborhood_centeri = neighborhood_center as isize;
 
     for j in i as isize - neighborhood_centeri..i as isize + neighborhood_centeri + 1 as isize {
         let index = match j {
-            x if x < 0 => input_lenght + x,
-            x if x >= input_lenght => x - input_lenght,
+            x if x < 0 => input_length + x,
+            x if x >= input_length => x - input_length,
             _ => j,
         };
         current_neighborhood.push(input[index as usize]);
@@ -187,11 +187,11 @@ fn test_get_neighborhood() {
 }
 
 fn step(input: &Vec<u32>, rules: &Vec<RuleSegment>) -> Vec<u32> {
-    let input_lenght = input.len();
+    let input_length = input.len();
     let mut output: Vec<u32> = Vec::new();
     let neighborhood_size: usize = rules[0].neighborhood.len();
     let neighborhood_center = (neighborhood_size - 1) / 2;
-    for i in 0..input_lenght {
+    for i in 0..input_length {
         let current_neighborhood = get_neighborhood(input, i, neighborhood_center);
         for rule in rules {
             if current_neighborhood == rule.neighborhood {
