@@ -3,7 +3,7 @@ from collections import namedtuple
 import numpy as np
 
 from _1D.python.cellular_automata import n_nary, wolfram_number_to_bin, generate_rule, RuleSegment, \
-    get_current_neighborhood
+    get_current_neighborhood, cellular_automata_step_1d
 import pytest
 
 n_ary_test_tuple = namedtuple("n_ary_test", "n, number, result")
@@ -60,3 +60,13 @@ def test_generate_rule():
 def test_get_current_neighborhood(get_current_neighborhood_test: get_current_neighborhood_tuple):
     assert get_current_neighborhood(get_current_neighborhood_test.input_list, get_current_neighborhood_test.i,
                                     get_current_neighborhood_test.neighborhood_center) == get_current_neighborhood_test.result
+
+
+def test_cellular_automata_step_1d():
+    rule = generate_rule(110, 3)
+    input_list = np.array([1, 0, 1, 1, 0, 0, 0, 0, 0, 0])
+    expected_output = np.array([1, 1, 1, 1, 0, 0, 0, 0, 0, 1])
+    output_list = cellular_automata_step_1d(input_list, rule)
+
+    np.testing.assert_array_equal(output_list, expected_output)
+

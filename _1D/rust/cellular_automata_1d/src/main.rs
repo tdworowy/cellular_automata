@@ -203,11 +203,12 @@ fn step(input: &Vec<u32>, rules: &Vec<RuleSegment>) -> Vec<u32> {
 }
 #[test]
 fn test_step() {
-    let row = generate_row_random(10, 0.3);
-    let rule = generate_rule(110, 3, 2); // TODO parametrize it
+    let row = vec![1, 0, 1, 1, 0, 0, 0, 0, 0, 0];
+    let expected_output = vec![1, 1, 1, 1, 0, 0, 0, 0, 0, 1];
+    let rule = generate_rule(110, 3, 2);
     let result_row = step(&row, &rule);
 
-    assert_eq!(row.len(), result_row.len());
+    assert_eq!(result_row, expected_output);
 }
 
 #[derive(Debug, Clone, Copy)]
