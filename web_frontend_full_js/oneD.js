@@ -86,22 +86,29 @@ arrays_equal = (a, b) => {
   return !!a && !!b && !(a < b || b < a);
 };
 
+function match_index(index, width) {
+  if (index < 0) {
+    return index + width;
+  }
+  if (index >= width) {
+    return index - width;
+  } else {
+    return index;
+  }
+}
+
 function cellular_automata_step_1d(input_list, rules) {
   let output_list = [];
   const width = input_list.length;
   let rule_found = false;
 
+  const neighborhood_size = rules[0].neighborhood.length;
+  const neighborhood_center = (neighborhood_size - 1) / 2;
   for (let i = 0; i < width; i++) {
     for (let rule of rules) {
-      const neighborhood_size = rule.neighborhood.length;
-      const temp = (neighborhood_size - 1) / 2;
       const current_neighborhood = [];
-      for (
-        let j = (((i - temp) % width) + width) % width;
-        j < (i + temp + 1) % width;
-        j++
-      ) {
-        current_neighborhood.push(input_list[j]);
+      for (let j = i - neighborhood_center; j < i + neighborhood_center + 1; j++) {
+        current_neighborhood.push(input_list[match_index(j, width)]);
       }
       if (arrays_equal(current_neighborhood, rule.neighborhood)) {
         output_list.push(rule.type);
