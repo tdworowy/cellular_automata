@@ -97,6 +97,17 @@ impl Rules {
     }
 }
 
+fn generate_random_rule() -> HashMap<(u8, u8), u8> {
+    let rule_lenght = thread_rng().gen_range(5..15);
+    let mut rules: HashMap<(u8, u8), u8> = HashMap::new();
+    for _ in 0..rule_lenght {
+        let first = thread_rng().gen_range(0..8) as u8;
+        let second = thread_rng().gen_range(0..8) as u8;
+        rules.insert((first, second), 1 as u8);
+    }
+    rules
+}
+
 fn get_rule(rule_name: &str) -> HashMap<(u8, u8), u8> {
     let rules = Rules::new();
     match rule_name {
@@ -108,6 +119,7 @@ fn get_rule(rule_name: &str) -> HashMap<(u8, u8), u8> {
         "mazectric" => rules.mazectric,
         "_move" => rules._move,
         "walled_cities" => rules.walled_cities,
+        "random" => generate_random_rule(),
         _ => panic!(
             "rule {} doesn't exist, avilable rules: {:?}",
             &rule_name, RULES_NAMES
@@ -237,9 +249,9 @@ fn test_count_colored_neighbours() {
 }
 
 fn update_grid(grid: &Vec<Vec<u8>>, rules: &HashMap<(u8, u8), u8>) -> Vec<Vec<u8>> {
-    let mut new_grid:Vec<Vec<u8>> = Vec::new();
+    let mut new_grid: Vec<Vec<u8>> = Vec::new();
     for (i, row) in grid.iter().enumerate() {
-        let mut new_row:Vec<u8> = Vec::new(); 
+        let mut new_row: Vec<u8> = Vec::new();
         for (j, cell) in row.iter().enumerate() {
             let live_neighbours = count_colored_neighbours(i, j, &grid);
             let state = *cell;
@@ -306,7 +318,7 @@ impl Application for CellularAutomata2D {
 
     fn update(&mut self, message: Message) -> Command<Message> {
         match message {
-            Message::Tick(local_time) => {
+            Message::Tick(_local_time) => {
                 self.grid = update_grid(&self.grid, &self.rules);
                 self.cache.clear();
             }
@@ -379,6 +391,7 @@ fn read_rule() -> HashMap<(u8, u8), u8> {
     } else {
         rule = get_rule(&args[1]);
         println!("Using rule:{}", &args[1]);
+        println!("Rule Details:{:?}", rule);
     }
     rule
 }

@@ -77,7 +77,7 @@ let requestId = undefined;
 function generateSnowflakeRule(neighbours_numbers = [1]) {
   let snowflake_rules = {};
 
-  for (neighbours_number of neighbours_numbers) {
+  for (let neighbours_number of neighbours_numbers) {
     snowflake_rules["0" + "_" + neighbours_number.toString()] = 1;
     snowflake_rules["1" + "_" + neighbours_number.toString()] = 1;
   }
@@ -87,6 +87,20 @@ function generateSnowflakeRule(neighbours_numbers = [1]) {
       snowflake_rules["1" + "_" + i.toString()] = 1;
     }
   return snowflake_rules;
+}
+
+function generateRandomRule() {
+  const minRuleSize = 5;
+  const maxRuleSize = 20;
+  const ruleSize =
+    Math.floor(Math.random() * (maxRuleSize - minRuleSize + 1)) + minRuleSize;
+  let rules = {};
+  for (let i = 0; i < ruleSize; i++) {
+    const first = Math.floor(Math.random() * 9);
+    const second = Math.floor(Math.random() * 9);
+    rules[`${first}_${second}`] = 1;
+  }
+  return rules;
 }
 
 rules = {
@@ -102,6 +116,7 @@ rules = {
   snowflake_1_5: generateSnowflakeRule([1, 5]),
   snowflake_1_3_5: generateSnowflakeRule([1, 3, 5]),
   snowflake_1_3: generateSnowflakeRule([1, 3]),
+  random: generateRandomRule()
 };
 
 function generateGridRandom(height, width, prob_of_one) {

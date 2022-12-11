@@ -107,7 +107,11 @@ function cellular_automata_step_1d(input_list, rules) {
   for (let i = 0; i < width; i++) {
     for (let rule of rules) {
       const current_neighborhood = [];
-      for (let j = i - neighborhood_center; j < i + neighborhood_center + 1; j++) {
+      for (
+        let j = i - neighborhood_center;
+        j < i + neighborhood_center + 1;
+        j++
+      ) {
         current_neighborhood.push(input_list[match_index(j, width)]);
       }
       if (arrays_equal(current_neighborhood, rule.neighborhood)) {
