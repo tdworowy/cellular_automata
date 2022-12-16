@@ -72,18 +72,8 @@ walled_cities_rules = {
   "1_5": 1,
 };
 epileptic_rules = {
-  "6_6": 1,
-  "3_0": 1,
-  "6_1": 1,
-  "4_2": 1,
-  "3_2": 1,
-  "3_1": 1,
-  "4_5": 1,
-  "3_6": 1,
   "0_0": 1,
-  "2_4": 1,
-  "0_2": 1,
-  "6_3": 1,
+  "0_2": 1, 
 };
 
 let requestId = undefined;
@@ -110,7 +100,7 @@ function generateRandomRule() {
     Math.floor(Math.random() * (maxRuleSize - minRuleSize + 1)) + minRuleSize;
   let rules = {};
   for (let i = 0; i < ruleSize; i++) {
-    const first = Math.floor(Math.random() * 9);
+    const first = Math.floor(Math.random() * 2);
     const second = Math.floor(Math.random() * 9);
     rules[`${first}_${second}`] = 1;
   }
@@ -223,6 +213,7 @@ function initGrid(event) {
 
 function step() {
   const params = new FormData(document.querySelector("#step"));
+  //console.log( rules[params.get("rule")])
   grid = JSON.parse(JSON.stringify(prev_grid));
   new_grid = updateGrid(
     grid,

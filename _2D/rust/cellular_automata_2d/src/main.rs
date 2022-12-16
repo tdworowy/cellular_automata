@@ -95,20 +95,7 @@ impl Rules {
                 ((1, 4), 1),
                 ((1, 5), 1),
             ]),
-            epileptic: HashMap::from([
-                ((6, 6), 1),
-                ((3, 0), 1),
-                ((6, 1), 1),
-                ((4, 2), 1),
-                ((3, 2), 1),
-                ((3, 1), 1),
-                ((4, 5), 1),
-                ((3, 6), 1),
-                ((0, 0), 1),
-                ((2, 4), 1),
-                ((0, 2), 1),
-                ((6, 3), 1),
-            ]),
+            epileptic: HashMap::from([((0, 0), 1), ((0, 2), 1)]),
         }
     }
 }
@@ -117,7 +104,7 @@ fn generate_random_rule(min_lenght: usize, max_lenght: usize) -> HashMap<(u8, u8
     let rule_lenght = thread_rng().gen_range(min_lenght..max_lenght);
     let mut rules: HashMap<(u8, u8), u8> = HashMap::new();
     for _ in 0..rule_lenght {
-        let first = thread_rng().gen_range(0..8) as u8;
+        let first = thread_rng().gen_range(0..2) as u8;
         let second = thread_rng().gen_range(0..8) as u8;
         rules.insert((first, second), 1 as u8);
     }
