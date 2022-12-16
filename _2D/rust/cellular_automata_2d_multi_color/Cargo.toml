@@ -1,0 +1,13 @@
+[package]
+name = "cellular_automata_2d_multi_color"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+iced = { version = "0.5.1", features = ["canvas", "tokio", "debug"]}   
+itertools ="0.10.5"
+rand ="0.8.5"
+env_logger = "0.9"
+time = { version = "0.3.5", features = ["local-offset"] }

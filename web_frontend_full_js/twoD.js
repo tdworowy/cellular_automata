@@ -71,6 +71,20 @@ walled_cities_rules = {
   "1_4": 1,
   "1_5": 1,
 };
+epileptic_rules = {
+  "6_6": 1,
+  "3_0": 1,
+  "6_1": 1,
+  "4_2": 1,
+  "3_2": 1,
+  "3_1": 1,
+  "4_5": 1,
+  "3_6": 1,
+  "0_0": 1,
+  "2_4": 1,
+  "0_2": 1,
+  "6_3": 1,
+};
 
 let requestId = undefined;
 
@@ -116,7 +130,8 @@ rules = {
   snowflake_1_5: generateSnowflakeRule([1, 5]),
   snowflake_1_3_5: generateSnowflakeRule([1, 3, 5]),
   snowflake_1_3: generateSnowflakeRule([1, 3]),
-  random: generateRandomRule()
+  epileptic: epileptic_rules,
+  random: generateRandomRule(),
 };
 
 function generateGridRandom(height, width, prob_of_one) {
