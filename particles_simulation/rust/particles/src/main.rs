@@ -27,7 +27,7 @@ struct ParticleInfo {
 fn get_colors() -> HashMap<u16, (f32, f32, f32)> {
     HashMap::from([
         (1, (0.0, 0.0, 1.0)), // red
-        (2, (1.0, 0.0, 0.0)), // grean
+        (2, (1.0, 0.0, 0.0)), // green
         (3, (0.0, 1.0, 0.0)), // blue
         (4, (1.0, 0.7, 0.0)), // yellow
     ])

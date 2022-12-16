@@ -185,7 +185,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "76a284da2e6fe2092f2353e51713435363112dfd60030e22add80be333fb928f"
 
 [[package]]
-name = "cellular_automata_2d"
+name = "cellular_automata_2d_multi_color"
 version = "0.1.0"
 dependencies = [
  "env_logger",

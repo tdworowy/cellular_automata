@@ -11,88 +11,27 @@ use iced::{
 const WIDTH: usize = 500;
 const HEIGHT: usize = 500;
 const TICK_TIME: u64 = 100;
-const PROB_OF_ONE: f64 = 0.4;
 
-const RULES_NAMES: [&str; 8] = [
-    "game_of_live",
-    "ameba",
-    "_2x2",
-    "_34_live",
-    "coagulations",
-    "mazectric",
-    "_move",
-    "walled_cities",
-];
+const COLOUR_COUNT: u8 = 4;
 
+fn get_colors() -> HashMap<u8, (f32, f32, f32)> {
+    HashMap::from([
+        (0, (0.0, 0.0, 1.0)), // blue
+        (1, (1.0, 0.0, 0.0)), // red
+        (2, (0.0, 1.0, 0.0)), // green
+        (3, (1.0, 0.7, 0.0)), // yellow
+    ])
+}
+
+const RULES_NAMES: [&str; 1] = ["placeholder"];
 struct Rules {
-    game_of_live: HashMap<(u8, u8), u8>,
-    ameba: HashMap<(u8, u8), u8>,
-    _2x2: HashMap<(u8, u8), u8>,
-    _34_live: HashMap<(u8, u8), u8>,
-    coagulations: HashMap<(u8, u8), u8>,
-    mazectric: HashMap<(u8, u8), u8>,
-    _move: HashMap<(u8, u8), u8>,
-    walled_cities: HashMap<(u8, u8), u8>,
+    placeholder: HashMap<(u8, u8), u8>,
 }
 
 impl Rules {
     fn new() -> Self {
         Self {
-            game_of_live: HashMap::from([((0, 3), 1), ((1, 3), 1), ((1, 2), 1)]),
-            ameba: HashMap::from([
-                ((0, 3), 1),
-                ((0, 5), 1),
-                ((0, 5), 1),
-                ((1, 1), 1),
-                ((1, 3), 1),
-                ((1, 5), 1),
-                ((1, 8), 1),
-            ]),
-            _2x2: HashMap::from([
-                ((0, 3), 1),
-                ((0, 6), 1),
-                ((1, 1), 1),
-                ((1, 2), 1),
-                ((1, 5), 1),
-            ]),
-            _34_live: HashMap::from([((0, 3), 1), ((0, 4), 1), ((1, 3), 1), ((1, 4), 1)]),
-            coagulations: HashMap::from([
-                ((0, 3), 1),
-                ((0, 7), 1),
-                ((0, 8), 1),
-                ((1, 2), 1),
-                ((1, 3), 1),
-                ((1, 5), 1),
-                ((1, 6), 1),
-                ((1, 7), 1),
-                ((1, 8), 1),
-            ]),
-            mazectric: HashMap::from([
-                ((0, 3), 1),
-                ((1, 1), 1),
-                ((1, 2), 1),
-                ((1, 3), 1),
-                ((1, 4), 1),
-            ]),
-            _move: HashMap::from([
-                ((0, 3), 1),
-                ((0, 6), 1),
-                ((0, 8), 1),
-                ((1, 2), 1),
-                ((1, 4), 1),
-                ((1, 5), 1),
-            ]),
-            walled_cities: HashMap::from([
-                ((0, 4), 1),
-                ((0, 5), 1),
-                ((0, 6), 1),
-                ((0, 7), 1),
-                ((0, 8), 1),
-                ((1, 2), 1),
-                ((1, 3), 1),
-                ((1, 4), 1),
-                ((1, 5), 1),
-            ]),
+            placeholder: HashMap::from([((0, 3), 1), ((1, 3), 1), ((1, 2), 1)]),
         }
     }
 }
@@ -103,7 +42,10 @@ fn generate_random_rule() -> HashMap<(u8, u8), u8> {
     for _ in 0..rule_lenght {
         let first = thread_rng().gen_range(0..8) as u8;
         let second = thread_rng().gen_range(0..8) as u8;
-        rules.insert((first, second), 1 as u8);
+        rules.insert(
+            (first, second),
+            thread_rng().gen_range(0..COLOUR_COUNT) as u8,
+        );
     }
     rules
 }
@@ -111,14 +53,7 @@ fn generate_random_rule() -> HashMap<(u8, u8), u8> {
 fn get_rule(rule_name: &str) -> HashMap<(u8, u8), u8> {
     let rules = Rules::new();
     match rule_name {
-        "game_of_live" => rules.game_of_live,
-        "ameba" => rules.ameba,
-        "_2x2" => rules._2x2,
-        "_34_live" => rules._34_live,
-        "coagulations" => rules.coagulations,
-        "mazectric" => rules.mazectric,
-        "_move" => rules._move,
-        "walled_cities" => rules.walled_cities,
+        "placeholder" => rules.placeholder,
         "random" => generate_random_rule(),
         _ => panic!(
             "rule {} doesn't exist, avilable rules: {:?}",
@@ -127,25 +62,16 @@ fn get_rule(rule_name: &str) -> HashMap<(u8, u8), u8> {
     }
 }
 
-fn generate_gird_random(width: usize, height: usize, probability_of_one: f64) -> Vec<Vec<u8>> {
+fn generate_gird_random(width: usize, height: usize) -> Vec<Vec<u8>> {
     let mut grid: Vec<Vec<u8>> = Vec::new();
     for i in 0..height {
         grid.push(vec![]);
         for _ in 0..width {
-            let is_one = thread_rng().gen_bool(probability_of_one);
-            let cell_type = if is_one { 1 } else { 0 };
-            grid[i].push(cell_type as u8);
+            let cell_type = thread_rng().gen_range(0..COLOUR_COUNT);
+            grid[i].push(cell_type);
         }
     }
     grid
-}
-
-#[test]
-fn test_generate_gird_random() {
-    assert_eq!(generate_gird_random(2, 2, 0.0), [[0, 0], [0, 0]]);
-    assert_eq!(generate_gird_random(2, 2, 1.0), [[1, 1], [1, 1]]);
-    assert_eq!(generate_gird_random(3, 2, 1.0), [[1, 1, 1], [1, 1, 1]]);
-    assert_eq!(generate_gird_random(2, 3, 1.0), [[1, 1], [1, 1], [1, 1]]);
 }
 
 fn generate_gird_one_cell(width: usize, height: usize) -> Vec<Vec<u8>> {
@@ -161,7 +87,7 @@ fn test_generate_gird_one_cell() {
         [[0, 0, 0], [0, 1, 0], [0, 0, 0]]
     );
 }
-
+// TODO how to handle it ?
 fn count_colored_neighbours(y: usize, x: usize, grid: &Vec<Vec<u8>>) -> u8 {
     let mut count: u8 = 0;
     let x_start = if x as isize - 1 <= 0 {
@@ -274,8 +200,8 @@ fn test_update_grid() {
 }
 
 fn test_console() {
-    let mut grid = generate_gird_random(WIDTH, HEIGHT, 0.4);
-    let rules = get_rule("game_of_live");
+    let mut grid = generate_gird_random(WIDTH, HEIGHT);
+    let rules = get_rule("random");
     for i in 0..100 {
         grid = update_grid(&grid, &rules);
         println!("Step {}", i);
@@ -301,7 +227,7 @@ impl Application for CellularAutomata2D {
 
     fn new(_flags: Self::Flags) -> (Self, Command<Self::Message>) {
         let rule = read_rule();
-        let init_grid = generate_gird_random(WIDTH, HEIGHT, PROB_OF_ONE);
+        let init_grid = generate_gird_random(WIDTH, HEIGHT);
         (
             CellularAutomata2D {
                 cache: Default::default(),
@@ -359,12 +285,8 @@ impl<Message> canvas::Program<Message> for CellularAutomata2D {
             let mut y: f32 = 0.0;
             for row in &self.grid {
                 for cell in row {
-                    let color = if cell == &1 {
-                        Color::from_rgb(1.0, 0.0, 0.0)
-                    } else {
-                        Color::from_rgb(0.0, 0.0, 1.0)
-                    };
-                    generate_box(frame, x, y, color);
+                    let color = get_colors()[cell];
+                    generate_box(frame, x, y, Color::from_rgb(color.0, color.1, color.2));
                     x += 2.0;
                 }
                 x = 0.0;
@@ -384,9 +306,9 @@ fn generate_box(frame: &mut Frame, x: f32, y: f32, color: Color) {
 
 fn read_rule() -> HashMap<(u8, u8), u8> {
     let args: Vec<String> = env::args().collect();
-    let mut rule: HashMap<(u8, u8), u8> = get_rule("game_of_live");
+    let mut rule: HashMap<(u8, u8), u8> = get_rule("random");
     if args.len() != 2 {
-        println!("using default rule: game_of_live");
+        println!("using default rule: random");
         println!("avilable rules: {:?}", RULES_NAMES);
     } else {
         rule = get_rule(&args[1]);
