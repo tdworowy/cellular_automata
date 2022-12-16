@@ -13,7 +13,7 @@ const HEIGHT: usize = 500;
 const TICK_TIME: u64 = 100;
 const PROB_OF_ONE: f64 = 0.4;
 
-const RULES_NAMES: [&str; 8] = [
+const RULES_NAMES: [&str; 9] = [
     "game_of_live",
     "ameba",
     "_2x2",
@@ -22,6 +22,7 @@ const RULES_NAMES: [&str; 8] = [
     "mazectric",
     "_move",
     "walled_cities",
+    "epileptic",
 ];
 
 struct Rules {
@@ -33,6 +34,7 @@ struct Rules {
     mazectric: HashMap<(u8, u8), u8>,
     _move: HashMap<(u8, u8), u8>,
     walled_cities: HashMap<(u8, u8), u8>,
+    epileptic: HashMap<(u8, u8), u8>,
 }
 
 impl Rules {
@@ -93,12 +95,26 @@ impl Rules {
                 ((1, 4), 1),
                 ((1, 5), 1),
             ]),
+            epileptic: HashMap::from([
+                ((6, 6), 1),
+                ((3, 0), 1),
+                ((6, 1), 1),
+                ((4, 2), 1),
+                ((3, 2), 1),
+                ((3, 1), 1),
+                ((4, 5), 1),
+                ((3, 6), 1),
+                ((0, 0), 1),
+                ((2, 4), 1),
+                ((0, 2), 1),
+                ((6, 3), 1),
+            ]),
         }
     }
 }
 
-fn generate_random_rule() -> HashMap<(u8, u8), u8> {
-    let rule_lenght = thread_rng().gen_range(5..15);
+fn generate_random_rule(min_lenght: usize, max_lenght: usize) -> HashMap<(u8, u8), u8> {
+    let rule_lenght = thread_rng().gen_range(min_lenght..max_lenght);
     let mut rules: HashMap<(u8, u8), u8> = HashMap::new();
     for _ in 0..rule_lenght {
         let first = thread_rng().gen_range(0..8) as u8;
@@ -119,7 +135,8 @@ fn get_rule(rule_name: &str) -> HashMap<(u8, u8), u8> {
         "mazectric" => rules.mazectric,
         "_move" => rules._move,
         "walled_cities" => rules.walled_cities,
-        "random" => generate_random_rule(),
+        "epileptic" => rules.epileptic,
+        "random" => generate_random_rule(5, 15),
         _ => panic!(
             "rule {} doesn't exist, avilable rules: {:?}",
             &rule_name, RULES_NAMES
