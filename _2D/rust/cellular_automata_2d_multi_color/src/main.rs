@@ -25,36 +25,42 @@ fn get_colors() -> HashMap<u8, (f32, f32, f32)> {
 
 const RULES_NAMES: [&str; 1] = ["placeholder"];
 struct Rules {
-    placeholder: HashMap<(u8, u8), u8>,
+    placeholder: HashMap<(u8, u8, u8), u8>,
+    // state, neighbourhood, color to count, new state
 }
 
 impl Rules {
     fn new() -> Self {
         Self {
-            placeholder: HashMap::from([((0, 3), 1), ((1, 3), 1), ((1, 2), 1)]),
+            placeholder: HashMap::from([
+                ((0, 3, 1), 1),
+                ((1, 3, 2), 2),
+                ((2, 3, 2), 3),
+                ((3, 2, 3), 4),
+                ((3, 3, 1), 1),
+            ]),
         }
     }
 }
 
-fn generate_random_rule() -> HashMap<(u8, u8), u8> {
-    let rule_lenght = thread_rng().gen_range(5..15);
-    let mut rules: HashMap<(u8, u8), u8> = HashMap::new();
-    for _ in 0..rule_lenght {
-        let first = thread_rng().gen_range(0..8) as u8;
-        let second = thread_rng().gen_range(0..8) as u8;
-        rules.insert(
-            (first, second),
-            thread_rng().gen_range(0..COLOUR_COUNT) as u8,
-        );
+fn generate_random_rule_cyclical() -> HashMap<(u8, u8, u8), u8> {
+    let mut rules: HashMap<(u8, u8, u8), u8> = HashMap::new();
+    for color in 0..COLOUR_COUNT {
+        let threshold_of_next_color = thread_rng().gen_range(0..8) as u8;
+        let mut next_color = (color + 1) % COLOUR_COUNT;
+        next_color = if next_color == 0 { 1 } else { next_color };
+        for i in threshold_of_next_color..8 {
+            rules.insert((color, i, next_color), next_color);
+        }
     }
     rules
 }
 
-fn get_rule(rule_name: &str) -> HashMap<(u8, u8), u8> {
+fn get_rule(rule_name: &str) -> HashMap<(u8, u8, u8), u8> {
     let rules = Rules::new();
     match rule_name {
         "placeholder" => rules.placeholder,
-        "random" => generate_random_rule(),
+        "random" => generate_random_rule_cyclical(),
         _ => panic!(
             "rule {} doesn't exist, avilable rules: {:?}",
             &rule_name, RULES_NAMES
@@ -87,8 +93,8 @@ fn test_generate_gird_one_cell() {
         [[0, 0, 0], [0, 1, 0], [0, 0, 0]]
     );
 }
-// TODO how to handle it ?
-fn count_colored_neighbours(y: usize, x: usize, grid: &Vec<Vec<u8>>) -> u8 {
+
+fn count_colored_neighbours(y: usize, x: usize, color_to_count: u8, grid: &Vec<Vec<u8>>) -> u8 {
     let mut count: u8 = 0;
     let x_start = if x as isize - 1 <= 0 {
         0
@@ -114,7 +120,7 @@ fn count_colored_neighbours(y: usize, x: usize, grid: &Vec<Vec<u8>>) -> u8 {
 
     for i in y_start..y_end {
         for j in x_start..x_end {
-            if grid[i][j] == 1 && (i, j) != (y, x) {
+            if grid[i][j] == color_to_count && (i, j) != (y, x) {
                 count += 1;
             }
         }
@@ -128,6 +134,7 @@ fn test_count_colored_neighbours() {
         count_colored_neighbours(
             1,
             1,
+            1,
             &vec![vec![1, 1, 0, 0], vec![0, 0, 1, 0], vec![0, 1, 0, 0],]
         ),
         4
@@ -136,30 +143,47 @@ fn test_count_colored_neighbours() {
         count_colored_neighbours(
             1,
             1,
-            &vec![vec![1, 1, 1, 1], vec![1, 1, 1, 1], vec![1, 1, 1, 1],]
+            2,
+            &vec![vec![1, 1, 1, 1], vec![1, 1, 1, 1], vec![0, 0, 0, 0],]
+        ),
+        0
+    );
+    assert_eq!(
+        count_colored_neighbours(
+            0,
+            0,
+            3,
+            &vec![vec![1, 3, 0, 0], vec![3, 3, 0, 1], vec![0, 0, 1, 0]],
+        ),
+        3
+    );
+    assert_eq!(
+        count_colored_neighbours(1, 1, 1, &vec![vec![1, 1, 1], vec![1, 0, 1], vec![1, 1, 1]],),
+        8
+    );
+    assert_eq!(
+        count_colored_neighbours(
+            1,
+            1,
+            1,
+            &vec![vec![1, 1, 1, 0], vec![1, 0, 1, 0], vec![1, 1, 1, 0]],
+        ),
+        8
+    );
+    assert_eq!(
+        count_colored_neighbours(
+            1,
+            1,
+            2,
+            &vec![vec![2, 2, 2, 0], vec![2, 0, 2, 1], vec![2, 2, 2, 0]],
         ),
         8
     );
     assert_eq!(
         count_colored_neighbours(
             0,
-            0,
-            &vec![vec![1, 1, 0, 0], vec![1, 0, 0, 1], vec![0, 0, 1, 0]],
-        ),
-        2
-    );
-    assert_eq!(
-        count_colored_neighbours(
-            1,
-            2,
-            &vec![vec![1, 1, 0, 0], vec![1, 0, 0, 1], vec![0, 0, 1, 0]],
-        ),
-        3
-    );
-    assert_eq!(
-        count_colored_neighbours(
-            0,
             3,
+            1,
             &vec![vec![1, 1, 0, 0], vec![1, 0, 0, 1], vec![0, 0, 1, 0]],
         ),
         1
@@ -168,20 +192,27 @@ fn test_count_colored_neighbours() {
         count_colored_neighbours(
             2,
             3,
+            1,
             &vec![vec![1, 1, 0, 0], vec![1, 0, 0, 1], vec![0, 0, 1, 0]],
         ),
         2
     );
 }
 
-fn update_grid(grid: &Vec<Vec<u8>>, rules: &HashMap<(u8, u8), u8>) -> Vec<Vec<u8>> {
+fn update_grid(grid: &Vec<Vec<u8>>, rules: &HashMap<(u8, u8, u8), u8>) -> Vec<Vec<u8>> {
     let mut new_grid: Vec<Vec<u8>> = Vec::new();
     for (i, row) in grid.iter().enumerate() {
         let mut new_row: Vec<u8> = Vec::new();
         for (j, cell) in row.iter().enumerate() {
-            let live_neighbours = count_colored_neighbours(i, j, &grid);
             let state = *cell;
-            new_row.push(*rules.get(&(state, live_neighbours)).unwrap_or(&0));
+            let next_color = (state + 1) % COLOUR_COUNT;
+            let live_neighbours = count_colored_neighbours(i, j, next_color, &grid);
+
+            new_row.push(
+                *rules
+                    .get(&(state, live_neighbours, next_color))
+                    .unwrap_or(&0),
+            );
         }
         new_grid.push(new_row);
     }
@@ -192,20 +223,11 @@ fn update_grid(grid: &Vec<Vec<u8>>, rules: &HashMap<(u8, u8), u8>) -> Vec<Vec<u8
 fn test_update_grid() {
     assert_eq!(
         update_grid(
-            &vec![vec![1, 1, 0, 0], vec![1, 0, 0, 1], vec![0, 0, 1, 0]],
-            &get_rule("game_of_live")
+            &vec![vec![1, 2, 0, 0], vec![2, 2, 0, 1], vec![0, 0, 1, 1]],
+            &get_rule("placeholder")
         ),
-        [[1, 1, 0, 0], [1, 0, 1, 0], [0, 0, 0, 0]]
+        [[2, 0, 0, 0], [0, 0, 1, 0], [0, 0, 0, 0]]
     );
-}
-
-fn test_console() {
-    let mut grid = generate_gird_random(WIDTH, HEIGHT);
-    let rules = get_rule("random");
-    for i in 0..100 {
-        grid = update_grid(&grid, &rules);
-        println!("Step {}", i);
-    }
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -216,7 +238,7 @@ enum Message {
 struct CellularAutomata2D {
     cache: Cache,
     grid: Vec<Vec<u8>>,
-    rules: HashMap<(u8, u8), u8>,
+    rules: HashMap<(u8, u8, u8), u8>,
 }
 
 impl Application for CellularAutomata2D {
@@ -304,17 +326,17 @@ fn generate_box(frame: &mut Frame, x: f32, y: f32, color: Color) {
     frame.fill_rectangle(top_left, size, color);
 }
 
-fn read_rule() -> HashMap<(u8, u8), u8> {
+fn read_rule() -> HashMap<(u8, u8, u8), u8> {
     let args: Vec<String> = env::args().collect();
-    let mut rule: HashMap<(u8, u8), u8> = get_rule("random");
+    let mut rule: HashMap<(u8, u8, u8), u8> = get_rule("random");
     if args.len() != 2 {
         println!("using default rule: random");
         println!("avilable rules: {:?}", RULES_NAMES);
     } else {
         rule = get_rule(&args[1]);
         println!("Using rule:{}", &args[1]);
-        println!("Rule Details:{:?}", rule);
     }
+    println!("Rule Details:{:?}", rule);
     rule
 }
 

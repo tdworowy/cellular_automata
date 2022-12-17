@@ -1,0 +1,1 @@
+cyclical rules - change state to next color if there are at least x living neighbours witch that color

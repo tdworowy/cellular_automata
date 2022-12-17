@@ -395,8 +395,8 @@ fn read_rule() -> HashMap<(u8, u8), u8> {
     } else {
         rule = get_rule(&args[1]);
         println!("Using rule:{}", &args[1]);
-        println!("Rule Details:{:?}", rule);
     }
+    println!("Rule Details:{:?}", rule);
     rule
 }
 
