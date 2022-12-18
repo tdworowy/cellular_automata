@@ -23,21 +23,44 @@ fn get_colors() -> HashMap<u8, (f32, f32, f32)> {
     ])
 }
 
-const RULES_NAMES: [&str; 1] = ["placeholder"];
+const RULES_NAMES: [&str; 1] = ["blob"];
 struct Rules {
-    placeholder: HashMap<(u8, u8, u8), u8>,
+    blob: HashMap<(u8, u8, u8), u8>,
     // state, neighbourhood, color to count, new state
 }
 
 impl Rules {
     fn new() -> Self {
         Self {
-            placeholder: HashMap::from([
-                ((0, 3, 1), 1),
+            blob: HashMap::from([
+                ((3, 5, 0), 0),
                 ((1, 3, 2), 2),
-                ((2, 3, 2), 3),
-                ((3, 2, 3), 4),
-                ((3, 3, 1), 1),
+                ((3, 6, 0), 0),
+                ((0, 3, 1), 1),
+                ((2, 1, 3), 3),
+                ((0, 5, 1), 1),
+                ((2, 0, 3), 3),
+                ((3, 3, 0), 0),
+                ((3, 7, 0), 0),
+                ((1, 1, 2), 2),
+                ((0, 4, 1), 1),
+                ((2, 2, 3), 3),
+                ((1, 2, 2), 2),
+                ((2, 3, 3), 3),
+                ((2, 6, 3), 3),
+                ((3, 4, 0), 0),
+                ((0, 6, 1), 1),
+                ((1, 4, 2), 2),
+                ((1, 5, 2), 2),
+                ((1, 7, 2), 2),
+                ((2, 7, 3), 3),
+                ((0, 7, 1), 1),
+                ((3, 0, 0), 0),
+                ((2, 5, 3), 3),
+                ((3, 1, 0), 0),
+                ((3, 2, 0), 0),
+                ((2, 4, 3), 3),
+                ((1, 6, 2), 2),
             ]),
         }
     }
@@ -47,8 +70,7 @@ fn generate_random_rule_cyclical() -> HashMap<(u8, u8, u8), u8> {
     let mut rules: HashMap<(u8, u8, u8), u8> = HashMap::new();
     for color in 0..COLOUR_COUNT {
         let threshold_of_next_color = thread_rng().gen_range(0..8) as u8;
-        let mut next_color = (color + 1) % COLOUR_COUNT;
-        next_color = if next_color == 0 { 1 } else { next_color };
+        let next_color = (color + 1) % COLOUR_COUNT;
         for i in threshold_of_next_color..8 {
             rules.insert((color, i, next_color), next_color);
         }
@@ -59,7 +81,7 @@ fn generate_random_rule_cyclical() -> HashMap<(u8, u8, u8), u8> {
 fn get_rule(rule_name: &str) -> HashMap<(u8, u8, u8), u8> {
     let rules = Rules::new();
     match rule_name {
-        "placeholder" => rules.placeholder,
+        "blob" => rules.blob,
         "random" => generate_random_rule_cyclical(),
         _ => panic!(
             "rule {} doesn't exist, avilable rules: {:?}",
@@ -211,23 +233,12 @@ fn update_grid(grid: &Vec<Vec<u8>>, rules: &HashMap<(u8, u8, u8), u8>) -> Vec<Ve
             new_row.push(
                 *rules
                     .get(&(state, live_neighbours, next_color))
-                    .unwrap_or(&0),
+                    .unwrap_or(&state),
             );
         }
         new_grid.push(new_row);
     }
     new_grid
-}
-
-#[test]
-fn test_update_grid() {
-    assert_eq!(
-        update_grid(
-            &vec![vec![1, 2, 0, 0], vec![2, 2, 0, 1], vec![0, 0, 1, 1]],
-            &get_rule("placeholder")
-        ),
-        [[2, 0, 0, 0], [0, 0, 1, 0], [0, 0, 0, 0]]
-    );
 }
 
 #[derive(Debug, Clone, Copy)]
