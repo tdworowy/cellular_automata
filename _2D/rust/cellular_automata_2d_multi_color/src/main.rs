@@ -14,6 +14,8 @@ const TICK_TIME: u64 = 100;
 
 const COLOUR_COUNT: u8 = 4;
 
+// TODO handle Totalistic and Cyclical rules, read parameter rule type and totalistic type
+
 fn get_colors() -> HashMap<u8, (f32, f32, f32)> {
     HashMap::from([
         (0, (0.0, 0.0, 1.0)), // blue
@@ -77,6 +79,27 @@ fn generate_random_rule_cyclical() -> HashMap<(u8, u8, u8), u8> {
     }
     rules
 }
+#[derive(PartialEq)]
+enum TotalisticType {
+    sum,
+    average,
+}
+// sum (or averagre) for 9 cells, new state
+fn generate_random_rule_totalistic(totalistic_type: TotalisticType) -> HashMap<u8, u8> {
+    let mut rules: HashMap<u8, u8> = HashMap::new();
+    let max = match totalistic_type {
+        TotalisticType::sum => 9 * COLOUR_COUNT,
+        TotalisticType::average => COLOUR_COUNT - 1,
+    };
+    for color in 0..COLOUR_COUNT {
+        let threshold_of_next_color = thread_rng().gen_range(0..max) as u8;
+        let next_color = (color + 1) % COLOUR_COUNT;
+        for i in threshold_of_next_color..8 {
+            rules.insert(i, next_color);
+        }
+    }
+    rules
+}
 
 fn get_rule(rule_name: &str) -> HashMap<(u8, u8, u8), u8> {
     let rules = Rules::new();
@@ -116,8 +139,7 @@ fn test_generate_gird_one_cell() {
     );
 }
 
-fn count_colored_neighbours(y: usize, x: usize, color_to_count: u8, grid: &Vec<Vec<u8>>) -> u8 {
-    let mut count: u8 = 0;
+fn get_range(y: usize, x: usize, grid: &Vec<Vec<u8>>) -> (usize, usize, usize, usize) {
     let x_start = if x as isize - 1 <= 0 {
         0
     } else {
@@ -139,6 +161,12 @@ fn count_colored_neighbours(y: usize, x: usize, color_to_count: u8, grid: &Vec<V
     } else {
         y + 2
     };
+    (x_start, y_start, x_end, y_end)
+}
+
+fn count_colored_neighbours(y: usize, x: usize, color_to_count: u8, grid: &Vec<Vec<u8>>) -> u8 {
+    let mut count: u8 = 0;
+    let (x_start, y_start, x_end, y_end) = get_range(y, x, grid);
 
     for i in y_start..y_end {
         for j in x_start..x_end {
@@ -221,7 +249,53 @@ fn test_count_colored_neighbours() {
     );
 }
 
-fn update_grid(grid: &Vec<Vec<u8>>, rules: &HashMap<(u8, u8, u8), u8>) -> Vec<Vec<u8>> {
+fn aggregate_colored_neighbours(
+    y: usize,
+    x: usize,
+    aggregation: &TotalisticType,
+    grid: &Vec<Vec<u8>>,
+) -> u8 {
+    let mut resoult = 0;
+    let (x_start, y_start, x_end, y_end) = get_range(y, x, grid);
+    for i in y_start..y_end {
+        for j in x_start..x_end {
+            resoult += grid[i][j];
+        }
+    }
+    if aggregation == &TotalisticType::average {
+        resoult = resoult / 9
+    }
+    resoult
+}
+
+#[test]
+fn test_aggregate_colored_neighbours() {
+    assert_eq!(
+        aggregate_colored_neighbours(
+            1,
+            1,
+            &TotalisticType::sum,
+            &vec![vec![1, 1, 0, 0], vec![3, 2, 1, 0], vec![0, 1, 0, 0],]
+        ),
+        9
+    );
+    assert_eq!(
+        aggregate_colored_neighbours(
+            1,
+            1,
+            &TotalisticType::average,
+            &vec![vec![2, 2, 2, 0], vec![3, 2, 3, 0], vec![2, 2, 2, 0],]
+        ),
+        2
+    );
+}
+
+enum RuleType {
+    cyclical,
+    totalistic,
+}
+
+fn update_grid_cyclical(grid: &Vec<Vec<u8>>, rules: &HashMap<(u8, u8, u8), u8>) -> Vec<Vec<u8>> {
     let mut new_grid: Vec<Vec<u8>> = Vec::new();
     for (i, row) in grid.iter().enumerate() {
         let mut new_row: Vec<u8> = Vec::new();
@@ -241,6 +315,25 @@ fn update_grid(grid: &Vec<Vec<u8>>, rules: &HashMap<(u8, u8, u8), u8>) -> Vec<Ve
     new_grid
 }
 
+fn update_grid_totalistic(
+    aggregation: TotalisticType,
+    grid: &Vec<Vec<u8>>,
+    rules: &HashMap<u8, u8>,
+) -> Vec<Vec<u8>> {
+    let mut new_grid: Vec<Vec<u8>> = Vec::new();
+    for (i, row) in grid.iter().enumerate() {
+        let mut new_row: Vec<u8> = Vec::new();
+        for (j, cell) in row.iter().enumerate() {
+            let state = *cell;
+            let aggregated_value = aggregate_colored_neighbours(i, j, &aggregation, &grid);
+
+            new_row.push(*rules.get(&aggregated_value).unwrap_or(&state));
+        }
+        new_grid.push(new_row);
+    }
+    new_grid
+}
+
 #[derive(Debug, Clone, Copy)]
 enum Message {
     Tick(time::OffsetDateTime),
@@ -249,7 +342,8 @@ enum Message {
 struct CellularAutomata2D {
     cache: Cache,
     grid: Vec<Vec<u8>>,
-    rules: HashMap<(u8, u8, u8), u8>,
+    rules_cyclical: Option<HashMap<(u8, u8, u8), u8>>,
+    rules_totalistic: Option<HashMap<u8, u8>>,
 }
 
 impl Application for CellularAutomata2D {
@@ -265,7 +359,8 @@ impl Application for CellularAutomata2D {
             CellularAutomata2D {
                 cache: Default::default(),
                 grid: init_grid,
-                rules: rule,
+                rules_cyclical: Some(rule),
+                rules_totalistic: None,
             },
             Command::none(),
         )
@@ -277,10 +372,15 @@ impl Application for CellularAutomata2D {
 
     fn update(&mut self, message: Message) -> Command<Message> {
         match message {
-            Message::Tick(_local_time) => {
-                self.grid = update_grid(&self.grid, &self.rules);
-                self.cache.clear();
-            }
+            Message::Tick(_local_time) => match &self.rules_cyclical {
+                None => {
+                    println!("That shoulnd not happen")
+                }
+                Some(rule) => {
+                    self.grid = update_grid_cyclical(&self.grid, &rule);
+                    self.cache.clear();
+                }
+            },
         }
 
         Command::none()
