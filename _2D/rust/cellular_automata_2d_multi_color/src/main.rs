@@ -1,3 +1,4 @@
+use rand::seq::IteratorRandom;
 use rand::{thread_rng, Rng};
 use std::collections::HashMap;
 use std::env;
@@ -83,17 +84,33 @@ enum TotalisticType {
     Sum,
     Average,
 }
+
+fn choose(raw: &mut Vec<u8>) -> Option<u8> {
+    let i = (0..raw.len()).choose(&mut thread_rng())?;
+    Some(raw.swap_remove(i))
+}
+
+#[test]
+fn test_choose() {
+    let mut test_vec: Vec<u8> = (0..4).collect();
+    let element = choose(&mut test_vec);
+
+    assert!(test_vec.len() == 3);
+    assert!(!test_vec.contains(&element.unwrap()));
+
+}
 // sum (or averagre) for 9 cells, new state
 fn generate_random_rule_totalistic(totalistic_type: TotalisticType) -> HashMap<u8, u8> {
     let mut rules: HashMap<u8, u8> = HashMap::new();
     let max = match totalistic_type {
         TotalisticType::Sum => 9 * COLOUR_COUNT,
-        TotalisticType::Average => COLOUR_COUNT - 1,
+        TotalisticType::Average => COLOUR_COUNT + 1,
     };
-    for color in 0..COLOUR_COUNT {
-        let threshold_of_next_color = thread_rng().gen_range(0..max) as u8;
-        let next_color = (color + 1) % COLOUR_COUNT;
-        for i in threshold_of_next_color..8 {
+    let mut thresholds_of_next_color: Vec<u8> = (0..max).collect();
+    for color in 0..COLOUR_COUNT  {
+        let threshold_of_next_color = choose(&mut thresholds_of_next_color).unwrap();
+        let next_color = color;
+        for i in 0..threshold_of_next_color {
             rules.insert(i, next_color);
         }
     }
