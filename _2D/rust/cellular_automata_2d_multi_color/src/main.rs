@@ -14,8 +14,6 @@ const TICK_TIME: u64 = 100;
 
 const COLOUR_COUNT: u8 = 4;
 
-// TODO handle Totalistic and Cyclical rules, read parameter rule type and totalistic type
-
 fn get_colors() -> HashMap<u8, (f32, f32, f32)> {
     HashMap::from([
         (0, (0.0, 0.0, 1.0)), // blue
@@ -77,19 +75,20 @@ fn generate_random_rule_cyclical() -> HashMap<(u8, u8, u8), u8> {
             rules.insert((color, i, next_color), next_color);
         }
     }
+    println!("Rule Details :{:?}", rules);
     rules
 }
 #[derive(PartialEq)]
 enum TotalisticType {
-    sum,
-    average,
+    Sum,
+    Average,
 }
 // sum (or averagre) for 9 cells, new state
 fn generate_random_rule_totalistic(totalistic_type: TotalisticType) -> HashMap<u8, u8> {
     let mut rules: HashMap<u8, u8> = HashMap::new();
     let max = match totalistic_type {
-        TotalisticType::sum => 9 * COLOUR_COUNT,
-        TotalisticType::average => COLOUR_COUNT - 1,
+        TotalisticType::Sum => 9 * COLOUR_COUNT,
+        TotalisticType::Average => COLOUR_COUNT - 1,
     };
     for color in 0..COLOUR_COUNT {
         let threshold_of_next_color = thread_rng().gen_range(0..max) as u8;
@@ -98,14 +97,25 @@ fn generate_random_rule_totalistic(totalistic_type: TotalisticType) -> HashMap<u
             rules.insert(i, next_color);
         }
     }
+    println!("Rule Details :{:?}", rules);
     rules
 }
 
-fn get_rule(rule_name: &str) -> HashMap<(u8, u8, u8), u8> {
+fn get_rule_cyclical(rule_name: &str) -> HashMap<(u8, u8, u8), u8> {
     let rules = Rules::new();
     match rule_name {
         "blob" => rules.blob,
         "random" => generate_random_rule_cyclical(),
+        _ => panic!(
+            "rule {} doesn't exist, avilable rules: {:?}",
+            &rule_name, RULES_NAMES
+        ),
+    }
+}
+
+fn get_rule_totalistic(rule_name: &str, totalistic_type: TotalisticType) -> HashMap<u8, u8> {
+    match rule_name {
+        "random" => generate_random_rule_totalistic(totalistic_type),
         _ => panic!(
             "rule {} doesn't exist, avilable rules: {:?}",
             &rule_name, RULES_NAMES
@@ -262,7 +272,7 @@ fn aggregate_colored_neighbours(
             resoult += grid[i][j];
         }
     }
-    if aggregation == &TotalisticType::average {
+    if aggregation == &TotalisticType::Average {
         resoult = resoult / 9
     }
     resoult
@@ -274,7 +284,7 @@ fn test_aggregate_colored_neighbours() {
         aggregate_colored_neighbours(
             1,
             1,
-            &TotalisticType::sum,
+            &TotalisticType::Sum,
             &vec![vec![1, 1, 0, 0], vec![3, 2, 1, 0], vec![0, 1, 0, 0],]
         ),
         9
@@ -283,7 +293,7 @@ fn test_aggregate_colored_neighbours() {
         aggregate_colored_neighbours(
             1,
             1,
-            &TotalisticType::average,
+            &TotalisticType::Average,
             &vec![vec![2, 2, 2, 0], vec![3, 2, 3, 0], vec![2, 2, 2, 0],]
         ),
         2
@@ -291,8 +301,9 @@ fn test_aggregate_colored_neighbours() {
 }
 
 enum RuleType {
-    cyclical,
-    totalistic,
+    Cyclical,
+    TotalisticSum,
+    TotalisticAverage,
 }
 
 fn update_grid_cyclical(grid: &Vec<Vec<u8>>, rules: &HashMap<(u8, u8, u8), u8>) -> Vec<Vec<u8>> {
@@ -344,6 +355,7 @@ struct CellularAutomata2D {
     grid: Vec<Vec<u8>>,
     rules_cyclical: Option<HashMap<(u8, u8, u8), u8>>,
     rules_totalistic: Option<HashMap<u8, u8>>,
+    rule_type: RuleType,
 }
 
 impl Application for CellularAutomata2D {
@@ -353,17 +365,33 @@ impl Application for CellularAutomata2D {
     type Flags = ();
 
     fn new(_flags: Self::Flags) -> (Self, Command<Self::Message>) {
-        let rule = read_rule();
+        let (rule_type, rule_name) = read_args();
         let init_grid = generate_gird_random(WIDTH, HEIGHT);
-        (
-            CellularAutomata2D {
+
+        let cellular_automata_2_d = match rule_type {
+            RuleType::Cyclical => CellularAutomata2D {
                 cache: Default::default(),
                 grid: init_grid,
-                rules_cyclical: Some(rule),
+                rules_cyclical: Some(get_rule_cyclical(&rule_name)),
                 rules_totalistic: None,
+                rule_type: RuleType::Cyclical,
             },
-            Command::none(),
-        )
+            RuleType::TotalisticAverage => CellularAutomata2D {
+                cache: Default::default(),
+                grid: init_grid,
+                rules_cyclical: None,
+                rules_totalistic: Some(get_rule_totalistic(&rule_name, TotalisticType::Average)),
+                rule_type: RuleType::TotalisticAverage,
+            },
+            RuleType::TotalisticSum => CellularAutomata2D {
+                cache: Default::default(),
+                grid: init_grid,
+                rules_cyclical: None,
+                rules_totalistic: Some(get_rule_totalistic(&rule_name, TotalisticType::Sum)),
+                rule_type: RuleType::TotalisticSum,
+            },
+        };
+        (cellular_automata_2_d, Command::none())
     }
 
     fn title(&self) -> String {
@@ -371,11 +399,23 @@ impl Application for CellularAutomata2D {
     }
 
     fn update(&mut self, message: Message) -> Command<Message> {
+        let totalistic_type: Option<TotalisticType> = match &self.rule_type {
+            RuleType::TotalisticAverage => Some(TotalisticType::Average),
+            RuleType::TotalisticSum => Some(TotalisticType::Sum),
+            RuleType::Cyclical => None,
+        };
         match message {
             Message::Tick(_local_time) => match &self.rules_cyclical {
-                None => {
-                    println!("That shoulnd not happen")
-                }
+                None => match &&self.rules_totalistic {
+                    Some(rule) => {
+                        self.grid =
+                            update_grid_totalistic(totalistic_type.unwrap(), &self.grid, &rule);
+                        self.cache.clear();
+                    }
+                    None => {
+                        println!("That Should not Happen")
+                    }
+                },
                 Some(rule) => {
                     self.grid = update_grid_cyclical(&self.grid, &rule);
                     self.cache.clear();
@@ -437,18 +477,25 @@ fn generate_box(frame: &mut Frame, x: f32, y: f32, color: Color) {
     frame.fill_rectangle(top_left, size, color);
 }
 
-fn read_rule() -> HashMap<(u8, u8, u8), u8> {
+fn read_args() -> (RuleType, String) {
     let args: Vec<String> = env::args().collect();
-    let mut rule: HashMap<(u8, u8, u8), u8> = get_rule("random");
-    if args.len() != 2 {
+    let rule_name = &args[1];
+    let rule_type = match rule_name.as_ref() {
+        "cyclical" => RuleType::Cyclical,
+        "totalistic_sum" => RuleType::TotalisticSum,
+        "totalistic_average" => RuleType::TotalisticAverage,
+        _ => RuleType::Cyclical,
+    };
+    let rule_name = if args.len() < 3 {
         println!("using default rule: random");
-        println!("avilable rules: {:?}", RULES_NAMES);
+        "random"
     } else {
-        rule = get_rule(&args[1]);
-        println!("Using rule:{}", &args[1]);
+        println!("Using rule:{}", &args[2]);
+        &args[2]
     }
-    println!("Rule Details:{:?}", rule);
-    rule
+    .to_string();
+
+    (rule_type, rule_name)
 }
 
 fn main() -> iced::Result {
