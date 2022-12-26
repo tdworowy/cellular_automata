@@ -97,20 +97,19 @@ fn test_choose() {
 
     assert!(test_vec.len() == 3);
     assert!(!test_vec.contains(&element.unwrap()));
-
 }
 // sum (or averagre) for 9 cells, new state
 fn generate_random_rule_totalistic(totalistic_type: TotalisticType) -> HashMap<u8, u8> {
     let mut rules: HashMap<u8, u8> = HashMap::new();
     let max = match totalistic_type {
         TotalisticType::Sum => 9 * COLOUR_COUNT,
-        TotalisticType::Average => COLOUR_COUNT + 1,
+        TotalisticType::Average => COLOUR_COUNT,
     };
-    let mut thresholds_of_next_color: Vec<u8> = (0..max).collect();
-    for color in 0..COLOUR_COUNT  {
+    let mut thresholds_of_next_color: Vec<u8> = (0..=max).collect();
+    for color in 0..COLOUR_COUNT {
         let threshold_of_next_color = choose(&mut thresholds_of_next_color).unwrap();
         let next_color = color;
-        for i in 0..threshold_of_next_color {
+        for i in 0..=threshold_of_next_color {
             rules.insert(i, next_color);
         }
     }
@@ -316,7 +315,7 @@ fn test_aggregate_colored_neighbours() {
         2
     );
 }
-
+#[derive(Debug)]
 enum RuleType {
     Cyclical,
     TotalisticSum,
@@ -496,13 +495,14 @@ fn generate_box(frame: &mut Frame, x: f32, y: f32, color: Color) {
 
 fn read_args() -> (RuleType, String) {
     let args: Vec<String> = env::args().collect();
-    let rule_name = &args[1];
+    let rule_name = if args.len() > 1 { &args[1] } else { "default" };
     let rule_type = match rule_name.as_ref() {
         "cyclical" => RuleType::Cyclical,
         "totalistic_sum" => RuleType::TotalisticSum,
         "totalistic_average" => RuleType::TotalisticAverage,
         _ => RuleType::Cyclical,
     };
+    println!("using rule type {:?}", rule_type);
     let rule_name = if args.len() < 3 {
         println!("using default rule: random");
         "random"
