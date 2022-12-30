@@ -1,3 +1,4 @@
+use rand::seq::IteratorRandom;
 use rand::{thread_rng, Rng};
 use std::collections::HashMap;
 use std::env;
@@ -11,9 +12,17 @@ use iced::{
 const WIDTH: usize = 500;
 const HEIGHT: usize = 500;
 const TICK_TIME: u64 = 100;
-const PROB_OF_ONE: f64 = 0.4;
+const MAX_COLORS: u8 = 4;
 
-const RULES_NAMES: [&str; 9] = [
+fn get_colors() -> HashMap<u8, (f32, f32, f32)> {
+    HashMap::from([
+        (0, (0.0, 0.0, 1.0)), // blue
+        (1, (1.0, 0.0, 0.0)), // red
+        (2, (0.0, 1.0, 0.0)), // green
+        (3, (1.0, 0.7, 0.0)), // yellow
+    ])
+}
+const ELEMENTARY_RULES_NAMES: [&str; 9] = [
     "game_of_live",
     "ameba",
     "_2x2",
@@ -25,7 +34,14 @@ const RULES_NAMES: [&str; 9] = [
     "epileptic",
 ];
 
-struct Rules {
+const CYCLICAL_RULES_NAMES: [&str; 1] = ["blob"];
+// state, neighbourhood, color to count, new state
+struct RulesCyclical {
+    blob: HashMap<(u8, u8, u8), u8>,
+}
+
+// state, live neighbourhood, new state
+struct RulesElementary {
     game_of_live: HashMap<(u8, u8), u8>,
     ameba: HashMap<(u8, u8), u8>,
     _2x2: HashMap<(u8, u8), u8>,
@@ -37,7 +53,7 @@ struct Rules {
     epileptic: HashMap<(u8, u8), u8>,
 }
 
-impl Rules {
+impl RulesElementary {
     fn new() -> Self {
         Self {
             game_of_live: HashMap::from([((0, 3), 1), ((1, 3), 1), ((1, 2), 1)]),
@@ -100,7 +116,44 @@ impl Rules {
     }
 }
 
-fn generate_random_rule(min_lenght: usize, max_lenght: usize) -> HashMap<(u8, u8), u8> {
+impl RulesCyclical {
+    fn new() -> Self {
+        Self {
+            blob: HashMap::from([
+                ((3, 5, 0), 0),
+                ((1, 3, 2), 2),
+                ((3, 6, 0), 0),
+                ((0, 3, 1), 1),
+                ((2, 1, 3), 3),
+                ((0, 5, 1), 1),
+                ((2, 0, 3), 3),
+                ((3, 3, 0), 0),
+                ((3, 7, 0), 0),
+                ((1, 1, 2), 2),
+                ((0, 4, 1), 1),
+                ((2, 2, 3), 3),
+                ((1, 2, 2), 2),
+                ((2, 3, 3), 3),
+                ((2, 6, 3), 3),
+                ((3, 4, 0), 0),
+                ((0, 6, 1), 1),
+                ((1, 4, 2), 2),
+                ((1, 5, 2), 2),
+                ((1, 7, 2), 2),
+                ((2, 7, 3), 3),
+                ((0, 7, 1), 1),
+                ((3, 0, 0), 0),
+                ((2, 5, 3), 3),
+                ((3, 1, 0), 0),
+                ((3, 2, 0), 0),
+                ((2, 4, 3), 3),
+                ((1, 6, 2), 2),
+            ]),
+        }
+    }
+}
+
+fn generate_random_rule_elementary(min_lenght: usize, max_lenght: usize) -> HashMap<(u8, u8), u8> {
     let rule_lenght = thread_rng().gen_range(min_lenght..max_lenght);
     let mut rules: HashMap<(u8, u8), u8> = HashMap::new();
     for _ in 0..rule_lenght {
@@ -111,8 +164,61 @@ fn generate_random_rule(min_lenght: usize, max_lenght: usize) -> HashMap<(u8, u8
     rules
 }
 
-fn get_rule(rule_name: &str) -> HashMap<(u8, u8), u8> {
-    let rules = Rules::new();
+fn generate_random_rule_cyclical(colour_count: u8) -> HashMap<(u8, u8, u8), u8> {
+    let mut rules: HashMap<(u8, u8, u8), u8> = HashMap::new();
+    for color in 0..colour_count {
+        let threshold_of_next_color = thread_rng().gen_range(0..8) as u8;
+        let next_color = (color + 1) % colour_count;
+        for i in threshold_of_next_color..8 {
+            rules.insert((color, i, next_color), next_color);
+        }
+    }
+    println!("Rule Details :{:?}", rules);
+    rules
+}
+#[derive(PartialEq)]
+enum TotalisticType {
+    Sum,
+    Average,
+}
+
+fn choose(raw: &mut Vec<u8>) -> Option<u8> {
+    let i = (0..raw.len()).choose(&mut thread_rng())?;
+    Some(raw.swap_remove(i))
+}
+
+#[test]
+fn test_choose() {
+    let mut test_vec: Vec<u8> = (0..4).collect();
+    let element = choose(&mut test_vec);
+
+    assert!(test_vec.len() == 3);
+    assert!(!test_vec.contains(&element.unwrap()));
+}
+// sum (or averagre) for 9 cells, new state
+fn generate_random_rule_totalistic(
+    totalistic_type: TotalisticType,
+    colour_count: u8,
+) -> HashMap<u8, u8> {
+    let mut rules: HashMap<u8, u8> = HashMap::new();
+    let max = match totalistic_type {
+        TotalisticType::Sum => 9 * colour_count,
+        TotalisticType::Average => colour_count,
+    };
+    let mut thresholds_of_next_color: Vec<u8> = (0..=max).collect();
+    for color in 0..colour_count {
+        let threshold_of_next_color = choose(&mut thresholds_of_next_color).unwrap();
+        let next_color = color;
+        for i in 0..=threshold_of_next_color {
+            rules.insert(i, next_color);
+        }
+    }
+    println!("Rule Details :{:?}", rules);
+    rules
+}
+
+fn get_rule_elementary(rule_name: &str) -> HashMap<(u8, u8), u8> {
+    let rules = RulesElementary::new();
     match rule_name {
         "game_of_live" => rules.game_of_live,
         "ameba" => rules.ameba,
@@ -123,33 +229,50 @@ fn get_rule(rule_name: &str) -> HashMap<(u8, u8), u8> {
         "_move" => rules._move,
         "walled_cities" => rules.walled_cities,
         "epileptic" => rules.epileptic,
-        "random" => generate_random_rule(5, 15),
+        "random" => generate_random_rule_elementary(5, 15),
         _ => panic!(
             "rule {} doesn't exist, avilable rules: {:?}",
-            &rule_name, RULES_NAMES
+            &rule_name, ELEMENTARY_RULES_NAMES
         ),
     }
 }
 
-fn generate_gird_random(width: usize, height: usize, probability_of_one: f64) -> Vec<Vec<u8>> {
+fn get_rule_cyclical(rule_name: &str, colour_count: u8) -> HashMap<(u8, u8, u8), u8> {
+    let rules = RulesCyclical::new();
+    match rule_name {
+        "blob" => rules.blob,
+        "random" => generate_random_rule_cyclical(colour_count),
+        _ => panic!(
+            "rule {} doesn't exist, avilable rules: {:?}",
+            &rule_name, CYCLICAL_RULES_NAMES
+        ),
+    }
+}
+
+fn get_rule_totalistic(
+    rule_name: &str,
+    totalistic_type: TotalisticType,
+    colour_count: u8,
+) -> HashMap<u8, u8> {
+    match rule_name {
+        "random" => generate_random_rule_totalistic(totalistic_type, colour_count),
+        _ => panic!(
+            "rule {} doesn't exist, avilable rules: {:?}",
+            &rule_name, CYCLICAL_RULES_NAMES
+        ),
+    }
+}
+
+fn generate_gird_random(width: usize, height: usize, colour_count: u8) -> Vec<Vec<u8>> {
     let mut grid: Vec<Vec<u8>> = Vec::new();
     for i in 0..height {
         grid.push(vec![]);
         for _ in 0..width {
-            let is_one = thread_rng().gen_bool(probability_of_one);
-            let cell_type = if is_one { 1 } else { 0 };
-            grid[i].push(cell_type as u8);
+            let cell_type = thread_rng().gen_range(0..colour_count);
+            grid[i].push(cell_type);
         }
     }
     grid
-}
-
-#[test]
-fn test_generate_gird_random() {
-    assert_eq!(generate_gird_random(2, 2, 0.0), [[0, 0], [0, 0]]);
-    assert_eq!(generate_gird_random(2, 2, 1.0), [[1, 1], [1, 1]]);
-    assert_eq!(generate_gird_random(3, 2, 1.0), [[1, 1, 1], [1, 1, 1]]);
-    assert_eq!(generate_gird_random(2, 3, 1.0), [[1, 1], [1, 1], [1, 1]]);
 }
 
 fn generate_gird_one_cell(width: usize, height: usize) -> Vec<Vec<u8>> {
@@ -166,8 +289,7 @@ fn test_generate_gird_one_cell() {
     );
 }
 
-fn count_colored_neighbours(y: usize, x: usize, grid: &Vec<Vec<u8>>) -> u8 {
-    let mut count: u8 = 0;
+fn get_range(y: usize, x: usize, grid: &Vec<Vec<u8>>) -> (usize, usize, usize, usize) {
     let x_start = if x as isize - 1 <= 0 {
         0
     } else {
@@ -189,10 +311,16 @@ fn count_colored_neighbours(y: usize, x: usize, grid: &Vec<Vec<u8>>) -> u8 {
     } else {
         y + 2
     };
+    (x_start, y_start, x_end, y_end)
+}
+
+fn count_colored_neighbours(y: usize, x: usize, color_to_count: u8, grid: &Vec<Vec<u8>>) -> u8 {
+    let mut count: u8 = 0;
+    let (x_start, y_start, x_end, y_end) = get_range(y, x, grid);
 
     for i in y_start..y_end {
         for j in x_start..x_end {
-            if grid[i][j] == 1 && (i, j) != (y, x) {
+            if grid[i][j] == color_to_count && (i, j) != (y, x) {
                 count += 1;
             }
         }
@@ -206,6 +334,7 @@ fn test_count_colored_neighbours() {
         count_colored_neighbours(
             1,
             1,
+            1,
             &vec![vec![1, 1, 0, 0], vec![0, 0, 1, 0], vec![0, 1, 0, 0],]
         ),
         4
@@ -214,30 +343,47 @@ fn test_count_colored_neighbours() {
         count_colored_neighbours(
             1,
             1,
-            &vec![vec![1, 1, 1, 1], vec![1, 1, 1, 1], vec![1, 1, 1, 1],]
+            2,
+            &vec![vec![1, 1, 1, 1], vec![1, 1, 1, 1], vec![0, 0, 0, 0],]
+        ),
+        0
+    );
+    assert_eq!(
+        count_colored_neighbours(
+            0,
+            0,
+            3,
+            &vec![vec![1, 3, 0, 0], vec![3, 3, 0, 1], vec![0, 0, 1, 0]],
+        ),
+        3
+    );
+    assert_eq!(
+        count_colored_neighbours(1, 1, 1, &vec![vec![1, 1, 1], vec![1, 0, 1], vec![1, 1, 1]],),
+        8
+    );
+    assert_eq!(
+        count_colored_neighbours(
+            1,
+            1,
+            1,
+            &vec![vec![1, 1, 1, 0], vec![1, 0, 1, 0], vec![1, 1, 1, 0]],
+        ),
+        8
+    );
+    assert_eq!(
+        count_colored_neighbours(
+            1,
+            1,
+            2,
+            &vec![vec![2, 2, 2, 0], vec![2, 0, 2, 1], vec![2, 2, 2, 0]],
         ),
         8
     );
     assert_eq!(
         count_colored_neighbours(
             0,
-            0,
-            &vec![vec![1, 1, 0, 0], vec![1, 0, 0, 1], vec![0, 0, 1, 0]],
-        ),
-        2
-    );
-    assert_eq!(
-        count_colored_neighbours(
-            1,
-            2,
-            &vec![vec![1, 1, 0, 0], vec![1, 0, 0, 1], vec![0, 0, 1, 0]],
-        ),
-        3
-    );
-    assert_eq!(
-        count_colored_neighbours(
-            0,
             3,
+            1,
             &vec![vec![1, 1, 0, 0], vec![1, 0, 0, 1], vec![0, 0, 1, 0]],
         ),
         1
@@ -246,18 +392,67 @@ fn test_count_colored_neighbours() {
         count_colored_neighbours(
             2,
             3,
+            1,
             &vec![vec![1, 1, 0, 0], vec![1, 0, 0, 1], vec![0, 0, 1, 0]],
         ),
         2
     );
 }
 
-fn update_grid(grid: &Vec<Vec<u8>>, rules: &HashMap<(u8, u8), u8>) -> Vec<Vec<u8>> {
+fn aggregate_colored_neighbours(
+    y: usize,
+    x: usize,
+    aggregation: &TotalisticType,
+    grid: &Vec<Vec<u8>>,
+) -> u8 {
+    let mut resoult = 0;
+    let (x_start, y_start, x_end, y_end) = get_range(y, x, grid);
+    for i in y_start..y_end {
+        for j in x_start..x_end {
+            resoult += grid[i][j];
+        }
+    }
+    if aggregation == &TotalisticType::Average {
+        resoult = resoult / 9
+    }
+    resoult
+}
+
+#[test]
+fn test_aggregate_colored_neighbours() {
+    assert_eq!(
+        aggregate_colored_neighbours(
+            1,
+            1,
+            &TotalisticType::Sum,
+            &vec![vec![1, 1, 0, 0], vec![3, 2, 1, 0], vec![0, 1, 0, 0],]
+        ),
+        9
+    );
+    assert_eq!(
+        aggregate_colored_neighbours(
+            1,
+            1,
+            &TotalisticType::Average,
+            &vec![vec![2, 2, 2, 0], vec![3, 2, 3, 0], vec![2, 2, 2, 0],]
+        ),
+        2
+    );
+}
+#[derive(Debug, PartialEq)]
+enum RuleType {
+    Elementary,
+    Cyclical,
+    TotalisticSum,
+    TotalisticAverage,
+}
+
+fn update_grid_elementary(grid: &Vec<Vec<u8>>, rules: &HashMap<(u8, u8), u8>) -> Vec<Vec<u8>> {
     let mut new_grid: Vec<Vec<u8>> = Vec::new();
     for (i, row) in grid.iter().enumerate() {
         let mut new_row: Vec<u8> = Vec::new();
         for (j, cell) in row.iter().enumerate() {
-            let live_neighbours = count_colored_neighbours(i, j, &grid);
+            let live_neighbours = count_colored_neighbours(i, j, 1, &grid);
             let state = *cell;
             new_row.push(*rules.get(&(state, live_neighbours)).unwrap_or(&0));
         }
@@ -266,24 +461,47 @@ fn update_grid(grid: &Vec<Vec<u8>>, rules: &HashMap<(u8, u8), u8>) -> Vec<Vec<u8
     new_grid
 }
 
-#[test]
-fn test_update_grid() {
-    assert_eq!(
-        update_grid(
-            &vec![vec![1, 1, 0, 0], vec![1, 0, 0, 1], vec![0, 0, 1, 0]],
-            &get_rule("game_of_live")
-        ),
-        [[1, 1, 0, 0], [1, 0, 1, 0], [0, 0, 0, 0]]
-    );
+fn update_grid_cyclical(
+    grid: &Vec<Vec<u8>>,
+    rules: &HashMap<(u8, u8, u8), u8>,
+    colour_count: u8,
+) -> Vec<Vec<u8>> {
+    let mut new_grid: Vec<Vec<u8>> = Vec::new();
+    for (i, row) in grid.iter().enumerate() {
+        let mut new_row: Vec<u8> = Vec::new();
+        for (j, cell) in row.iter().enumerate() {
+            let state = *cell;
+            let next_color = (state + 1) % colour_count;
+            let live_neighbours = count_colored_neighbours(i, j, next_color, &grid);
+
+            new_row.push(
+                *rules
+                    .get(&(state, live_neighbours, next_color))
+                    .unwrap_or(&state),
+            );
+        }
+        new_grid.push(new_row);
+    }
+    new_grid
 }
 
-fn test_console() {
-    let mut grid = generate_gird_random(WIDTH, HEIGHT, 0.4);
-    let rules = get_rule("game_of_live");
-    for i in 0..100 {
-        grid = update_grid(&grid, &rules);
-        println!("Step {}", i);
+fn update_grid_totalistic(
+    aggregation: TotalisticType,
+    grid: &Vec<Vec<u8>>,
+    rules: &HashMap<u8, u8>,
+) -> Vec<Vec<u8>> {
+    let mut new_grid: Vec<Vec<u8>> = Vec::new();
+    for (i, row) in grid.iter().enumerate() {
+        let mut new_row: Vec<u8> = Vec::new();
+        for (j, cell) in row.iter().enumerate() {
+            let state = *cell;
+            let aggregated_value = aggregate_colored_neighbours(i, j, &aggregation, &grid);
+
+            new_row.push(*rules.get(&aggregated_value).unwrap_or(&state));
+        }
+        new_grid.push(new_row);
     }
+    new_grid
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -294,7 +512,11 @@ enum Message {
 struct CellularAutomata2D {
     cache: Cache,
     grid: Vec<Vec<u8>>,
-    rules: HashMap<(u8, u8), u8>,
+    rules_elementary: Option<HashMap<(u8, u8), u8>>,
+    rules_cyclical: Option<HashMap<(u8, u8, u8), u8>>,
+    rules_totalistic: Option<HashMap<u8, u8>>,
+    rule_type: RuleType,
+    colour_count: u8,
 }
 
 impl Application for CellularAutomata2D {
@@ -304,16 +526,56 @@ impl Application for CellularAutomata2D {
     type Flags = ();
 
     fn new(_flags: Self::Flags) -> (Self, Command<Self::Message>) {
-        let rule = read_rule();
-        let init_grid = generate_gird_random(WIDTH, HEIGHT, PROB_OF_ONE);
-        (
-            CellularAutomata2D {
+        let (rule_type, rule_name, colour_count) = read_args();
+        let init_grid = generate_gird_random(WIDTH, HEIGHT, colour_count);
+
+        let cellular_automata_2_d = match rule_type {
+            RuleType::Elementary => CellularAutomata2D {
                 cache: Default::default(),
                 grid: init_grid,
-                rules: rule,
+                rules_elementary: Some(get_rule_elementary(&rule_name)),
+                rules_cyclical: None,
+                rules_totalistic: None,
+                rule_type: RuleType::Elementary,
+                colour_count,
             },
-            Command::none(),
-        )
+            RuleType::Cyclical => CellularAutomata2D {
+                cache: Default::default(),
+                grid: init_grid,
+                rules_elementary: None,
+                rules_cyclical: Some(get_rule_cyclical(&rule_name, colour_count)),
+                rules_totalistic: None,
+                rule_type: RuleType::Cyclical,
+                colour_count,
+            },
+            RuleType::TotalisticAverage => CellularAutomata2D {
+                cache: Default::default(),
+                grid: init_grid,
+                rules_elementary: None,
+                rules_cyclical: None,
+                rules_totalistic: Some(get_rule_totalistic(
+                    &rule_name,
+                    TotalisticType::Average,
+                    colour_count,
+                )),
+                rule_type: RuleType::TotalisticAverage,
+                colour_count,
+            },
+            RuleType::TotalisticSum => CellularAutomata2D {
+                cache: Default::default(),
+                grid: init_grid,
+                rules_elementary: None,
+                rules_cyclical: None,
+                rules_totalistic: Some(get_rule_totalistic(
+                    &rule_name,
+                    TotalisticType::Sum,
+                    colour_count,
+                )),
+                rule_type: RuleType::TotalisticSum,
+                colour_count,
+            },
+        };
+        (cellular_automata_2_d, Command::none())
     }
 
     fn title(&self) -> String {
@@ -321,11 +583,35 @@ impl Application for CellularAutomata2D {
     }
 
     fn update(&mut self, message: Message) -> Command<Message> {
+        let totalistic_type: Option<TotalisticType> = match &self.rule_type {
+            RuleType::TotalisticAverage => Some(TotalisticType::Average),
+            RuleType::TotalisticSum => Some(TotalisticType::Sum),
+            RuleType::Elementary => None,
+            RuleType::Cyclical => None,
+        };
         match message {
-            Message::Tick(_local_time) => {
-                self.grid = update_grid(&self.grid, &self.rules);
-                self.cache.clear();
-            }
+            Message::Tick(_local_time) => match &self.rules_cyclical {
+                None => match &&self.rules_totalistic {
+                    Some(rule) => {
+                        self.grid =
+                            update_grid_totalistic(totalistic_type.unwrap(), &self.grid, &rule);
+                        self.cache.clear();
+                    }
+                    None => match &&self.rules_elementary {
+                        Some(rule) => {
+                            self.grid = update_grid_elementary(&self.grid, &rule);
+                            self.cache.clear();
+                        }
+                        None => {
+                            panic!("It should not happem");
+                        }
+                    },
+                },
+                Some(rule) => {
+                    self.grid = update_grid_cyclical(&self.grid, &rule, self.colour_count);
+                    self.cache.clear();
+                }
+            },
         }
 
         Command::none()
@@ -363,12 +649,8 @@ impl<Message> canvas::Program<Message> for CellularAutomata2D {
             let mut y: f32 = 0.0;
             for row in &self.grid {
                 for cell in row {
-                    let color = if cell == &1 {
-                        Color::from_rgb(1.0, 0.0, 0.0)
-                    } else {
-                        Color::from_rgb(0.0, 0.0, 1.0)
-                    };
-                    generate_box(frame, x, y, color);
+                    let color = get_colors()[cell];
+                    generate_box(frame, x, y, Color::from_rgb(color.0, color.1, color.2));
                     x += 2.0;
                 }
                 x = 0.0;
@@ -386,18 +668,41 @@ fn generate_box(frame: &mut Frame, x: f32, y: f32, color: Color) {
     frame.fill_rectangle(top_left, size, color);
 }
 
-fn read_rule() -> HashMap<(u8, u8), u8> {
+fn read_args() -> (RuleType, String, u8) {
     let args: Vec<String> = env::args().collect();
-    let mut rule: HashMap<(u8, u8), u8> = get_rule("game_of_live");
-    if args.len() != 2 {
-        println!("using default rule: game_of_live");
-        println!("avilable rules: {:?}", RULES_NAMES);
+    let rule_name = if args.len() > 1 { &args[1] } else { "default" };
+    let rule_type = match rule_name.as_ref() {
+        "elementary" => RuleType::Elementary,
+        "cyclical" => RuleType::Cyclical,
+        "totalistic_sum" => RuleType::TotalisticSum,
+        "totalistic_average" => RuleType::TotalisticAverage,
+        _ => RuleType::Elementary,
+    };
+
+    println!("using rule type: {:?}", rule_type);
+    let rule_name = if args.len() < 3 {
+        println!("using default rule: random");
+        "random"
     } else {
-        rule = get_rule(&args[1]);
-        println!("Using rule:{}", &args[1]);
+        println!("Using rule: {}", &args[2]);
+        &args[2]
     }
-    println!("Rule Details:{:?}", rule);
-    rule
+    .to_string();
+
+    let colour_count: u8 = if rule_type == RuleType::Elementary {
+        2
+    } else if args.len() < 3 {
+        MAX_COLORS
+    } else {
+        let temp = &args[3].parse::<u8>();
+        let result = match temp {
+            Ok(n) => n,
+            Err(e) => panic!(),
+        };
+        *result
+    };
+    println!("Color Count:{} max colors:{}", colour_count, MAX_COLORS);
+    (rule_type, rule_name, colour_count)
 }
 
 fn main() -> iced::Result {

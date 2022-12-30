@@ -1,5 +1,5 @@
 [package]
-name = "cellular_automata_2d_multi_color"
+name = "cellular_automata_2d_legacy"
 version = "0.1.0"
 edition = "2021"
 
