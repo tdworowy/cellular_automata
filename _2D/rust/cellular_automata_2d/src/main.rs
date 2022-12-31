@@ -589,26 +589,30 @@ impl Application for CellularAutomata2D {
             RuleType::Elementary => None,
             RuleType::Cyclical => None,
         };
+
         match message {
-            Message::Tick(_local_time) => match &self.rules_cyclical {
-                None => match &&self.rules_totalistic {
-                    Some(rule) => {
-                        self.grid =
-                            update_grid_totalistic(totalistic_type.unwrap(), &self.grid, &rule);
-                        self.cache.clear();
-                    }
-                    None => match &&self.rules_elementary {
-                        Some(rule) => {
-                            self.grid = update_grid_elementary(&self.grid, &rule);
-                            self.cache.clear();
-                        }
-                        None => {
-                            panic!("It should not happem");
-                        }
-                    },
-                },
-                Some(rule) => {
-                    self.grid = update_grid_cyclical(&self.grid, &rule, self.colour_count);
+            Message::Tick(_local_time) => match &self.rule_type {
+                RuleType::Elementary => {
+                    self.grid = update_grid_elementary(
+                        &self.grid,
+                        &self.rules_elementary.as_ref().unwrap(),
+                    );
+                    self.cache.clear();
+                }
+                RuleType::Cyclical => {
+                    self.grid = update_grid_cyclical(
+                        &self.grid,
+                        &self.rules_cyclical.as_ref().unwrap(),
+                        self.colour_count,
+                    );
+                    self.cache.clear();
+                }
+                RuleType::TotalisticAverage | RuleType::TotalisticSum => {
+                    self.grid = update_grid_totalistic(
+                        totalistic_type.unwrap(),
+                        &self.grid,
+                        &self.rules_totalistic.as_ref().unwrap(),
+                    );
                     self.cache.clear();
                 }
             },
