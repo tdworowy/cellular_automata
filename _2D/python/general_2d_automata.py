@@ -153,5 +153,3 @@ def update_grid_two_d(grid: np.ndarray, rules: defaultdict) -> np.ndarray:
             live_neighbours = count_colored_neighbours(i, j, grid)
             new_grid[i][j] = rules[(state, live_neighbours)]
     return new_grid
-
-

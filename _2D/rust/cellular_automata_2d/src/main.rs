@@ -22,7 +22,7 @@ fn get_colors() -> HashMap<u8, (f32, f32, f32)> {
         (3, (1.0, 0.7, 0.0)), // yellow
     ])
 }
-const ELEMENTARY_RULES_NAMES: [&str; 9] = [
+const ELEMENTARY_RULES_NAMES: [&str; 15] = [
     "game_of_live",
     "ameba",
     "_2x2",
@@ -32,9 +32,16 @@ const ELEMENTARY_RULES_NAMES: [&str; 9] = [
     "_move",
     "walled_cities",
     "epileptic",
+    "snowflake_1",
+    "snowflake_1_5",
+    "snowflake_1_3_5",
+    "snowflake_1_3",
+    "snowflake_random",
+    "random",
 ];
 
-const CYCLICAL_RULES_NAMES: [&str; 1] = ["blob"];
+const CYCLICAL_RULES_NAMES: [&str; 2] = ["blob", "random"];
+const TOTALISTIC_RULES_NAMES: [&str; 1] = ["random"];
 // state, neighbourhood, color to count, new state
 struct RulesCyclical {
     blob: HashMap<(u8, u8, u8), u8>,
@@ -153,6 +160,38 @@ impl RulesCyclical {
     }
 }
 
+fn generate_snowflake_rule(neighbours_numbers: Vec<u8>) -> HashMap<(u8, u8), u8> {
+    let mut rules: HashMap<(u8, u8), u8> = HashMap::new();
+    for number in neighbours_numbers {
+        rules.insert((0 as u8, number), 1 as u8);
+        rules.insert((1 as u8, number), 1 as u8);
+    }
+    println!("Rule Details :{:?}", rules);
+    rules
+}
+
+fn generate_snowflake_rule_random() -> HashMap<(u8, u8), u8> {
+    let rule_lenght = thread_rng().gen_range(1..=8);
+    let neighbours_numbers: Vec<u8> = (1..rule_lenght)
+        .map(|_| thread_rng().gen_range(1..rule_lenght))
+        .collect();
+    generate_snowflake_rule(neighbours_numbers)
+}
+
+#[test]
+fn test_generate_snowflake_rule() {
+    assert_eq!(
+        generate_snowflake_rule(vec![1, 3, 5]),
+        HashMap::from([
+            ((0, 1), 1),
+            ((1, 1), 1),
+            ((0, 3), 1),
+            ((1, 3), 1),
+            ((0, 5), 1),
+            ((1, 5), 1)
+        ])
+    );
+}
 fn generate_random_rule_elementary(min_lenght: usize, max_lenght: usize) -> HashMap<(u8, u8), u8> {
     let rule_lenght = thread_rng().gen_range(min_lenght..max_lenght);
     let mut rules: HashMap<(u8, u8), u8> = HashMap::new();
@@ -161,6 +200,7 @@ fn generate_random_rule_elementary(min_lenght: usize, max_lenght: usize) -> Hash
         let second = thread_rng().gen_range(0..8) as u8;
         rules.insert((first, second), 1 as u8);
     }
+    println!("Rule Details :{:?}", rules);
     rules
 }
 
@@ -195,6 +235,7 @@ fn test_choose() {
     assert!(test_vec.len() == 3);
     assert!(!test_vec.contains(&element.unwrap()));
 }
+
 // sum (or averagre) for 9 cells, new state
 fn generate_random_rule_totalistic(
     totalistic_type: TotalisticType,
@@ -229,6 +270,11 @@ fn get_rule_elementary(rule_name: &str) -> HashMap<(u8, u8), u8> {
         "_move" => rules._move,
         "walled_cities" => rules.walled_cities,
         "epileptic" => rules.epileptic,
+        "snowflake_1" => generate_snowflake_rule(vec![1]),
+        "snowflake_1_5" => generate_snowflake_rule(vec![1, 5]),
+        "snowflake_1_3_5" => generate_snowflake_rule(vec![1, 3, 5]),
+        "snowflake_1_3" => generate_snowflake_rule(vec![1, 3]),
+        "snowflake_random" => generate_snowflake_rule_random(),
         "random" => generate_random_rule_elementary(5, 15),
         _ => panic!(
             "rule {} doesn't exist, avilable rules: {:?}",
@@ -258,7 +304,7 @@ fn get_rule_totalistic(
         "random" => generate_random_rule_totalistic(totalistic_type, colour_count),
         _ => panic!(
             "rule {} doesn't exist, avilable rules: {:?}",
-            &rule_name, CYCLICAL_RULES_NAMES
+            &rule_name, TOTALISTIC_RULES_NAMES
         ),
     }
 }
@@ -442,20 +488,38 @@ fn test_aggregate_colored_neighbours() {
 #[derive(Debug, PartialEq)]
 enum RuleType {
     Elementary,
+    ElementarySonwflake,
     Cyclical,
     TotalisticSum,
     TotalisticAverage,
 }
 
-fn update_grid_elementary(grid: &Vec<Vec<u8>>, rules: &HashMap<(u8, u8), u8>) -> Vec<Vec<u8>> {
+enum ElementaryType {
+    Elementary,
+    Sonwflake,
+}
+
+fn update_grid_elementary(
+    rule_type: ElementaryType,
+    grid: &Vec<Vec<u8>>,
+    rules: &HashMap<(u8, u8), u8>,
+) -> Vec<Vec<u8>> {
     let mut new_grid: Vec<Vec<u8>> = Vec::new();
     for (i, row) in grid.iter().enumerate() {
         let mut new_row: Vec<u8> = Vec::new();
         for (j, cell) in row.iter().enumerate() {
             let live_neighbours = count_colored_neighbours(i, j, 1, &grid);
             let state = *cell;
-            new_row.push(*rules.get(&(state, live_neighbours)).unwrap_or(&0));
+            match rule_type {
+                ElementaryType::Elementary => {
+                    new_row.push(*rules.get(&(state, live_neighbours)).unwrap_or(&0))
+                }
+                ElementaryType::Sonwflake => {
+                    new_row.push(*rules.get(&(state, live_neighbours)).unwrap_or(&state))
+                }
+            }
         }
+
         new_grid.push(new_row);
     }
     new_grid
@@ -527,7 +591,11 @@ impl Application for CellularAutomata2D {
 
     fn new(_flags: Self::Flags) -> (Self, Command<Self::Message>) {
         let (rule_type, rule_name, colour_count) = read_args();
-        let init_grid = generate_gird_random(WIDTH, HEIGHT, colour_count);
+
+        let init_grid = match rule_type {
+            RuleType::ElementarySonwflake => generate_gird_one_cell(WIDTH, HEIGHT),
+            _ => generate_gird_random(WIDTH, HEIGHT, colour_count),
+        };
 
         let cellular_automata_2_d = match rule_type {
             RuleType::Elementary => CellularAutomata2D {
@@ -537,6 +605,15 @@ impl Application for CellularAutomata2D {
                 rules_cyclical: None,
                 rules_totalistic: None,
                 rule_type: RuleType::Elementary,
+                colour_count,
+            },
+            RuleType::ElementarySonwflake => CellularAutomata2D {
+                cache: Default::default(),
+                grid: init_grid,
+                rules_elementary: Some(get_rule_elementary(&rule_name)),
+                rules_cyclical: None,
+                rules_totalistic: None,
+                rule_type: RuleType::ElementarySonwflake,
                 colour_count,
             },
             RuleType::Cyclical => CellularAutomata2D {
@@ -586,7 +663,7 @@ impl Application for CellularAutomata2D {
         let totalistic_type: Option<TotalisticType> = match &self.rule_type {
             RuleType::TotalisticAverage => Some(TotalisticType::Average),
             RuleType::TotalisticSum => Some(TotalisticType::Sum),
-            RuleType::Elementary => None,
+            RuleType::Elementary | RuleType::ElementarySonwflake => None,
             RuleType::Cyclical => None,
         };
 
@@ -594,6 +671,15 @@ impl Application for CellularAutomata2D {
             Message::Tick(_local_time) => match &self.rule_type {
                 RuleType::Elementary => {
                     self.grid = update_grid_elementary(
+                        ElementaryType::Elementary,
+                        &self.grid,
+                        &self.rules_elementary.as_ref().unwrap(),
+                    );
+                    self.cache.clear();
+                }
+                RuleType::ElementarySonwflake => {
+                    self.grid = update_grid_elementary(
+                        ElementaryType::Sonwflake,
                         &self.grid,
                         &self.rules_elementary.as_ref().unwrap(),
                     );
@@ -677,6 +763,7 @@ fn read_args() -> (RuleType, String, u8) {
     let rule_name = if args.len() > 1 { &args[1] } else { "default" };
     let rule_type = match rule_name.as_ref() {
         "elementary" => RuleType::Elementary,
+        "elementary_sonwflake" => RuleType::ElementarySonwflake,
         "cyclical" => RuleType::Cyclical,
         "totalistic_sum" => RuleType::TotalisticSum,
         "totalistic_average" => RuleType::TotalisticAverage,
@@ -693,18 +780,19 @@ fn read_args() -> (RuleType, String, u8) {
     }
     .to_string();
 
-    let colour_count: u8 = if rule_type == RuleType::Elementary {
-        2
-    } else if args.len() < 3 {
-        MAX_COLORS
-    } else {
-        let temp = &args[3].parse::<u8>();
-        let result = match temp {
-            Ok(n) => n,
-            Err(e) => panic!(),
+    let colour_count: u8 =
+        if rule_type == RuleType::Elementary || rule_type == RuleType::ElementarySonwflake {
+            2
+        } else if args.len() < 3 {
+            MAX_COLORS
+        } else {
+            let temp = &args[3].parse::<u8>();
+            let result = match temp {
+                Ok(n) => n,
+                Err(e) => panic!("{}", e),
+            };
+            *result
         };
-        *result
-    };
     println!("Color Count:{} max colors:{}", colour_count, MAX_COLORS);
     (rule_type, rule_name, colour_count)
 }
