@@ -309,15 +309,23 @@ fn get_rule_totalistic(
     }
 }
 
+// fn generate_gird_random(width: usize, height: usize, colour_count: u8) -> Vec<Vec<u8>> {
+//     let mut grid: Vec<Vec<u8>> = Vec::new();
+//     for i in 0..height {
+//         grid.push(vec![]);
+//         for _ in 0..width {
+//             let cell_type = thread_rng().gen_range(0..colour_count);
+//             grid[i].push(cell_type);
+//         }
+//     }
+//     grid
+// }
+
 fn generate_gird_random(width: usize, height: usize, colour_count: u8) -> Vec<Vec<u8>> {
-    let mut grid: Vec<Vec<u8>> = Vec::new();
-    for i in 0..height {
-        grid.push(vec![]);
-        for _ in 0..width {
-            let cell_type = thread_rng().gen_range(0..colour_count);
-            grid[i].push(cell_type);
-        }
-    }
+    let mut rng = rand::thread_rng();
+    let grid: Vec<Vec<u8>> = (0..height)
+        .map(|_| (0..width).map(|_| rng.gen_range(0..colour_count)).collect())
+        .collect();
     grid
 }
 
