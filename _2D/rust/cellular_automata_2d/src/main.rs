@@ -343,7 +343,7 @@ fn test_generate_gird_one_cell() {
     );
 }
 
-fn get_range(y: usize, x: usize, grid: &Vec<Vec<u8>>) -> (usize, usize, usize, usize) {
+fn get_range(y: usize, x: usize, grid: &[Vec<u8>]) -> (usize, usize, usize, usize) {
     let x_start = if x as isize - 1 <= 0 {
         0
     } else {
@@ -467,7 +467,7 @@ fn aggregate_colored_neighbours(
         }
     }
     if aggregation == &TotalisticType::Average {
-        resoult = resoult / 9
+        resoult /= 9
     }
     resoult
 }
@@ -516,7 +516,7 @@ fn update_grid_elementary(
     for (i, row) in grid.iter().enumerate() {
         let mut new_row: Vec<u8> = Vec::new();
         for (j, cell) in row.iter().enumerate() {
-            let live_neighbours = count_colored_neighbours(i, j, 1, &grid);
+            let live_neighbours = count_colored_neighbours(i, j, 1, grid);
             let state = *cell;
             match rule_type {
                 ElementaryType::Elementary => {
@@ -567,7 +567,7 @@ fn update_grid_totalistic(
         let mut new_row: Vec<u8> = Vec::new();
         for (j, cell) in row.iter().enumerate() {
             let state = *cell;
-            let aggregated_value = aggregate_colored_neighbours(i, j, &aggregation, &grid);
+            let aggregated_value = aggregate_colored_neighbours(i, j, &aggregation, grid);
 
             new_row.push(*rules.get(&aggregated_value).unwrap_or(&state));
         }
@@ -681,7 +681,7 @@ impl Application for CellularAutomata2D {
                     self.grid = update_grid_elementary(
                         ElementaryType::Elementary,
                         &self.grid,
-                        &self.rules_elementary.as_ref().unwrap(),
+                        self.rules_elementary.as_ref().unwrap(),
                     );
                     self.cache.clear();
                 }
@@ -689,14 +689,14 @@ impl Application for CellularAutomata2D {
                     self.grid = update_grid_elementary(
                         ElementaryType::Sonwflake,
                         &self.grid,
-                        &self.rules_elementary.as_ref().unwrap(),
+                        self.rules_elementary.as_ref().unwrap(),
                     );
                     self.cache.clear();
                 }
                 RuleType::Cyclical => {
                     self.grid = update_grid_cyclical(
                         &self.grid,
-                        &self.rules_cyclical.as_ref().unwrap(),
+                        self.rules_cyclical.as_ref().unwrap(),
                         self.colour_count,
                     );
                     self.cache.clear();
@@ -705,7 +705,7 @@ impl Application for CellularAutomata2D {
                     self.grid = update_grid_totalistic(
                         totalistic_type.unwrap(),
                         &self.grid,
-                        &self.rules_totalistic.as_ref().unwrap(),
+                        self.rules_totalistic.as_ref().unwrap(),
                     );
                     self.cache.clear();
                 }
@@ -769,7 +769,7 @@ fn generate_box(frame: &mut Frame, x: f32, y: f32, color: Color) {
 fn read_args() -> (RuleType, String, u8) {
     let args: Vec<String> = env::args().collect();
     let rule_name = if args.len() > 1 { &args[1] } else { "default" };
-    let rule_type = match rule_name.as_ref() {
+    let rule_type = match rule_name {
         "elementary" => RuleType::Elementary,
         "elementary_sonwflake" => RuleType::ElementarySonwflake,
         "cyclical" => RuleType::Cyclical,
