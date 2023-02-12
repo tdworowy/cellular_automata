@@ -323,10 +323,9 @@ fn get_rule_totalistic(
 
 fn generate_gird_random(width: usize, height: usize, colour_count: u8) -> Vec<Vec<u8>> {
     let mut rng = rand::thread_rng();
-    let grid: Vec<Vec<u8>> = (0..height)
+    (0..height)
         .map(|_| (0..width).map(|_| rng.gen_range(0..colour_count)).collect())
-        .collect();
-    grid
+        .collect()
 }
 
 fn generate_gird_one_cell(width: usize, height: usize) -> Vec<Vec<u8>> {
