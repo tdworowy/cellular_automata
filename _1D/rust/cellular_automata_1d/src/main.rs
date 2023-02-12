@@ -47,13 +47,15 @@ where
 impl<T: Iterator + Clone> ProductRepeat for T where T::Item: Clone {}
 
 fn generate_row_random(width: usize, probability_of_one: f64) -> Vec<u32> {
-    let mut row: Vec<u32> = Vec::new();
-    for _ in 0..width {
-        let is_one = thread_rng().gen_bool(probability_of_one);
-        let cell_type = if is_one { 1 } else { 0 };
-        row.push(cell_type as u32);
-    }
-    row
+    (0..width)
+        .map(|_| {
+            if thread_rng().gen_bool(probability_of_one) {
+                1
+            } else {
+                0
+            }
+        })
+        .collect()
 }
 
 fn generate_row_one_cell(width: usize) -> Vec<u32> {
@@ -264,7 +266,7 @@ impl<Message> canvas::Program<Message> for CellularAutomata1D {
         let geometry = self.cache.draw(bounds.size(), |frame| {
             let mut x: f32 = 0.0;
             let mut y: f32 = 0.0;
-            let mut row = generate_row_one_cell(WIDTH);
+            let mut row = generate_row_random(WIDTH, 0.6);//generate_row_one_cell(WIDTH);
             for _ in 0..HEIGHT {
                 for cell in &row {
                     let color = get_colors()[cell];
