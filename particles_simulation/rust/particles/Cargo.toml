@@ -8,5 +8,5 @@ edition = "2021"
 [dependencies]
 flo_canvas = "0.3.0"
 flo_draw = "0.3.0"
-itertools ="0.10.5"
+itertools ="0.11.0"
 rand ="0.8.5"

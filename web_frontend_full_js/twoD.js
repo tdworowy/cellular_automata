@@ -73,7 +73,7 @@ walled_cities_rules = {
 };
 epileptic_rules = {
   "0_0": 1,
-  "0_2": 1, 
+  "0_2": 1,
 };
 
 let requestId = undefined;
@@ -224,6 +224,7 @@ function step() {
   generateGrid(new_grid);
 }
 function step_event(event) {
+  //TODO something doesn't work
   if (event && event.hasOwnProperty("preventDefault")) {
     event.preventDefault();
   }
@@ -235,10 +236,10 @@ function step_play() {
   requestId = window.requestAnimationFrame(step_play);
 }
 
-function generateGrid(grid) {
-  const canvas = document.getElementById("canvas");
-  const context = canvas.getContext("2d");
+const canvas = document.getElementById("canvas");
+const context = canvas.getContext("2d");
 
+function generateGrid(grid) {
   let x_cor = 0;
   let y_cor = 0;
 
@@ -252,6 +253,17 @@ function generateGrid(grid) {
   }
   prev_grid = JSON.parse(JSON.stringify(grid));
 }
+
+canvas.onclick = (event) => {
+  const x = event.offsetX;
+  const y = event.offsetY;
+
+  context.fillStyle = colors[1];
+  // TODO make it align to grid
+  // TODO after 'play" grid may be undefinded
+  grid[x][y] = 1;
+  context.fillRect(x, y, call_width, call_height);
+};
 
 function play() {
   if (!requestId) {
