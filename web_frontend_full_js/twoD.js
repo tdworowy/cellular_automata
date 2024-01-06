@@ -255,14 +255,17 @@ function generateGrid(grid) {
 }
 
 canvas.onclick = (event) => {
-  const x = event.offsetX;
-  const y = event.offsetY;
+  const x = Math.round(event.offsetX / call_width);
+  const y = Math.round(event.offsetY / call_height);
+
+  const x_cord = event.offsetX;
+  const y_cord = event.offsetY;
 
   context.fillStyle = colors[1];
   // TODO make it align to grid
-  // TODO after 'play" grid may be undefinded
+  // TODO is seems to not update grid
   grid[x][y] = 1;
-  context.fillRect(x, y, call_width, call_height);
+  context.fillRect(x_cord, y_cord, call_width, call_height);
 };
 
 function play() {
