@@ -2,10 +2,10 @@ use itertools::{Itertools, MultiProduct};
 use rand::{thread_rng, Rng};
 use std::collections::HashMap;
 
-use iced::widget::canvas::{self, Cache, Canvas, Cursor, Frame, Geometry};
+use iced::widget::canvas::{self, Cache, Canvas, Frame, Geometry};
 use iced::{
     executor, Application, Color, Command, Element, Length, Point, Rectangle, Renderer, Settings,
-    Size, Theme,
+    Size, Theme, mouse,
 };
 
 const WIDTH: usize = 500;
@@ -247,8 +247,8 @@ impl Application for CellularAutomata1D {
     }
     fn view(&self) -> Element<'_, Self::Message, Renderer<Self::Theme>> {
         Canvas::new(self)
-            .width(Length::Units(WIDTH as u16 * 2))
-            .height(Length::Units(HEIGHT as u16 * 2))
+            .width(Length::Fill)
+            .height(Length::Fill)
             .into()
     }
 }
@@ -259,11 +259,12 @@ impl<Message> canvas::Program<Message> for CellularAutomata1D {
     fn draw(
         &self,
         _state: &Self::State,
+        renderer: &Renderer,
         _theme: &Theme,
         bounds: Rectangle,
-        _cursor: Cursor,
+        _cursor: mouse::Cursor,
     ) -> Vec<Geometry> {
-        let geometry = self.cache.draw(bounds.size(), |frame| {
+        let geometry = self.cache.draw(renderer,bounds.size(), |frame| {
             let mut x: f32 = 0.0;
             let mut y: f32 = 0.0;
             let mut row = generate_row_random(WIDTH, 0.6);//generate_row_one_cell(WIDTH);
