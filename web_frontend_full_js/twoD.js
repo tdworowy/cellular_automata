@@ -3,8 +3,6 @@ const formE2 = document.getElementById("step");
 const formE3 = document.getElementById("add");
 const play_button = document.getElementById("play");
 
-const call_width = config.call_width;
-const call_height = config.call_height;
 let grid;
 let prev_grid;
 
@@ -220,6 +218,9 @@ function updateGrid(grid, grid_x_axis, grid_y_asix, rules) {
 
 function initGrid(event) {
   const params = new FormData(document.querySelector("#initGrid"));
+  const cell_width = Number(params.get("cell_width"));
+  const cell_height = Number(params.get("cell_height"));
+
   if (params.get("grid_type") === "random") {
     grid = generateGridRandom(
       params.get("width"),
@@ -229,12 +230,17 @@ function initGrid(event) {
   }
   if (params.get("grid_type") === "center") {
     params.set("cell_count", "1");
-    grid = generateGridCenter(params.get("width"), params.get("height"));
+    grid = generateGridCenter(
+      params.get("width"),
+      params.get("height"),
+      cell_width,
+      cell_height
+    );
   }
   event.preventDefault();
-  document.getElementById("canvas").width = params.get("width") * call_width;
-  document.getElementById("canvas").height = params.get("height") * call_height;
-  generateGrid(grid);
+  document.getElementById("canvas").width = params.get("width") * cell_width;
+  document.getElementById("canvas").height = params.get("height") * cell_height;
+  generateGrid(grid, cell_width, cell_height);
 }
 
 function add(event) {
@@ -244,6 +250,10 @@ function add(event) {
 }
 
 function step() {
+  const params_init_grid = new FormData(document.querySelector("#initGrid"));
+  const cell_width = Number(params_init_grid.get("cell_width"));
+  const cell_height = Number(params_init_grid.get("cell_height"));
+
   const params = new FormData(document.querySelector("#step"));
   //console.log( rules[params.get("rule")])
   grid = JSON.parse(JSON.stringify(prev_grid));
@@ -253,7 +263,7 @@ function step() {
     grid[0].length,
     rules[params.get("rule")]
   );
-  generateGrid(new_grid);
+  generateGrid(new_grid, cell_width, cell_height);
 }
 function step_event(event) {
   event.preventDefault();
@@ -268,34 +278,34 @@ function step_play() {
 const canvas = document.getElementById("canvas");
 const context = canvas.getContext("2d");
 
-function generateGrid(grid) {
+function generateGrid(grid, cell_width, cell_height) {
   let x_cor = 0;
   let y_cor = 0;
 
   for (var x = 0; x < grid.length; x++) {
     for (var y = 0; y < grid[x].length; y++) {
       context.fillStyle = colors[grid[x][y]];
-      context.fillRect(x_cor, y_cor, call_width, call_height);
-      x_cor = x * call_width;
-      y_cor = y * call_width;
+      context.fillRect(x_cor, y_cor, cell_width, cell_height);
+      x_cor = x * cell_width;
+      y_cor = y * cell_width;
     }
   }
   prev_grid = JSON.parse(JSON.stringify(grid));
 }
 
-canvas.onclick = (event) => {
-  const x = Math.round(event.offsetX / call_width);
-  const y = Math.round(event.offsetY / call_height);
+// canvas.onclick = (event) => {
+//   const x = Math.round(event.offsetX / call_width);
+//   const y = Math.round(event.offsetY / call_height);
 
-  const x_cord = event.offsetX;
-  const y_cord = event.offsetY;
+//   const x_cord = event.offsetX;
+//   const y_cord = event.offsetY;
 
-  context.fillStyle = colors[1];
-  // TODO make it align to grid
-  // TODO is seems to not update grid
-  grid[x][y] = 1;
-  context.fillRect(x_cord, y_cord, call_width, call_height);
-};
+//   context.fillStyle = colors[1];
+//   // TODO make it align to grid
+//   // TODO is seems to not update grid
+//   grid[x][y] = 1;
+//   context.fillRect(x_cord, y_cord, call_width, call_height);
+// };
 
 function addPattern(pattern_key) {
   const pattern = pattentrs[pattern_key];
