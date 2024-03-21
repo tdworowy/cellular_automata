@@ -11,6 +11,7 @@
           placeholder="Width"
           id="width"
           name="width"
+          value="200"
         />
         <label class="label" for="width">width</label>
       </div>
@@ -21,6 +22,7 @@
           type="text"
           id="height"
           name="height"
+          value="200"
         />
         <label class="label" for="height">height</label>
       </div>
@@ -30,6 +32,7 @@
           type="text"
           id="one_prob"
           name="one_prob"
+          value="0.2"
           placeholder="Probability of one (colored state)"
         />
         <label class="label" for="one_prob"
@@ -60,6 +63,14 @@
         <option value="random">random</option>
       </select>
       <button type="submit" class="btn">Next Step</button>
+    </form>
+
+    <form onsubmit="" id="add">
+      <select id="pattern" name="pattern" class="btn">
+        <option value="glider">glider</option>
+        <option value="eater1">eater1</option>
+      </select>
+      <button type="submit" class="btn">Add</button>
     </form>
     <button id="play" class="btn">Play</button> <br />
     <canvas

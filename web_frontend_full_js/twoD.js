@@ -1,5 +1,6 @@
 const formEl = document.getElementById("initGrid");
 const formE2 = document.getElementById("step");
+const formE3 = document.getElementById("add");
 const play_button = document.getElementById("play");
 
 const call_width = config.call_width;
@@ -7,19 +8,19 @@ const call_height = config.call_height;
 let grid;
 let prev_grid;
 
-game_of_live_rules = {
+const game_of_live_rules = {
   "0_3": 1,
   "1_3": 1,
   "1_2": 1,
 };
-mazectric_rules = {
+const mazectric_rules = {
   "0_3": 1,
   "1_1": 1,
   "1_2": 1,
   "1_3": 1,
   "1_4": 1,
 };
-amoeba_rules = {
+const amoeba_rules = {
   "0_3": 1,
   "0_5": 1,
   "0_7": 1,
@@ -28,20 +29,20 @@ amoeba_rules = {
   "1_5": 1,
   "1_8": 1,
 };
-_2x2_rules = {
+const _2x2_rules = {
   "0_3": 1,
   "0_6": 1,
   "1_1": 1,
   "1_2": 1,
   "1_5": 1,
 };
-_34_live_rules = {
+const _34_live_rules = {
   "0_3": 1,
   "0_4": 1,
   "1_3": 1,
   "1_4": 1,
 };
-coagulations_rules = {
+const coagulations_rules = {
   "0_3": 1,
   "0_7": 1,
   "0_8": 1,
@@ -52,7 +53,7 @@ coagulations_rules = {
   "1_7": 1,
   "1_8": 1,
 };
-move_rules = {
+const move_rules = {
   "0_3": 1,
   "0_6": 1,
   "0_8": 1,
@@ -60,7 +61,7 @@ move_rules = {
   "1_4": 1,
   "1_5": 1,
 };
-walled_cities_rules = {
+const walled_cities_rules = {
   "0_4": 1,
   "0_5": 1,
   "0_6": 1,
@@ -71,9 +72,23 @@ walled_cities_rules = {
   "1_4": 1,
   "1_5": 1,
 };
-epileptic_rules = {
+const epileptic_rules = {
   "0_0": 1,
   "0_2": 1,
+};
+
+const pattentrs = {
+  glider: [
+    [0, 0, 1],
+    [1, 0, 1],
+    [0, 1, 1],
+  ],
+  eater1: [
+    [1, 1, 0, 0],
+    [1, 0, 1, 0],
+    [0, 0, 1, 0],
+    [0, 0, 1, 1],
+  ],
 };
 
 let requestId = undefined;
@@ -107,7 +122,7 @@ function generateRandomRule() {
   return rules;
 }
 
-rules = {
+const rules = {
   game_of_life: game_of_live_rules,
   amoeba: amoeba_rules,
   twoXTwo: _2x2_rules,
@@ -211,11 +226,17 @@ function initGrid(event) {
   generateGrid(grid);
 }
 
+function add(event) {
+  event.preventDefault();
+  const params = new FormData(document.querySelector("#add"));
+  addPattern(params.get("pattern"));
+}
+
 function step() {
   const params = new FormData(document.querySelector("#step"));
   //console.log( rules[params.get("rule")])
   grid = JSON.parse(JSON.stringify(prev_grid));
-  new_grid = updateGrid(
+  const new_grid = updateGrid(
     grid,
     grid.length,
     grid[0].length,
@@ -224,10 +245,7 @@ function step() {
   generateGrid(new_grid);
 }
 function step_event(event) {
-  //TODO something doesn't work
-  if (event && event.hasOwnProperty("preventDefault")) {
-    event.preventDefault();
-  }
+  event.preventDefault();
   step();
 }
 
@@ -268,12 +286,42 @@ canvas.onclick = (event) => {
   context.fillRect(x_cord, y_cord, call_width, call_height);
 };
 
+function addPattern(pattern_key) {
+  const pattern = pattentrs[pattern_key];
+  const pattern_height = pattern.length;
+  const pattern_width = pattern[0].length;
+
+  let grid = JSON.parse(JSON.stringify(prev_grid));
+
+  const start_y = Math.floor(
+    Math.random() * grid[0].length - pattern_width + 1
+  );
+  const start_x = Math.floor(Math.random() * grid.length - pattern_height + 1);
+
+  const end_x = start_x + pattern_height;
+  const end_y = start_y + pattern_width;
+
+  let i = 0;
+  let j = 0;
+
+  for (let x = start_x; x < end_x; x++) {
+    j = 0;
+    for (let y = start_y; y < end_y; y++) {
+      grid[x][y] = pattern[i][j];
+      j++;
+    }
+    i++;
+  }
+  prev_grid = JSON.parse(JSON.stringify(grid));
+}
+
 function play() {
   if (!requestId) {
     play_button.textContent = "Stop";
     window.requestAnimationFrame(step_play);
   }
 }
+
 function stop() {
   if (requestId) {
     play_button.textContent = "Play";
@@ -284,5 +332,6 @@ function stop() {
 
 formEl.addEventListener("submit", initGrid);
 formE2.addEventListener("submit", step_event);
+formE3.addEventListener("submit", add);
 play_button.addEventListener("click", play);
 play_button.addEventListener("click", stop);
