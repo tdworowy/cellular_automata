@@ -18,7 +18,7 @@ jobs:
         with:
           workspaces: _2D/rust/cellular_automata_2d
       - name: Build
-        run: rustup && cargo build --manifest-path _2D/rust/cellular_automata_2d/Cargo.toml --verbose
+        run: rustup update && cargo build --manifest-path _2D/rust/cellular_automata_2d/Cargo.toml --verbose
       - name: Run tests
         run: cargo test --manifest-path _2D/rust/cellular_automata_2d/Cargo.toml --verbose
 
@@ -30,7 +30,7 @@ jobs:
         with:
           workspaces: _2D/rust/cellular_automata_1d
       - name: Build
-        run: rustup && cargo build --manifest-path _1D/rust/cellular_automata_1d/Cargo.toml --verbose
+        run: rustup update && cargo build --manifest-path _1D/rust/cellular_automata_1d/Cargo.toml --verbose
       - name: Run tests
         run: cargo test --manifest-path _1D/rust/cellular_automata_1d/Cargo.toml --verbose
 
