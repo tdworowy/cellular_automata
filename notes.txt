@@ -4,3 +4,7 @@ sass style.scss style.css
 
 
 pylint $(git ls-files '*.py')
+
+
+
+https://conwaylife.com/wiki/Glider

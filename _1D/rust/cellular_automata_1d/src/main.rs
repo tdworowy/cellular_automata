@@ -245,7 +245,7 @@ impl Application for CellularAutomata1D {
     fn update(&mut self, message: Message) -> Command<Message> {
         Command::none()
     }
-    fn view(&self) -> Element<'_, Self::Message, Renderer<Self::Theme>> {
+    fn view(&self) -> Element<'_, Message, Theme, iced::Renderer>{
         Canvas::new(self)
             .width(Length::Fill)
             .height(Length::Fill)

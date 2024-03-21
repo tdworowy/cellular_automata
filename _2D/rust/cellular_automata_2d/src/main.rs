@@ -6,7 +6,7 @@ use std::env;
 use iced::widget::canvas::{self, Cache, Canvas, Frame, Geometry};
 use iced::{
     executor, Application, Color, Command, Element, Length, Point, Rectangle, Renderer, Settings,
-    Size, Subscription, Theme, mouse,
+    Size, Subscription, Theme, mouse
 };
 
 const WIDTH: usize = 500;
@@ -714,7 +714,7 @@ impl Application for CellularAutomata2D {
         Command::none()
     }
 
-    fn view(&self) -> Element<'_, Self::Message, Renderer<Self::Theme>> {
+    fn view(&self) -> Element<'_, Message, Theme, iced::Renderer> {
         Canvas::new(self)
             .width(Length::Fill)
             .height(Length::Fill)
