@@ -8,3 +8,4 @@ pylint $(git ls-files '*.py')
 
 
 https://conwaylife.com/wiki/Glider
+// TODO parse wiki to generate pattenrs ?
