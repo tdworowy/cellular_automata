@@ -55,7 +55,7 @@ class ParticlesGenerator:
                             fx += F * dx
                             fy += F * dy
 
-            vmix = (1. - self.viscosity)
+            vmix = 1.0 - self.viscosity
             particle_1["vx"] = particle_1["vx"] * vmix + fx * self.time_scale
             particle_1["vy"] = particle_1["vy"] * vmix + fy * self.time_scale
 
@@ -73,7 +73,9 @@ class ParticlesGenerator:
 
         return particles
 
-    def update_particles(self, rule: dict, init_particles: list, particles_queue: Queue):
+    def update_particles(
+        self, rule: dict, init_particles: list, particles_queue: Queue
+    ):
         particles = init_particles
         while 1:
             particles = self.apply_rules(rule, particles)
@@ -88,13 +90,14 @@ if __name__ == "__main__":
     WIDTH = 1280
     HEIGHT = 720
 
-    colours = {"blue": (0, 0, 255, 255),
-               "red": (255, 0, 0, 255),
-               "green": (0, 255, 0, 255),
-               "purple": (255, 0, 255, 255)
-               # "aquamarine": (102, 205, 212, 255),
-               # "gold": (255, 215, 0, 255),
-               }
+    colours = {
+        "blue": (0, 0, 255, 255),
+        "red": (255, 0, 0, 255),
+        "green": (0, 255, 0, 255),
+        "purple": (255, 0, 255, 255),
+        # "aquamarine": (102, 205, 212, 255),
+        # "gold": (255, 215, 0, 255),
+    }
 
     particles_generator = ParticlesGenerator(width=WIDTH, height=HEIGHT)
     init_particles = particles_generator.generate_init_particles(300, "red")
@@ -104,8 +107,10 @@ if __name__ == "__main__":
 
     rules = random_rules(colours)
 
-    process = Process(target=particles_generator.update_particles,
-                      args=(rules, init_particles, particles_queue))
+    process = Process(
+        target=particles_generator.update_particles,
+        args=(rules, init_particles, particles_queue),
+    )
     process.daemon = True
     process.start()
 

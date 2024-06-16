@@ -17,7 +17,9 @@ class LangtonAnt:
         self.height = height
 
         self.canvas = tkinter.Canvas(master, width=self.width, height=self.height)
-        self.button_play = tkinter.Button(master, text="Play", command=self.play_call_back)
+        self.button_play = tkinter.Button(
+            master, text="Play", command=self.play_call_back
+        )
 
         self.ants_count = tkinter.Entry(master)
         self.ants_count.insert(0, "3")
@@ -36,7 +38,7 @@ class LangtonAnt:
         self.step = 1
 
     def rectangle_coordinates(self, x: int, y: int) -> dict:
-        dic = {'x': x, 'y': y, 'x1': self.cell_size + x, 'y1': self.cell_size + y}
+        dic = {"x": x, "y": y, "x1": self.cell_size + x, "y1": self.cell_size + y}
         return dic
 
     def step_call_back(self):
@@ -55,25 +57,31 @@ class LangtonAnt:
                     if self.cells[(x, y)] != (-1, -1):
                         self.canvas.delete(self.cells[(x, y)])
 
-                    colour = colours_rules[(list(value.keys())[0], list(value.values())[0])]
-                    rectangle = self.canvas.create_rectangle(coordinate['x'],
-                                                             coordinate['y'],
-                                                             coordinate['x1'],
-                                                             coordinate['y1'],
-                                                             fill=colour)
+                    colour = colours_rules[
+                        (list(value.keys())[0], list(value.values())[0])
+                    ]
+                    rectangle = self.canvas.create_rectangle(
+                        coordinate["x"],
+                        coordinate["y"],
+                        coordinate["x1"],
+                        coordinate["y1"],
+                        fill=colour,
+                    )
                     self.cells[(x, y)] = rectangle
 
-                y = coordinate['y1']
-            x = coordinate['x1']
+                y = coordinate["y1"]
+            x = coordinate["x1"]
             y = 0
         self.prev_step = self.grid.copy()
         self.grid, self.turn = update_grid_ant(self.grid, self.turn)
 
     def play_call_back(self):
-        self.grid, self.turn = generate_grid_ant(self.width // self.cell_size,
-                                                 self.height // self.cell_size,
-                                                 int(self.ants_count.get()),
-                                                 bool(int(self.random_init_turn.get())))
+        self.grid, self.turn = generate_grid_ant(
+            self.width // self.cell_size,
+            self.height // self.cell_size,
+            int(self.ants_count.get()),
+            bool(int(self.random_init_turn.get())),
+        )
 
         while 1:
             self.step_call_back()

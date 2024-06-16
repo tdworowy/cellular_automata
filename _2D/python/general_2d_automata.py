@@ -2,11 +2,7 @@ import numpy as np
 from collections import defaultdict
 from utils.utils import default_dict
 
-game_of_live_rules = {
-    (0, 3): 1,
-    (1, 3): 1,
-    (1, 2): 1
-}
+game_of_live_rules = {(0, 3): 1, (1, 3): 1, (1, 2): 1}
 game_of_live_rules = defaultdict(lambda: 0, game_of_live_rules)
 
 amoeba_rules = {
@@ -16,7 +12,7 @@ amoeba_rules = {
     (1, 1): 1,
     (1, 3): 1,
     (1, 5): 1,
-    (1, 8): 1
+    (1, 8): 1,
 }
 amoeba_rules = defaultdict(lambda: 0, amoeba_rules)
 
@@ -75,7 +71,6 @@ walled_cities_rules = {
     (0, 6): 1,
     (0, 7): 1,
     (0, 8): 1,
-
     (1, 2): 1,
     (1, 3): 1,
     (1, 4): 1,
@@ -95,24 +90,28 @@ def generate_snowflake_rule(neighbours_numbers: list = [1]) -> dict:
 
 
 rules = {
-    'game_of_life': game_of_live_rules,
-    'amoeba': amoeba_rules,
-    'twoXTwo': _2x2_rules,
-    'threeFourLive': _34_live_rules,
-    'coagulations': coagulations_rules,
-    'mazectric_rules': mazectric_rules,
-    'move': move_rules,
-    'walled_cities': walled_cities_rules,
-    'snowflake_1': generate_snowflake_rule(neighbours_numbers=[1]),
-    'snowflake_1_5': generate_snowflake_rule(neighbours_numbers=[1, 5]),
-    'snowflake_1_3_5': generate_snowflake_rule(neighbours_numbers=[1, 3, 5]),
-    'snowflake_1_3': generate_snowflake_rule(neighbours_numbers=[1, 3]),
+    "game_of_life": game_of_live_rules,
+    "amoeba": amoeba_rules,
+    "twoXTwo": _2x2_rules,
+    "threeFourLive": _34_live_rules,
+    "coagulations": coagulations_rules,
+    "mazectric_rules": mazectric_rules,
+    "move": move_rules,
+    "walled_cities": walled_cities_rules,
+    "snowflake_1": generate_snowflake_rule(neighbours_numbers=[1]),
+    "snowflake_1_5": generate_snowflake_rule(neighbours_numbers=[1, 5]),
+    "snowflake_1_3_5": generate_snowflake_rule(neighbours_numbers=[1, 3, 5]),
+    "snowflake_1_3": generate_snowflake_rule(neighbours_numbers=[1, 3]),
 }
 
 
-def generate_grid_random_cells(width: int, height: int, probability_of_one: float) -> np.ndarray:
+def generate_grid_random_cells(
+    width: int, height: int, probability_of_one: float
+) -> np.ndarray:
     probability_of_zero = 1 - probability_of_one
-    return np.random.choice(a=(0, 1), size=(width, height), p=(probability_of_zero, probability_of_one))
+    return np.random.choice(
+        a=(0, 1), size=(width, height), p=(probability_of_zero, probability_of_one)
+    )
 
 
 def generate_grid_one_cell(width: int, height: int) -> np.ndarray:
@@ -122,7 +121,8 @@ def generate_grid_one_cell(width: int, height: int) -> np.ndarray:
 
 
 def generate_grid_central(width: int, height: int, cell_count: int = 1) -> np.ndarray:
-    if cell_count == 1: return generate_grid_one_cell(width, height)
+    if cell_count == 1:
+        return generate_grid_one_cell(width, height)
     grid = np.full((height, width), 0)
     x = width // 2
     y = height // 2
@@ -141,7 +141,8 @@ def count_colored_neighbours(x: int, y: int, grid: np.ndarray) -> int:
 
     for i in range(start_x, end_x):
         for j in range(start_y, end_y):
-            if grid[i][j] == 1 and (i, j) != (x, y): colored_neighbours += 1
+            if grid[i][j] == 1 and (i, j) != (x, y):
+                colored_neighbours += 1
     return colored_neighbours
 
 

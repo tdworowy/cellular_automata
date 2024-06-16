@@ -7,13 +7,14 @@ from kivy.config import Config
 
 from particles_generator_v1 import ParticlesGenerator, random_rules
 
-colours = {"blue": (0, 0, 255, 255),
-           "red": (255, 0, 0, 255),
-           "green": (0, 255, 0, 255),
-           "purple": (255, 0, 255, 255)
-           # "aquamarine": (102, 205, 212, 255),
-           # "gold": (255, 215, 0, 255),
-           }
+colours = {
+    "blue": (0, 0, 255, 255),
+    "red": (255, 0, 0, 255),
+    "green": (0, 255, 0, 255),
+    "purple": (255, 0, 255, 255),
+    # "aquamarine": (102, 205, 212, 255),
+    # "gold": (255, 215, 0, 255),
+}
 
 WIDTH = 1280
 HEIGHT = 720
@@ -33,7 +34,7 @@ class CanvasWidget(Widget):
     def generate_particle(self, particles: list):
         with self.canvas:
             for particle in particles:
-                Color(*colours[particle["color"]], mode='rgba')
+                Color(*colours[particle["color"]], mode="rgba")
                 Ellipse(pos=(particle["x"], particle["y"]), size=self.particle_size)
 
     def update_particles(self):
@@ -45,8 +46,8 @@ class CanvasWidget(Widget):
 
 class CanvasApp(App):
     def build(self):
-        Config.set('graphics', 'width', f'{WIDTH}')
-        Config.set('graphics', 'height', f'{HEIGHT}')
+        Config.set("graphics", "width", f"{WIDTH}")
+        Config.set("graphics", "height", f"{HEIGHT}")
 
         self.canvasWidget = CanvasWidget()
         return self.canvasWidget
@@ -64,8 +65,10 @@ class CanvasApp(App):
         self.canvasWidget.generate_particle(init_particles)
         rules = random_rules(colours)
 
-        process = Process(target=particles_generator.update_particles,
-                          args=(rules, init_particles, particles_queue))
+        process = Process(
+            target=particles_generator.update_particles,
+            args=(rules, init_particles, particles_queue),
+        )
         process.daemon = True
         process.start()
 

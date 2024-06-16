@@ -1,7 +1,7 @@
 from random import randint
 import numpy as np
 
-ant_symbols = ['2']
+ant_symbols = ["2"]
 
 
 def if_zero(grid: np.arange, x: int, y: int, turn: int) -> tuple:
@@ -18,13 +18,12 @@ def if_one(grid: np.arange, x: int, y: int, turn: int) -> tuple:
     return grid, turn
 
 
-rules = {
-    0: if_zero,
-    1: if_one
-}
+rules = {0: if_zero, 1: if_one}
 
 
-def generate_grid_ant(width: int, height: int, ant_count: int = 1, random_init_turn=False) -> tuple:
+def generate_grid_ant(
+    width: int, height: int, ant_count: int = 1, random_init_turn=False
+) -> tuple:
     array = np.full((height, width), {0: 0})
     if ant_count == 1:
         array[width // 2][height // 2] = {0: ant_symbols[0]}
@@ -35,7 +34,10 @@ def generate_grid_ant(width: int, height: int, ant_count: int = 1, random_init_t
             ant_symbols.append(str(i))
             array[x][y] = {0: str(i)}
 
-    turns = {ant_symbol: randint(1, 4) if random_init_turn else 1 for ant_symbol in ant_symbols}
+    turns = {
+        ant_symbol: randint(1, 4) if random_init_turn else 1
+        for ant_symbol in ant_symbols
+    }
     return array, turns
 
 
@@ -62,13 +64,21 @@ def update_grid_ant(grid: np.ndarray, turns: dict, rules: dict = rules) -> tuple
         width = grid.shape[0]
         height = grid.shape[1]
         if turn == 1:
-            grid[(x + 1) % width][y] = {list(grid[(x + 1) % width][y].keys())[0]: ant_symbol}
+            grid[(x + 1) % width][y] = {
+                list(grid[(x + 1) % width][y].keys())[0]: ant_symbol
+            }
         if turn == 2:
-            grid[x][(y - 1) % height] = {list(grid[x][(y - 1) % height].keys())[0]: ant_symbol}
+            grid[x][(y - 1) % height] = {
+                list(grid[x][(y - 1) % height].keys())[0]: ant_symbol
+            }
         if turn == 3:
-            grid[(x - 1) % width][y] = {list(grid[(x - 1) % width][y].keys())[0]: ant_symbol}
+            grid[(x - 1) % width][y] = {
+                list(grid[(x - 1) % width][y].keys())[0]: ant_symbol
+            }
         if turn == 4:
-            grid[x][(y + 1) % height] = {list(grid[x][(y + 1) % height].keys())[0]: ant_symbol}
+            grid[x][(y + 1) % height] = {
+                list(grid[x][(y + 1) % height].keys())[0]: ant_symbol
+            }
 
     return grid, turns
 

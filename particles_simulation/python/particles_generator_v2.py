@@ -30,7 +30,7 @@ def random_rules(colours: dict, rule_range: tuple = (-2, 2)) -> dict:
 def split(lst: list, n: int):
     sub_list_length = len(lst) // n
     for i in range(0, len(lst), sub_list_length):
-        yield lst[i:i + sub_list_length]
+        yield lst[i : i + sub_list_length]
 
 
 class ParticlesGenerator:
@@ -54,7 +54,9 @@ class ParticlesGenerator:
             particles.append(particle_info(color, x, y, 0, 0))
         return particles
 
-    def apply_rules_thread(self, rules: dict, particles_sub_list: list, particles_all_list: list):
+    def apply_rules_thread(
+        self, rules: dict, particles_sub_list: list, particles_all_list: list
+    ):
         for particle_1 in particles_sub_list:
             fx = 0
             fy = 0
@@ -70,7 +72,7 @@ class ParticlesGenerator:
                             fx += F * dx
                             fy += F * dy
 
-            vmix = (1. - self.viscosity)
+            vmix = 1.0 - self.viscosity
             particle_1["vx"] = particle_1["vx"] * vmix + fx * self.time_scale
             particle_1["vy"] = particle_1["vy"] * vmix + fy * self.time_scale
 
@@ -81,7 +83,10 @@ class ParticlesGenerator:
         particles_chunks = list(split(particles, number_of_threads))
 
         for i in range(number_of_threads):
-            thread = Thread(target=self.apply_rules_thread, args=(rules, particles_chunks[i], particles))
+            thread = Thread(
+                target=self.apply_rules_thread,
+                args=(rules, particles_chunks[i], particles),
+            )
             thread.start()
             threads.append(thread)
 
@@ -106,8 +111,12 @@ class ParticlesGenerator:
 
         return particles_results
 
-    def update_particles(self, rule: dict, init_particles: list, particles_queue: MultiprocessingQueue,
-                         ):
+    def update_particles(
+        self,
+        rule: dict,
+        init_particles: list,
+        particles_queue: MultiprocessingQueue,
+    ):
         particles = init_particles
         number_of_threads = len(particles) // 10
         while 1:
@@ -123,13 +132,14 @@ if __name__ == "__main__":
     WIDTH = 1280
     HEIGHT = 720
 
-    colours = {"blue": (0, 0, 255, 255),
-               "red": (255, 0, 0, 255),
-               "green": (0, 255, 0, 255),
-               "purple": (255, 0, 255, 255)
-               # "aquamarine": (102, 205, 212, 255),
-               # "gold": (255, 215, 0, 255),
-               }
+    colours = {
+        "blue": (0, 0, 255, 255),
+        "red": (255, 0, 0, 255),
+        "green": (0, 255, 0, 255),
+        "purple": (255, 0, 255, 255),
+        # "aquamarine": (102, 205, 212, 255),
+        # "gold": (255, 215, 0, 255),
+    }
 
     particles_generator = ParticlesGenerator(width=WIDTH, height=HEIGHT)
     init_particles = particles_generator.generate_init_particles(200, "red")
@@ -139,8 +149,10 @@ if __name__ == "__main__":
 
     rules = random_rules(colours)
 
-    process = Process(target=particles_generator.update_particles,
-                      args=(rules, init_particles, particles_queue))
+    process = Process(
+        target=particles_generator.update_particles,
+        args=(rules, init_particles, particles_queue),
+    )
     process.daemon = True
     process.start()
     start_time = time.time()

@@ -9,7 +9,8 @@ def count_neighbours(cords: tuple, grid: dict) -> int:
         for i in range(x - 1, x + 2):
             for j in range(y - 1, y + 2):
                 for k in range(z - 1, z + 2):
-                    if grid[(i, j, k)] == 1 and (i, j, k) != (x, y, z): neighbours += 1
+                    if grid[(i, j, k)] == 1 and (i, j, k) != (x, y, z):
+                        neighbours += 1
     except KeyError:
         pass
     return neighbours

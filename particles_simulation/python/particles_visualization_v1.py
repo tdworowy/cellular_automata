@@ -8,13 +8,14 @@ from kivy.uix.widget import Widget
 from kivy.graphics import Color, Ellipse
 from kivy.config import Config
 
-colours = {"blue": (0, 0, 255, 255),
-           "red": (255, 0, 0, 255),
-           "green": (0, 255, 0, 255),
-           # "aquamarine": (102, 205, 212, 255),
-           # "gold": (255, 215, 0, 255),
-           # "purple": (255, 0, 255, 255)
-           }
+colours = {
+    "blue": (0, 0, 255, 255),
+    "red": (255, 0, 0, 255),
+    "green": (0, 255, 0, 255),
+    # "aquamarine": (102, 205, 212, 255),
+    # "gold": (255, 215, 0, 255),
+    # "purple": (255, 0, 255, 255)
+}
 
 # WIDTH = 1280
 # HEIGHT = 720
@@ -56,7 +57,7 @@ class CanvasWidget(Widget):
 
     def generate_particle(self, color: str, x: int, y: int, vx: int, vy: int):
         with self.canvas:
-            Color(*colours[color], mode='rgba')
+            Color(*colours[color], mode="rgba")
             Ellipse(pos=(x, y), size=(2 * self.r, 2 * self.r))
             self.particles.append(particle_info(color, x, y, vx, vy))
 
@@ -89,7 +90,7 @@ class CanvasWidget(Widget):
                             fx += F * dx
                             fy += F * dy
 
-            vmix = (1. - self.viscosity)
+            vmix = 1.0 - self.viscosity
             particle_1["vx"] = particle_1["vx"] * vmix + fx * self.time_scale
             particle_1["vy"] = particle_1["vy"] * vmix + fy * self.time_scale
 
@@ -108,8 +109,8 @@ class CanvasWidget(Widget):
 
 class CanvasApp(App):
     def build(self):
-        Config.set('graphics', 'width', f'{WIDTH}')
-        Config.set('graphics', 'height', f'{HEIGHT}')
+        Config.set("graphics", "width", f"{WIDTH}")
+        Config.set("graphics", "height", f"{HEIGHT}")
 
         self.canvasWidget = CanvasWidget()
         return self.canvasWidget

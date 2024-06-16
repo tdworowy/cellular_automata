@@ -8,21 +8,24 @@ from typing import Iterable
 
 from PIL import Image
 
-from _1D.python.cellular_automata import generate_rule, \
-    cellular_automata_step_1d, generate_random
+from _1D.python.cellular_automata import (
+    generate_rule,
+    cellular_automata_step_1d,
+    generate_random,
+)
 
 
 def count_rules(neighborhood_size: int, color_count: int) -> int:
-    return 2 ** (color_count ** neighborhood_size)
+    return 2 ** (color_count**neighborhood_size)
 
 
 def take_screenshot(folder: str, file_name: str, canvas: tkinter.Canvas):
     if not path.isdir(folder):
         mkdir(folder)
-    if not path.isfile(path.join(folder, f'{file_name}.png')):
-        canvas.postscript(file=f'{file_name}.eps')
-        img = Image.open(f'{file_name}.eps')
-        img.save(path.join(folder, f'{file_name}.png'), 'png')
+    if not path.isfile(path.join(folder, f"{file_name}.png")):
+        canvas.postscript(file=f"{file_name}.eps")
+        img = Image.open(f"{file_name}.eps")
+        img.save(path.join(folder, f"{file_name}.png"), "png")
 
 
 class GUI:
@@ -36,17 +39,32 @@ class GUI:
 
         self.canvas = tkinter.Canvas(master, width=self.width, height=self.height)
 
-        self.button_step = tkinter.Button(master, text="Step", command=self.step_call_back)
-        self.button_play = tkinter.Button(master, text="Play", command=self.play_call_back)
+        self.button_step = tkinter.Button(
+            master, text="Step", command=self.step_call_back
+        )
+        self.button_play = tkinter.Button(
+            master, text="Play", command=self.play_call_back
+        )
 
-        self.button_init_random = tkinter.Button(master, text="Init random", command=self.init_random_call_back)
-        self.button_init_one = tkinter.Button(master, text="Init one", command=self.init_one_call_back)
+        self.button_init_random = tkinter.Button(
+            master, text="Init random", command=self.init_random_call_back
+        )
+        self.button_init_one = tkinter.Button(
+            master, text="Init one", command=self.init_one_call_back
+        )
 
-        self.button_clear = tkinter.Button(master, text="Clear", command=self.clear_call_back)
+        self.button_clear = tkinter.Button(
+            master, text="Clear", command=self.clear_call_back
+        )
 
-        self.button_play_all = tkinter.Button(master, text="Play all rules", command=self.play_all_rules_call_back)
-        self.button_play_all_random = tkinter.Button(master, text="Play all rules random",
-                                                     command=self.play_all_rules_random_call_back)
+        self.button_play_all = tkinter.Button(
+            master, text="Play all rules", command=self.play_all_rules_call_back
+        )
+        self.button_play_all_random = tkinter.Button(
+            master,
+            text="Play all rules random",
+            command=self.play_all_rules_random_call_back,
+        )
 
         self.wolfram_rule_number = tkinter.Entry(master)
         self.wolfram_rule_number.insert(0, "90")
@@ -72,21 +90,24 @@ class GUI:
         self.replay = False
 
     def rectangle_coordinates(self, x: int, y: int) -> dict:
-        dic = {'x1': x, 'y1': y, 'x2': self.cell_size + x, 'y2': self.cell_size + y}
+        dic = {"x1": x, "y1": y, "x2": self.cell_size + x, "y2": self.cell_size + y}
         return dic
 
     def init(self):
-        self.rule = generate_rule(int(self.wolfram_rule_number.get()),
-                                  int(self.neighborhood_size.get()),
-                                  [i for i in range(int(self.color_count.get()))]
-                                  )
+        self.rule = generate_rule(
+            int(self.wolfram_rule_number.get()),
+            int(self.neighborhood_size.get()),
+            [i for i in range(int(self.color_count.get()))],
+        )
         self.labelText.set(
-            f"Possible Rules: {str(count_rules(int(self.neighborhood_size.get()), int(self.color_count.get())))}")
+            f"Possible Rules: {str(count_rules(int(self.neighborhood_size.get()), int(self.color_count.get())))}"
+        )
 
     def random_init_list(self):
         return generate_random(
             input_list=tuple(i for i in range(int(self.color_count.get()))),
-            length=self.width // self.cell_size)
+            length=self.width // self.cell_size,
+        )
 
     def one_cell_start(self) -> np.ndarray:
         input_list = np.full((self.width // self.cell_size, 1), 0)
@@ -112,17 +133,19 @@ class GUI:
             3: "black",
             4: "white",
             5: "gold",
-            6: "purple"
-            }
+            6: "purple",
+        }
 
         for i in self.input_list:
             coordinate = self.rectangle_coordinates(self.x, self.y)
             colour = colours[int(i)]
-            rectangle = self.canvas.create_rectangle(coordinate['x1'],
-                                                     coordinate['y1'],
-                                                     coordinate['x2'],
-                                                     coordinate['y2'],
-                                                     fill=colour)
+            rectangle = self.canvas.create_rectangle(
+                coordinate["x1"],
+                coordinate["y1"],
+                coordinate["x2"],
+                coordinate["y2"],
+                fill=colour,
+            )
 
             self.cells.append(rectangle)
             self.x += self.cell_size
@@ -142,11 +165,15 @@ class GUI:
             self.canvas.delete(rectangle)
 
     def play_all_rules_call_back(self):
-        ordered = range(count_rules(int(self.neighborhood_size.get()), int(self.color_count.get())))
+        ordered = range(
+            count_rules(int(self.neighborhood_size.get()), int(self.color_count.get()))
+        )
         self.play_all(ordered)
 
     def play_all_rules_random_call_back(self):
-        count = count_rules(int(self.neighborhood_size.get()), int(self.color_count.get()))
+        count = count_rules(
+            int(self.neighborhood_size.get()), int(self.color_count.get())
+        )
 
         def generator():
             for i in range(count):
@@ -168,9 +195,11 @@ class GUI:
             # if not self.replay and rule_file + ".png" in files_list:
             #     continue
 
-            self.rule = generate_rule(rule,
-                                      int(self.neighborhood_size.get()),
-                                      [i for i in range(int(self.color_count.get()))])
+            self.rule = generate_rule(
+                rule,
+                int(self.neighborhood_size.get()),
+                [i for i in range(int(self.color_count.get()))],
+            )
 
             self.wolfram_rule_number.delete(0, tkinter.END)
             self.wolfram_rule_number.insert(0, str(rule))
@@ -184,7 +213,11 @@ class GUI:
 
             self.clear_call_back()
 
-            self.input_list = self.random_init_list() if self.init_way == 'random_start' else self.one_cell_start()
+            self.input_list = (
+                self.random_init_list()
+                if self.init_way == "random_start"
+                else self.one_cell_start()
+            )
 
     def main_loop(self):
 

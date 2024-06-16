@@ -7,8 +7,15 @@ from _2D.python.general_2d_automata import generate_grid_random_cells, update_gr
 
 # TODO use pyglet to increase performance
 class CellularAutomata2DVisualization:
-    def __init__(self, rules: defaultdict, width: int = 1085, height: int = 1085, cell_size: int = 10,
-                 probability_of_one: float = 0.4, init_grid=None):
+    def __init__(
+        self,
+        rules: defaultdict,
+        width: int = 1085,
+        height: int = 1085,
+        cell_size: int = 10,
+        probability_of_one: float = 0.4,
+        init_grid=None,
+    ):
         self.top = tkinter.Tk()
         self.top_frame = tkinter.Frame()
         self.button_frame = tkinter.Frame()
@@ -17,7 +24,9 @@ class CellularAutomata2DVisualization:
         self.height = height
 
         self.canvas = tkinter.Canvas(master, width=self.width, height=self.height)
-        self.button_play = tkinter.Button(master, text="Play", command=self.play_call_back)
+        self.button_play = tkinter.Button(
+            master, text="Play", command=self.play_call_back
+        )
 
         self.cell_size = cell_size
 
@@ -29,13 +38,16 @@ class CellularAutomata2DVisualization:
         self.step = 1
         self.rules = rules
         if not init_grid:
-            self.grid = generate_grid_random_cells(self.width // self.cell_size, self.height // self.cell_size,
-                                                   self.probability_of_one)
+            self.grid = generate_grid_random_cells(
+                self.width // self.cell_size,
+                self.height // self.cell_size,
+                self.probability_of_one,
+            )
         else:
             self.grid = init_grid
 
     def rectangle_coordinates(self, x: int, y: int) -> dict:
-        dic = {'x1': x, 'y1': y, 'x2': self.cell_size + x, 'y2': self.cell_size + y}
+        dic = {"x1": x, "y1": y, "x2": self.cell_size + x, "y2": self.cell_size + y}
         return dic
 
     def step_call_back(self):
@@ -54,14 +66,16 @@ class CellularAutomata2DVisualization:
                         self.canvas.delete(self.cells[(x, y)])
 
                     colour = colours_rules[value]
-                    rectangle = self.canvas.create_rectangle(coordinate['x1'],
-                                                             coordinate['y1'],
-                                                             coordinate['x2'],
-                                                             coordinate['y2'],
-                                                             fill=colour)
+                    rectangle = self.canvas.create_rectangle(
+                        coordinate["x1"],
+                        coordinate["y1"],
+                        coordinate["x2"],
+                        coordinate["y2"],
+                        fill=colour,
+                    )
                     self.cells[(x, y)] = rectangle
-                y = coordinate['y2']
-            x = coordinate['x2']
+                y = coordinate["y2"]
+            x = coordinate["x2"]
             y = 0
         self.prev_step = [[value for value in row] for row in self.grid]
         self.grid = update_grid_two_d(self.grid, rules=self.rules)
@@ -71,7 +85,7 @@ class CellularAutomata2DVisualization:
             self.step_call_back()
             self.top.update()
             # print(f"step: {self.step}")
-            #self.step += 1
+            # self.step += 1
 
     def main_loop(self):
 

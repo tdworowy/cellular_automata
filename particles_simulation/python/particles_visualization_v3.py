@@ -6,13 +6,14 @@ from pyglet import clock
 
 from particles_generator_v2 import ParticlesGenerator, random_rules
 
-colours = {"blue": (0, 0, 255),
-           "red": (255, 0, 0),
-           "green": (0, 255, 0),
-           "purple": (255, 0, 255)
-           # "aquamarine": (102, 205, 212, 255),
-           # "gold": (255, 215, 0, 255),
-           }
+colours = {
+    "blue": (0, 0, 255),
+    "red": (255, 0, 0),
+    "green": (0, 255, 0),
+    "purple": (255, 0, 255),
+    # "aquamarine": (102, 205, 212, 255),
+    # "gold": (255, 215, 0, 255),
+}
 
 WIDTH = 1280
 HEIGHT = 720
@@ -30,8 +31,13 @@ rendered_particles = []
 
 def generate_particles(particles: list):
     for particle in particles:
-        rendered_particle = shapes.Circle(particle["x"], particle["y"], r, color=colours[particle["color"]],
-                                          batch=batch)
+        rendered_particle = shapes.Circle(
+            particle["x"],
+            particle["y"],
+            r,
+            color=colours[particle["color"]],
+            batch=batch,
+        )
         rendered_particle.opacity = 255
         rendered_particles.append(rendered_particle)
 
@@ -65,8 +71,10 @@ def on_draw():
         # with open("rules.txt", "a") as rule_file:
         #     rule_file.write(f"{str(rules)}\n")
 
-        process = Process(target=particles_generator.update_particles,
-                          args=(rules, init_particles, particles_queue))
+        process = Process(
+            target=particles_generator.update_particles,
+            args=(rules, init_particles, particles_queue),
+        )
         process.daemon = True
         process.start()
 

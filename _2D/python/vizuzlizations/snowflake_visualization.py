@@ -1,9 +1,14 @@
 import tkinter
 from doctest import master
 
-from _2D.python.general_2d_automata import update_grid_two_d, \
-    generate_snowflake_rule, generate_grid_central
-from _2D.python.vizuzlizations.general_visualization import CellularAutomata2DVisualization
+from _2D.python.general_2d_automata import (
+    update_grid_two_d,
+    generate_snowflake_rule,
+    generate_grid_central,
+)
+from _2D.python.vizuzlizations.general_visualization import (
+    CellularAutomata2DVisualization,
+)
 
 
 class SnowflakeVisualization(CellularAutomata2DVisualization):
@@ -30,23 +35,31 @@ class SnowflakeVisualization(CellularAutomata2DVisualization):
                 coordinate = self.rectangle_coordinates(x, y)
                 if value != value_prev:
                     colour = colours_rules[value]
-                    self.canvas.create_rectangle(coordinate['x1'],
-                                                 coordinate['y1'],
-                                                 coordinate['x2'],
-                                                 coordinate['y2'],
-                                                 fill=colour)
+                    self.canvas.create_rectangle(
+                        coordinate["x1"],
+                        coordinate["y1"],
+                        coordinate["x2"],
+                        coordinate["y2"],
+                        fill=colour,
+                    )
 
-                y = coordinate['y2']
-            x = coordinate['x2']
+                y = coordinate["y2"]
+            x = coordinate["x2"]
             y = 0
         self.prev_step = self.grid.copy()
-        neighbours_number = [int(number) for number in self.neighbours_number.get().split(",")]
-        self.grid = update_grid_two_d(self.grid, rules=generate_snowflake_rule(neighbours_number))
+        neighbours_number = [
+            int(number) for number in self.neighbours_number.get().split(",")
+        ]
+        self.grid = update_grid_two_d(
+            self.grid, rules=generate_snowflake_rule(neighbours_number)
+        )
 
     def play_call_back(self):
-        self.grid = generate_grid_central(self.width // self.cell_size,
-                                          self.height // self.cell_size,
-                                          int(self.ini_cell_count.get()))
+        self.grid = generate_grid_central(
+            self.width // self.cell_size,
+            self.height // self.cell_size,
+            int(self.ini_cell_count.get()),
+        )
 
         while 1:
             self.step_call_back()
