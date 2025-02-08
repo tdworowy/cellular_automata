@@ -1,6 +1,46 @@
 import * as THREE from "three";
 import { MapControls } from "three/addons/controls/MapControls.js";
 
+const game_of_live_rules = {
+  "0_3": 1,
+  "1_1": 0,
+  "1_4": 0,
+};
+
+const three_d_game_of_live_rules1 = {
+  //https://cs.brown.edu/courses/cs195v/projects/life/edwallac/index.html
+  "0_5": 1,
+  "1_4": 0,
+  "1_3": 0,
+  "1_2": 0,
+  "1_1": 0,
+  "1_0": 0,
+  "1_8": 0,
+};
+
+const three_d_game_of_live_rules2 = {
+  //https://cs.brown.edu/courses/cs195v/projects/life/edwallac/index.html
+  "0_14": 1,
+  "0_15": 1,
+  "0_16": 1,
+  "0_17": 1,
+  "0_18": 1,
+  "0_19": 1,
+  "1_12": 0,
+  "1_11": 0,
+  "1_10": 0,
+  "1_9": 0,
+  "1_7": 0,
+  "1_6": 0,
+  "1_5": 0,
+  "1_4": 0,
+  "1_3": 0,
+  "1_2": 0,
+  "1_1": 0,
+  "1_0": 0,
+};
+//TODO find more rules
+
 function generateCubeRandom(height, width, depth, prob_of_one) {
   let cube = [];
   for (let x = 0; x < height; x++) {
@@ -8,16 +48,69 @@ function generateCubeRandom(height, width, depth, prob_of_one) {
     for (let y = 0; y < width; y++) {
       let row = [];
       for (let z = 0; z < depth; z++) {
-        let rand_int = Math.floor(Math.random() * 10 + 1);
-        if (rand_int <= prob_of_one * 10) row.push(1);
-        else row.push(0);
+        let rand_int = Math.floor(Math.random() * 100 + 1);
+        if (rand_int <= prob_of_one * 100) {
+          row.push(1);
+        } else row.push(0);
       }
-
       grid.push(row);
     }
     cube.push(grid);
   }
   return cube;
+}
+
+function countColoredNeighbours(
+  x,
+  y,
+  z,
+  cube_x_axis,
+  cube_y_axis,
+  cube_z_axis,
+  cube
+) {
+  let colored_neighbours = 0;
+  for (let i = 0; i < 3; i++) {
+    let ni = (x + i - 1 + cube_x_axis) % cube_x_axis;
+    for (let j = 0; j < 3; j++) {
+      let nj = (y + j - 1 + cube_y_axis) % cube_y_axis;
+      for (let k = 0; k < 3; k++) {
+        let nk = (z + k - 1 + cube_z_axis) % cube_z_axis;
+        if (cube[ni][nj][nk] === 1 && !(i === 1 && j === 1 && k === 1)) {
+          colored_neighbours += 1;
+        }
+      }
+    }
+  }
+  console.log(colored_neighbours);
+  return colored_neighbours;
+}
+
+function updateCube(cube, rules) {
+  let new_cube = JSON.parse(JSON.stringify(cube));
+  for (let i = 0; i < cube.length; i++) {
+    for (let j = 0; j < cube[i].length; j++) {
+      for (let k = 0; k < cube[i][j].length; k++) {
+        let state = cube[i][j][k];
+        let live_neighbours = countColoredNeighbours(
+          i,
+          j,
+          k,
+          cube.length,
+          cube[0].length,
+          cube[0][0].length,
+          cube
+        );
+        let rule = rules[state.toString() + "_" + live_neighbours.toString()];
+        if (rule) {
+          new_cube[i][j][k] = rule;
+        } else {
+          new_cube[i][j][k] = cube[i][j][k];
+        }
+      }
+    }
+  }
+  return new_cube;
 }
 
 function renderCubes(cube, scene, geometry, material) {
@@ -32,7 +125,7 @@ function renderCubes(cube, scene, geometry, material) {
       }
     }
   }
-  return scene
+  return scene;
 }
 
 const width = window.innerWidth;
@@ -45,7 +138,7 @@ const camera = new THREE.PerspectiveCamera(
   1,
   1000
 );
-camera.position.set(0, 200, -400);
+camera.position.set(-50, 50, -50);
 
 let controls = new MapControls(camera, renderer.domElement);
 controls.enableDamping = true;
@@ -64,11 +157,13 @@ const z_size = 0.9;
 const material = new THREE.MeshNormalMaterial();
 const geometry = new THREE.BoxGeometry(x_size, y_size, z_size);
 
+let cube = generateCubeRandom(30, 30, 30, 0.3);
+
 function render() {
-   scene.clear()
-   const cube = generateCubeRandom(20, 20, 20, 0.3);
-   scene = renderCubes(cube, scene, geometry, material);
-   renderer.render(scene, camera);  
+  cube = updateCube(cube, three_d_game_of_live_rules2);
+  scene.clear();
+  scene = renderCubes(cube, scene, geometry, material);
+  renderer.render(scene, camera);
 }
 
 renderer.setSize(width, height);
@@ -86,3 +181,5 @@ function animate(time) {
   controls.update();
   render();
 }
+
+//TODO something seems to be wrong
