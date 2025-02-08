@@ -41,6 +41,22 @@ const three_d_game_of_live_rules2 = {
 };
 //TODO find more rules
 
+function generateSnowflakeRule(neighbours_numbers = [1]) {
+  let snowflake_rules = {};
+
+  for (let neighbours_number of neighbours_numbers) {
+    snowflake_rules["0" + "_" + neighbours_number.toString()] = 1;
+    snowflake_rules["1" + "_" + neighbours_number.toString()] = 1;
+  }
+  for (let i = 0; i < 9; i++)
+    if (!neighbours_numbers.includes(i)) {
+      snowflake_rules["0" + "_" + i.toString()] = 0;
+      snowflake_rules["1" + "_" + i.toString()] = 1;
+    }
+  return snowflake_rules;
+}
+
+
 function generateCubeRandom(height, width, depth, prob_of_one) {
   let cube = [];
   for (let x = 0; x < height; x++) {
@@ -60,6 +76,25 @@ function generateCubeRandom(height, width, depth, prob_of_one) {
   return cube;
 }
 
+function generateCubeCenter(height, width, depth) {
+  let cube = [];
+  for (let x = 0; x < height; x++) {
+    let grid = [];
+    for (let y = 0; y < width; y++) {
+      let row = [];
+      for (let z = 0; z < depth; z++) {
+        if (x === height / 2 && y === width / 2 && z === depth /2) row.push(1)
+          else row.push(0);
+      }
+      grid.push(row);
+    }
+    cube.push(grid);
+  }
+  return cube;
+}
+
+
+//TODO something seems to be wrong
 function countColoredNeighbours(
   x,
   y,
@@ -82,7 +117,7 @@ function countColoredNeighbours(
       }
     }
   }
-  console.log(colored_neighbours);
+  //console.log(colored_neighbours);
   return colored_neighbours;
 }
 
@@ -157,13 +192,15 @@ const z_size = 0.9;
 const material = new THREE.MeshNormalMaterial();
 const geometry = new THREE.BoxGeometry(x_size, y_size, z_size);
 
-let cube = generateCubeRandom(30, 30, 30, 0.3);
+//let cube = generateCubeRandom(30, 30, 30, 0.3);
+let cube = generateCubeCenter(30, 30, 30);
 
 function render() {
-  cube = updateCube(cube, three_d_game_of_live_rules2);
+ // cube = updateCube(cube, three_d_game_of_live_rules2);
+  cube = updateCube(cube, generateSnowflakeRule([1,15]))
   scene.clear();
   scene = renderCubes(cube, scene, geometry, material);
-  renderer.render(scene, camera);
+  renderer.render(scene, camera);  
 }
 
 renderer.setSize(width, height);
@@ -181,5 +218,3 @@ function animate(time) {
   controls.update();
   render();
 }
-
-//TODO something seems to be wrong
