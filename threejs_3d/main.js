@@ -56,7 +56,6 @@ function generateSnowflakeRule(neighbours_numbers = [1]) {
   return snowflake_rules;
 }
 
-
 function generateCubeRandom(height, width, depth, prob_of_one) {
   let cube = [];
   for (let x = 0; x < height; x++) {
@@ -83,8 +82,8 @@ function generateCubeCenter(height, width, depth) {
     for (let y = 0; y < width; y++) {
       let row = [];
       for (let z = 0; z < depth; z++) {
-        if (x === height / 2 && y === width / 2 && z === depth /2) row.push(1)
-          else row.push(0);
+        if (x === height / 2 && y === width / 2 && z === depth / 2) row.push(1);
+        else row.push(0);
       }
       grid.push(row);
     }
@@ -92,7 +91,6 @@ function generateCubeCenter(height, width, depth) {
   }
   return cube;
 }
-
 
 //TODO something seems to be wrong
 function countColoredNeighbours(
@@ -196,11 +194,11 @@ const geometry = new THREE.BoxGeometry(x_size, y_size, z_size);
 let cube = generateCubeCenter(30, 30, 30);
 
 function render() {
- // cube = updateCube(cube, three_d_game_of_live_rules2);
-  cube = updateCube(cube, generateSnowflakeRule([1,15]))
+  // cube = updateCube(cube, three_d_game_of_live_rules2);
+  cube = updateCube(cube, generateSnowflakeRule([1, 15]));
   scene.clear();
   scene = renderCubes(cube, scene, geometry, material);
-  renderer.render(scene, camera);  
+  renderer.render(scene, camera);
 }
 
 renderer.setSize(width, height);

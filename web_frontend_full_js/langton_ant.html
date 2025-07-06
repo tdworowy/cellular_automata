@@ -1,0 +1,66 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <form onsubmit="" id="initGrid">
+      <div class="form-group">
+        <input
+          class="input"
+          type="text"
+          placeholder="Width"
+          id="width"
+          name="width"
+          value="400"
+        />
+        <label class="label" for="width">width</label>
+      </div>
+      <div class="form-group">
+        <input
+          class="input"
+          placeholder="height"
+          type="text"
+          id="height"
+          name="height"
+          value="400"
+        />
+        <label class="label" for="height">height</label>
+      </div>
+      <div class="form-group">
+        <input
+          class="input"
+          placeholder="cell width"
+          type="text"
+          id="cell_width"
+          name="cell_width"
+          value="2"
+        />
+        <label class="label" for="cell_width">cell width</label>
+      </div>
+      <div class="form-group">
+        <input
+          class="input"
+          placeholder="cell height"
+          type="text"
+          id="cell_height"
+          name="cell_height"
+          value="2"
+        />
+        <label class="label" for="cell_height">cell height</label>
+      </div>
+      <button type="submit" class="btn">Generate init grid</button>
+    </form>
+    <form onsubmit="" id="step">
+      <button type="submit" class="btn">Next Step</button>
+    </form>
+    <button id="play" class="btn">Play</button> <br />
+    <canvas
+      id="canvas"
+      width="420px"
+      height="420px"
+      style="background: #fff; margin: 10px"
+    ></canvas>
+  </body>
+  <script type="text/javascript" src="config.js"></script>
+  <script src="langton_ant.js"></script>
+</html>
