@@ -293,7 +293,7 @@ function initGrid(event) {
   event.preventDefault();
   document.getElementById("canvas").width = params.get("width") * cell_width;
   document.getElementById("canvas").height = params.get("height") * cell_height;
-  generateGrid(grid, cell_width, cell_height);
+  generateGrid(grid, null, cell_width, cell_height);
 }
 
 function add(event) {
@@ -316,7 +316,7 @@ function step() {
     grid[0].length,
     rules[params.get("rule")]
   );
-  generateGrid(new_grid, cell_width, cell_height);
+  generateGrid(new_grid, prev_grid, cell_width, cell_height);
 }
 function step_event(event) {
   event.preventDefault();
@@ -331,14 +331,16 @@ function step_play() {
 const canvas = document.getElementById("canvas");
 const context = canvas.getContext("2d");
 
-function generateGrid(grid, cell_width, cell_height) {
+function generateGrid(grid, old_grid, cell_width, cell_height) {
   let x_cor = 0;
   let y_cor = 0;
 
   for (var x = 0; x < grid.length; x++) {
     for (var y = 0; y < grid[x].length; y++) {
-      context.fillStyle = colors[grid[x][y]];
-      context.fillRect(x_cor, y_cor, cell_width, cell_height);
+      if (!old_grid || old_grid[x][y] !== grid[x][y]) {
+        context.fillStyle = colors[grid[x][y]];
+        context.fillRect(x_cor, y_cor, cell_width, cell_height);
+      } 
       x_cor = x * cell_width;
       y_cor = y * cell_width;
     }

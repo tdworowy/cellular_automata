@@ -127,7 +127,6 @@ function renderGrid(grid, old_grid, cell_width, cell_height) {
   for (var x = 0; x < grid.length; x++) {
     for (var y = 0; y < grid[x].length; y++) {
       if (!old_grid || old_grid[x][y] !== grid[x][y]) {
-        // TODO try this optimization in other cellular automata
         context.fillStyle = colors[grid[x][y]];
         context.fillRect(x_cor, y_cor, cell_width, cell_height);
       }
