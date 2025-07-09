@@ -50,6 +50,38 @@
       </div>
       <button type="submit" class="btn">Generate init grid</button>
     </form>
+
+    <form onsubmit="" id="addAnt">
+      <div class="form-group">
+        <input
+          class="input"
+          type="text"
+          placeholder="X"
+          id="ant_x"
+          name="ant_x"
+          value="25"
+        />
+        <label class="label" for="ant_x">X</label>
+      </div>
+      <div class="form-group">
+        <input
+          class="input"
+          placeholder="Y"
+          type="text"
+          id="ant_y"
+          name="ant_y"
+          value="25"
+        />
+        <label class="label" for="ant_y">Y</label>
+      </div>
+      <select id="ant_direction" name="ant_direction" class="btn">
+        <option value="Up">Up</option>
+        <option value="Ddown">Down</option>
+        <option value="Left">Left</option>
+        <option value="Right">Right</option>
+      </select>
+      <button type="submit" class="btn">Add Ant</button>
+    </form>
     <form onsubmit="" id="step">
       <button type="submit" class="btn">Next Step</button>
     </form>

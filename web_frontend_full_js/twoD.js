@@ -340,7 +340,7 @@ function generateGrid(grid, old_grid, cell_width, cell_height) {
       if (!old_grid || old_grid[x][y] !== grid[x][y]) {
         context.fillStyle = colors[grid[x][y]];
         context.fillRect(x_cor, y_cor, cell_width, cell_height);
-      } 
+      }
       x_cor = x * cell_width;
       y_cor = y * cell_width;
     }

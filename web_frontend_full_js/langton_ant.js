@@ -2,6 +2,8 @@ const formEl = document.getElementById("initGrid");
 const formE2 = document.getElementById("step");
 const play_button = document.getElementById("play");
 
+const formAnt = document.getElementById("addAnt");
+
 let grid;
 let prev_grid;
 
@@ -18,7 +20,18 @@ const ant1 = { x: 150, y: 150, direction: Directions.Up };
 const ant2 = { x: 50, y: 50, direction: Directions.Down };
 const ant3 = { x: 25, y: 25, direction: Directions.Down };
 const ant4 = { x: 10, y: 10, direction: Directions.Down };
-let ants = [ant1, ant2, ant3, ant4];
+let ants = [];
+
+function addAnt(event) {
+  event.preventDefault();
+
+  const params = new FormData(document.querySelector("#addAnt"));
+  const ant_x = Number(params.get("ant_x"));
+  const ant_y = Number(params.get("ant_y"));
+  const ant_direction = params.get("ant_direction");
+
+  ants.push({ x: ant_x, y: ant_y, direction: ant_direction });
+}
 
 function checkRules(grid, ants) {
   ants.forEach((ant) => {
@@ -79,12 +92,14 @@ function generateGrid(height, width) {
 }
 
 function initGrid(event) {
+  event.preventDefault();
+
   const params = new FormData(document.querySelector("#initGrid"));
   const cell_width = Number(params.get("cell_width"));
   const cell_height = Number(params.get("cell_height"));
 
   grid = generateGrid(params.get("width"), params.get("height"));
-  event.preventDefault();
+
   document.getElementById("canvas").width = params.get("width") * cell_width;
   document.getElementById("canvas").height = params.get("height") * cell_height;
   renderGrid(grid, null, cell_width, cell_height);
@@ -156,3 +171,5 @@ formEl.addEventListener("submit", initGrid);
 formE2.addEventListener("submit", step_event);
 play_button.addEventListener("click", play);
 play_button.addEventListener("click", stop);
+
+formAnt.addEventListener("submit", addAnt);
