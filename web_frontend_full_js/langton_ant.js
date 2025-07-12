@@ -16,10 +16,41 @@ const Directions = {
   Right: "Right",
 };
 
-const ant1 = { x: 150, y: 150, direction: Directions.Up };
-const ant2 = { x: 50, y: 50, direction: Directions.Down };
-const ant3 = { x: 25, y: 25, direction: Directions.Down };
-const ant4 = { x: 10, y: 10, direction: Directions.Down };
+const standard_ant_rules = {
+  "0_Up": {
+    new_cell: 1,
+    new_direction: Directions.Right,
+  },
+  "0_Down": {
+    new_cell: 1,
+    new_direction: Directions.Left,
+  },
+  "0_Right": {
+    new_cell: 1,
+    new_direction: Directions.Down,
+  },
+  "0_Left": {
+    new_cell: 1,
+    new_direction: Directions.Up,
+  },
+  "1_Up": {
+    new_cell: 0,
+    new_direction: Directions.Left,
+  },
+  "1_Down": {
+    new_cell: 0,
+    new_direction: Directions.Right,
+  },
+  "1_Right": {
+    new_cell: 0,
+    new_direction: Directions.Up,
+  },
+  "1_Left": {
+    new_cell: 0,
+    new_direction: Directions.Down,
+  },
+};
+
 let ants = [];
 
 function addAnt(event) {
@@ -33,51 +64,82 @@ function addAnt(event) {
   ants.push({ x: ant_x, y: ant_y, direction: ant_direction });
 }
 
+function move(direction, curentValue, maxValue) {
+  switch (direction) {
+    case Directions.Up:
+    case Directions.Left:
+      return (curentValue + 1) % maxValue;
+    case Directions.Right:
+    case Directions.Down:
+      return curentValue - 1 < 0 ? maxValue - 1 : curentValue - 1;
+  }
+}
+
 function checkRules(grid, ants) {
   ants.forEach((ant) => {
-    if (grid[ant.x][ant.y] === 0 && ant.direction === Directions.Up) {
-      grid[ant.x][ant.y] = 1;
-      ant.direction = Directions.Right;
-      ant.x = ant.x - 1 < 0 ? grid.length - 1 : ant.x - 1;
-    }
-    if (grid[ant.x][ant.y] === 0 && ant.direction === Directions.Down) {
-      grid[ant.x][ant.y] = 1;
-      ant.direction = Directions.Left;
-      ant.x = (ant.x + 1) % grid.length;
-    }
-    if (grid[ant.x][ant.y] === 0 && ant.direction === Directions.Right) {
-      grid[ant.x][ant.y] = 1;
-      ant.direction = Directions.Down;
-      ant.y = ant.y - 1 < 0 ? grid.length - 1 : ant.y - 1;
-    }
-    if (grid[ant.x][ant.y] === 0 && ant.direction === Directions.Left) {
-      grid[ant.x][ant.y] = 1;
-      ant.direction = Directions.Up;
-      ant.y = (ant.y + 1) % grid.length;
-    }
-    if (grid[ant.x][ant.y] === 1 && ant.direction === Directions.Up) {
-      grid[ant.x][ant.y] = 0;
-      ant.direction = Directions.Left;
-      ant.x = (ant.x + 1) % grid.length;
-    }
-    if (grid[ant.x][ant.y] === 1 && ant.direction === Directions.Down) {
-      grid[ant.x][ant.y] = 0;
-      ant.direction = Directions.Right;
-      ant.x = ant.x - 1 < 0 ? grid.length - 1 : ant.x - 1;
-    }
-    if (grid[ant.x][ant.y] === 1 && ant.direction === Directions.Right) {
-      grid[ant.x][ant.y] = 0;
-      ant.direction = Directions.Up;
-      ant.y = (ant.y + 1) % grid.length;
-    }
-    if (grid[ant.x][ant.y] === 1 && ant.direction === Directions.Left) {
-      grid[ant.x][ant.y] = 0;
-      ant.direction = Directions.Down;
-      ant.y = ant.y - 1 < 0 ? grid.length - 1 : ant.y - 1;
+    result =
+      standard_ant_rules[grid[ant.x][ant.y].toString() + "_" + ant.direction];
+    grid[ant.x][ant.y] = result.new_cell;
+    ant.direction = result.new_direction;
+    switch (result.new_direction) {
+      case Directions.Up:
+      case Directions.Down:
+        ant.y = move(ant.direction, ant.y, grid.length);
+        break;
+      case Directions.Left:
+      case Directions.Right:
+        ant.x = move(ant.direction, ant.x, grid.length);
+        break;
     }
   });
   return [grid, ants];
 }
+
+// function checkRules_old(grid, ants) {
+//   ants.forEach((ant) => {
+//     if (grid[ant.x][ant.y] === 0 && ant.direction === Directions.Up) {
+//       grid[ant.x][ant.y] = 1;
+//       ant.direction = Directions.Right;
+//       ant.x = move(ant.direction, ant.x, grid.length)
+//     }
+//     if (grid[ant.x][ant.y] === 0 && ant.direction === Directions.Down) {
+//       grid[ant.x][ant.y] = 1;
+//       ant.direction = Directions.Left;
+//        ant.x = move(ant.direction, ant.x, grid.length)
+//     }
+//     if (grid[ant.x][ant.y] === 0 && ant.direction === Directions.Right) {
+//       grid[ant.x][ant.y] = 1;
+//       ant.direction = Directions.Down;
+//       ant.y = move(ant.direction, ant.y, grid.length)
+//     }
+//     if (grid[ant.x][ant.y] === 0 && ant.direction === Directions.Left) {
+//       grid[ant.x][ant.y] = 1;
+//       ant.direction = Directions.Up;
+//       ant.y = move(ant.direction, ant.y, grid.length)
+//     }
+//     if (grid[ant.x][ant.y] === 1 && ant.direction === Directions.Up) {
+//       grid[ant.x][ant.y] = 0;
+//       ant.direction = Directions.Left;
+//       ant.x = move(ant.direction, ant.x, grid.length)
+//     }
+//     if (grid[ant.x][ant.y] === 1 && ant.direction === Directions.Down) {
+//       grid[ant.x][ant.y] = 0;
+//       ant.direction = Directions.Right;
+//       ant.x = move(ant.direction, ant.x, grid.length)
+//     }
+//     if (grid[ant.x][ant.y] === 1 && ant.direction === Directions.Right) {
+//       grid[ant.x][ant.y] = 0;
+//       ant.direction = Directions.Up;
+//       ant.y = move(ant.direction, ant.y, grid.length)
+//     }
+//     if (grid[ant.x][ant.y] === 1 && ant.direction === Directions.Left) {
+//       grid[ant.x][ant.y] = 0;
+//       ant.direction = Directions.Down;
+//       ant.y = move(ant.direction, ant.y, grid.length)
+//     }
+//   });
+//   return [grid, ants];
+// }
 
 function generateGrid(height, width) {
   let grid = [];
