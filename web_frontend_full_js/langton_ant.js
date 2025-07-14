@@ -51,6 +51,24 @@ const standard_ant_rules = {
   },
 };
 
+function get_random(list) {
+  return list[Math.floor(Math.random() * list.length)];
+}
+
+function generate_random_rules(count) {
+  let rules = {};
+  const directions = ["Up", "Down", "Left", "Right"];
+  for (let i = 0; i <= count; i++) {
+    directions.forEach((direction) => {
+      rules[`${i.toString()}_${direction}`] = {
+        new_cell: i < count ? i + 1 : 0,
+        new_direction: get_random(directions),
+      };
+    });
+  }
+  return rules;
+}
+
 let ants = [];
 
 function addAnt(event) {
@@ -75,10 +93,9 @@ function move(direction, curentValue, maxValue) {
   }
 }
 
-function checkRules(grid, ants) {
+function checkRules(grid, ants, rules) {
   ants.forEach((ant) => {
-    result =
-      standard_ant_rules[grid[ant.x][ant.y].toString() + "_" + ant.direction];
+    result = rules[grid[ant.x][ant.y].toString() + "_" + ant.direction];
     grid[ant.x][ant.y] = result.new_cell;
     ant.direction = result.new_direction;
     switch (result.new_direction) {
@@ -177,10 +194,13 @@ function step() {
   const params_init_grid = new FormData(document.querySelector("#initGrid"));
   const cell_width = Number(params_init_grid.get("cell_width"));
   const cell_height = Number(params_init_grid.get("cell_height"));
+  const color_count = Number(params_init_grid.get("colors_count"));
 
   const params = new FormData(document.querySelector("#step"));
   grid = JSON.parse(JSON.stringify(prev_grid));
-  const [new_grid, new_ants] = checkRules(grid, ants);
+  rules =
+    color_count == 2 ? standard_ant_rules : generate_random_rules(color_count);
+  const [new_grid, new_ants] = checkRules(grid, ants, rules);
   ants = new_ants;
   renderGrid(new_grid, prev_grid, cell_width, cell_height);
 }
