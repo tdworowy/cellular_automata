@@ -55,13 +55,23 @@ function get_random(list) {
   return list[Math.floor(Math.random() * list.length)];
 }
 
+function generate_array(n, except) {
+  arr = [...Array(n).keys()];
+  arr.filter((elem) => !elem in except);
+  return arr;
+}
+
 function generate_random_rules(count) {
   let rules = {};
   const directions = ["Up", "Down", "Left", "Right"];
+  let used_states = [];
   for (let i = 0; i <= count; i++) {
+    new_cell = get_random(generate_array(count, [i, ...[used_states]]));
+    used_states.push(new_cell);
+  
     directions.forEach((direction) => {
       rules[`${i.toString()}_${direction}`] = {
-        new_cell: i < count ? i + 1 : 0,
+        new_cell: new_cell,
         new_direction: get_random(directions),
       };
     });
